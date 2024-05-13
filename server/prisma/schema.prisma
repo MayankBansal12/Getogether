@@ -13,73 +13,170 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id            Int            @id @default(autoincrement())
-  is_verified   Boolean        @default(false)
-  otp           String?
-  name          String
-  email         String         @unique
-  password      String
-  avatar        Int            @default(1)
-  about         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  Friend_user   Friends[]      @relation("user")
-  Friend_friend Friends[]      @relation("friend")
-  GroupMembers  GroupMembers[]
-  Chats         Chats[]
-  Tags          Tags[]
-}
-
-model Groups {
-  id           Int            @id @default(autoincrement())
-  personal     Boolean        @default(true)
-  name         String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  GroupMembers GroupMembers[]
-  Chats        Chats[]
-  Friends      Friends[]
-}
-
-model GroupMembers {
+model User {
   id        Int      @id @default(autoincrement())
-  user_id   Int
-  group_id  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  group     Groups   @relation(fields: [group_id], references: [id])
-  user      Users    @relation(fields: [user_id], references: [id])
+  name      String
+  email     String
+  phone     String
+  about     String
+  photographers Photographer[]
+  eventParticipants EventParticipant[]
+  vendors   Vendor[]
+  // payments  Payment[] @relation("Payer")
+  payments  Payment[] 
+  // payments  Payment[] @relation("Payer") @relation("Payee")
+  chatParticipants ChatParticipant[]
+  channelParticipants ChannelParticipant[]
+  groupMessages GroupMessage[]
 }
 
-model Chats {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  group_id  Int
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  group     Groups   @relation(fields: [group_id], references: [id])
-  user      Users    @relation(fields: [user_id], references: [id])
+model Budget {
+  id       Int    @id @default(autoincrement())
+  eventId  Int
+  totalAmount Int
+  spent    Int
+  event    Event  @relation(fields: [eventId], references: [id])
 }
 
-model Friends {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  friend_id Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  group_id  Int
-  user      Users    @relation(name: "user", fields: [user_id], references: [id])
-  friend    Users    @relation(name: "friend", fields: [friend_id], references: [id])
-  group     Groups   @relation(fields: [group_id], references: [id])
+model Photographer {
+  id      Int    @id @default(autoincrement())
+  userId  Int    @unique
+  user    User   @relation(fields: [userId], references: [id])
+  photos  Photo[]
 }
 
-model Tags {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  tag       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      Users    @relation(fields: [user_id], references: [id])
+model Photo {
+  id             Int    @id @default(autoincrement())
+  photographerId Int
+  eventId        Int
+  private        Boolean
+  photographer   Photographer @relation(fields: [photographerId], references: [id])
+  event          Event        @relation(fields: [eventId], references: [id])
+}
+
+model Event {
+  id        Int         @id @default(autoincrement())
+  channels  Channel[]
+  photos    Photo[]
+  eventParticipants EventParticipant[]
+  vendors   Vendor[]
+  budgets   Budget[]
+  chats     Chat[]
+  groups    Group[]
+}
+
+model Channel {
+  id        Int        @id @default(autoincrement())
+  eventId   Int
+  name      String
+  venue     String
+  startTime DateTime
+  endTime   DateTime
+  event     Event      @relation(fields: [eventId], references: [id])
+  channelParticipants ChannelParticipant[]
+  groupRelations GroupRelation[]
+  channelServices ChannelService[]
+}
+
+model ChannelParticipant {
+  id            Int     @id @default(autoincrement())
+  participantId Int
+  channelId     Int
+  user          User    @relation(fields: [participantId], references: [id])
+  channel       Channel @relation(fields: [channelId], references: [id])
+  // chatParticipants ChatParticipant[]
+}
+
+model GroupRelation {
+  id        Int     @id @default(autoincrement())
+  groupId   Int
+  channelId Int
+  group     Group   @relation(fields: [groupId], references: [id])
+  channel   Channel @relation(fields: [channelId], references: [id])
+}
+
+model Group {
+  id        Int        @id @default(autoincrement())
+  name      String
+  desc      String
+  eventId   Int
+  event     Event      @relation(fields: [eventId], references: [id])
+  groupRelations GroupRelation[]
+  groupMessages GroupMessage[]
+}
+
+model GroupMessage {
+  id        Int    @id @default(autoincrement())
+  groupId   Int
+  senderId  Int
+  message   String
+  photos    String
+  group     Group  @relation(fields: [groupId], references: [id])
+  sender    User   @relation(fields: [senderId], references: [id])
+}
+
+model ChannelService {
+  id        Int     @id @default(autoincrement())
+  channelId Int
+  vendorId  Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+  vendor    Vendor  @relation(fields: [vendorId], references: [id])
+}
+
+model EventParticipant {
+  id        Int     @id @default(autoincrement())
+  eventId   Int
+  userId    Int @unique
+  role      String
+  status    Int
+  user      User    @relation(fields: [userId], references: [id])
+  event     Event   @relation(fields: [eventId], references: [id])
+  chatParticipants ChatParticipant[]
+}
+
+model Vendor {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  service   String
+  user      User    @relation(fields: [userId], references: [id])
+  event     Event   @relation(fields: [eventId], references: [id])
+  channelServices ChannelService[]
+}
+
+model Payment {
+  id        Int     @id @default(autoincrement())
+  amount    Int
+  date      Int
+  payerId   Int
+  payeeId   Int
+  eventId   Int
+  status    Int
+  payer     User    @relation(fields: [payerId], references: [id], name: "Payer")
+  payee     User    @relation(fields: [payeeId], references: [id], name: "Payee")
+  event     Event   @relation(fields: [eventId], references: [id])
+}
+
+model Chat {
+  id        Int        @id @default(autoincrement())
+  eventId   Int
+  senderId  Int
+  receiverId Int
+  message   String
+  time      DateTime
+  event     Event      @relation(fields: [eventId], references: [id])
+  sender    EventParticipant @relation(name: "Sender",fields: [senderId], references: [userId])
+  receiver  EventParticipant @relation(name: "Receiver",fields: [receiverId], references: [userId])
+  chatParticipants ChatParticipant[]
+}
+
+model ChatParticipant {
+  id            Int     @id @default(autoincrement())
+  eventId       Int
+  participantId Int
+  chatId        Int
+  event         Event  @relation(fields: [eventId], references: [id])
+  participant   User   @relation(fields: [participantId], references: [id])
+  chat          Chat   @relation(fields: [chatId], references: [id])
+  // channelParticipant ChannelParticipant @relation(fields: [participantId, eventId], references: [participantId, eventId])
 }

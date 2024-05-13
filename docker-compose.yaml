@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   db:
-    container_name: postgresFASTDEP
+    container_name: postgresWeddingPlanner
     image: postgres
     restart: always
     environment:
@@ -14,7 +14,7 @@ services:
       - data:/var/lib/postgresql/data
 
   pg-admin:
-    container_name: adminerFASTDEP
+    container_name: adminerWeddingPlanner
     image: dpage/pgadmin4
     restart: always
     environment:
