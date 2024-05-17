@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npm i && tsc",
     "dev": "nodemon ./src/app.ts",
-    "start": "node ./dist/app.js"
+    "start": "node ./dist/app.js",
+    "migrate": "prisma migrate dev"
   },
   "repository": {
     "type": "git",
