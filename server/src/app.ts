@@ -10,6 +10,18 @@ app.use(cors())
 const PORT = process.env.PORT || 5000
 
 // Routes here
+import eventRouter from "./routes/event-router";
+import groupRouter from "./routes/group-router";
+import channelRouter from "./routes/channel-router";
+import userRouter from "./routes/user-router";
+
+app.use("/user", userRouter);
+app.use("/event", eventRouter)
+app.use("/group", groupRouter)
+app.use("/channel", channelRouter)
+
+// Todo - Setting up socket server for connection
+
 
 // Routes
 app.get('/', (req, res) => {
