@@ -18,7 +18,7 @@ const authMiddleware = async (req: Request, res: Response, next: Function) => {
             return res.status(401).json({ message: 'Unauthorized', loggedIn: false })
         }
 
-        const user = await prisma.users.findUnique({ where: { id: decoded.id } })
+        const user = await prisma.user.findUnique({ where: { id: decoded.id } })
         if (!user) {
             console.log('==authMiddleware==\n Invalid token')
             return res.status(401).json({ message: 'Unauthorized', loggedIn: false })
