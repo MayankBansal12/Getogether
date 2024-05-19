@@ -1,9 +1,10 @@
 import React from 'react'
 import Button from '../components/button'
-
+import { useNavigate } from 'react-router-dom'
 const Home = () => {
+  const navigate = useNavigate()
   const handleClick = () => {
-    console.log('login')
+    navigate('/auth/login')
   }
   return (
     <div className="container w-full flex-row py-20 px-4 md:px-20 justify-center items-center font-josefin">
