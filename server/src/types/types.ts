@@ -2,6 +2,7 @@ interface IUser {
   id: number;
   name: string;
   email: string;
+  password: string;
   phone: string;
   about: string;
   Photographer?: IPhotographer | null;
@@ -37,6 +38,9 @@ interface IPhoto {
 
 interface IEvent {
   id: number;
+  name: string;
+  desc: string;
+  date: Date;
   EventParticipant: IEventParticipant[];
   Photo: IPhoto[];
   Vendor: IVendor[];
@@ -162,4 +166,4 @@ interface IChatParticipant {
   Event: IEvent;
 }
 
-export {IUser, IBudget, IChannel, IChannelParticipant, IChannelService, IChat, IChatParticipant, IEvent, IEventParticipant, IGroup, IGroupMessage, IGroupRelation, IPayment, IPhoto, IPhotographer, IVendor}
+export { IUser, IBudget, IChannel, IChannelParticipant, IChannelService, IChat, IChatParticipant, IEvent, IEventParticipant, IGroup, IGroupMessage, IGroupRelation, IPayment, IPhoto, IPhotographer, IVendor }
