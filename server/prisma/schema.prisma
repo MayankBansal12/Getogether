@@ -17,6 +17,7 @@ model User {
   id               Int               @id @default(autoincrement())
   name             String
   email            String
+  password         String
   phone            String
   about            String
   Photographer     Photographer?
@@ -52,6 +53,9 @@ model Photo {
 
 model Event {
   id               Int                @id @default(autoincrement())
+  name             String
+  desc             String
+  date             DateTime
   EventParticipant EventParticipant[]
   Photo            Photo[]
   Vendor           Vendor[]

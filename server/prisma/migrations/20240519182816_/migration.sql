@@ -3,6 +3,7 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "about" TEXT NOT NULL,
 
@@ -40,6 +41,9 @@ CREATE TABLE "Photo" (
 -- CreateTable
 CREATE TABLE "Event" (
     "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "desc" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Event_pkey" PRIMARY KEY ("id")
 );
