@@ -21,6 +21,15 @@ export interface AlertStoreType extends AlertStoreDataType {
   setOpen: (open: boolean) => void
 }
 
+export interface SnackbarStoreDataType {
+  open: boolean
+  content: string
+  type: 'success' | 'error' | 'warning' | 'info'
+}
+export interface SnackbarStoreType extends SnackbarStoreDataType {
+  setOpen: (open: SnackbarStoreDataType) => void
+}
+
 // User Data Store
 const useUserStore = create<UserStoreType>()((set) => ({
   user: null,
@@ -42,4 +51,13 @@ const useAlertStore = create<AlertStoreType>((set) => ({
   setOpen: (open: boolean) => set({ open }),
 }))
 
-export { useUserStore, useAlertStore }
+// Snackbar Store
+const useSnackbarStore = create<SnackbarStoreType>((set) => ({
+  open: false,
+  content: '',
+  type: 'success',
+  setOpen: (state: SnackbarStoreDataType) =>
+    set({ open: state.open, content: state.content, type: state.type }),
+}))
+
+export { useUserStore, useAlertStore, useSnackbarStore }

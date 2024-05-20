@@ -3,12 +3,7 @@ import React from 'react'
 type Props = {}
 
 const Test = (props: Props) => {
-  console.log('rendered')
-  const online = navigator.onLine
-
-  if (!online) return <div>Offline</div>
-
-  return <div>Online</div>
+  return <div className="bg-slate-200 w-80 h-80">Hello</div>
 }
 
 export default Test

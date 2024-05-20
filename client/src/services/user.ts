@@ -3,11 +3,18 @@ import { LoginEvent, SignupEvent } from '../pages/auth/auth'
 
 const BACKEND = 'http://localhost:5000'
 
+interface AuthSuccess {
+  success: boolean
+  message: string
+  type: 'success' | 'error' | 'warning' | 'info'
+}
+
 class User {
   public static async IsLoggedIn(): Promise<boolean> {
     // Check if token exists
     const token = localStorage.getItem('token')
     if (!token) {
+      console.log('No token')
       return false
     }
 
@@ -39,7 +46,7 @@ class User {
 
   public static async Signup(
     e: React.FormEvent<HTMLFormElement> & SignupEvent,
-  ): Promise<boolean> {
+  ): Promise<AuthSuccess> {
     try {
       const email = e.target.email.value
       const name = e.target.name.value
@@ -56,13 +63,19 @@ class User {
         !password ||
         !confirmPassword
       ) {
-        alert('Please fill all the fields')
-        return false
+        return {
+          success: false,
+          message: 'All the fields are required',
+          type: 'info',
+        }
       }
 
       if (password !== confirmPassword) {
-        alert('Passwords do not match')
-        return false
+        return {
+          success: false,
+          message: 'Passwords do not match',
+          type: 'error',
+        }
       }
 
       const res = await fetch(`${BACKEND}/user/signup`, {
@@ -78,19 +91,27 @@ class User {
         // show data.message success message
         const token = data.token
         localStorage.setItem('token', token)
-        return true
+        return {
+          success: true,
+          message: data?.message || 'Login success',
+          type: 'success',
+        }
       } else {
-        alert(data.message)
-        return false
+        return {
+          success: false,
+          message: data?.message || data?.error,
+          type: 'error',
+        }
       }
     } catch (error) {
-      return false
+      console.log(error)
+      return { success: false, message: 'Some error occured', type: 'error' }
     }
   }
 
   public static async Login(
     e: React.FormEvent<HTMLFormElement> & LoginEvent,
-  ): Promise<boolean> {
+  ): Promise<AuthSuccess> {
     try {
       const email = e.target.email.value
       const password = e.target.password.value
@@ -98,8 +119,11 @@ class User {
       console.log(email, password)
 
       if (!email || !password) {
-        alert('Please fill all the fields')
-        return false
+        return {
+          success: false,
+          message: 'All the fields are required',
+          type: 'info',
+        }
       }
 
       const res = await fetch(`${BACKEND}/user/login`, {
@@ -111,17 +135,27 @@ class User {
       })
 
       const data = await res.json()
+      console.log(data)
       if (res.ok) {
         // show data.message success message
         const token = data.token
         localStorage.setItem('token', token)
-        return true
+        return {
+          success: true,
+          message: data?.message || 'Login success',
+          type: 'success',
+        }
       } else {
-        alert(data.message)
-        return false
+        console.log(data?.message)
+        return {
+          success: false,
+          message: data?.message || data?.error || 'Error occured',
+          type: 'error',
+        }
       }
     } catch (error) {
-      return false
+      console.log(error)
+      return { success: false, message: 'Some error occured', type: 'error' }
     }
   }
 }

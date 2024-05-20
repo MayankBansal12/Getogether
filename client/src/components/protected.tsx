@@ -17,6 +17,7 @@ const Protected = ({ children }: Props) => {
   const checkLogin = async () => {
     try {
       const loggedIn = await User.IsLoggedIn()
+      console.log(loggedIn)
       if (!loggedIn) {
         setAlert({
           open: true,

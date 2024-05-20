@@ -11,6 +11,7 @@ import AlertDialog from './components/alert-dialog'
 import Auth from './pages/auth/auth'
 import PageNotFound from './pages/page-not-found'
 import Navbar from './components/navbar/navbar'
+import SnackbarComp from './components/snackbar'
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,7 @@ const App = () => {
       {/* All other stuff */}
       {!online && <Offline />}
       <AlertDialog />
+      <SnackbarComp />
     </>
   )
 }
