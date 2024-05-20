@@ -10,6 +10,7 @@ module.exports = {
       colors: {
         primary: {
           light: '#8477D7',
+          dull: '#757575',
           DEFAULT: '#000000',
         },
         accent: {
