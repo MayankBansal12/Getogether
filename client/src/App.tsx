@@ -12,8 +12,7 @@ import Auth from './pages/auth/auth'
 import PageNotFound from './pages/page-not-found'
 import Navbar from './components/navbar/navbar'
 import AllEvents from './pages/allevents'
-import SingleSubEvent from './components/eventcomponents/singlesubevent'
-import Subevents from './components/eventcomponents/subevent'
+import Host from './pages/host'
 
 const router = createBrowserRouter([
   {
@@ -29,8 +28,8 @@ const router = createBrowserRouter([
     element: <Auth />,
   },
   {
-    path: '/testcmp',
-    element: <SingleSubEvent />,
+    path: '/host',
+    element: <Host />,
   },
   {
     path: '/test',
@@ -54,7 +53,7 @@ const App = () => {
   const online = useOnline()
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <RouterProvider router={router} />
       {/* All other stuff */}
       {!online && <Offline />}
