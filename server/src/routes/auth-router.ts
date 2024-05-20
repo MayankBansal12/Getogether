@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { Request, Router } from 'express'
 import { AuthReqType, UserReqType } from '../types/req'
-import authMiddleware from '../middlewares/auth'
+import authMiddleware from '../middlewares/user-middleware'
 import prisma from '../db/db'
 
 const router = Router()

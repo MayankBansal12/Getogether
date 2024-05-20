@@ -65,7 +65,7 @@ class User {
         return false
       }
 
-      const res = await fetch(`${BACKEND}/auth/signup`, {
+      const res = await fetch(`${BACKEND}/user/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ class User {
         return false
       }
 
-      const res = await fetch(`${BACKEND}/auth/login`, {
+      const res = await fetch(`${BACKEND}/user/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
