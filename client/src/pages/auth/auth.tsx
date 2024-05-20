@@ -4,34 +4,55 @@ import PageNotFound from '../page-not-found'
 import Button from '../../components/button'
 import { Link } from '@mui/material'
 import Loader from '../../components/loader'
+import User from '../../services/user'
 
 type Props = {}
 
+export interface SignupEvent {
+  target: {
+    email: HTMLInputElement
+    name: HTMLInputElement
+    phone: HTMLInputElement
+    about: HTMLTextAreaElement
+    password: HTMLInputElement
+    confirmPassword: HTMLInputElement
+  }
+}
+export interface LoginEvent {
+  target: {
+    email: HTMLInputElement
+    password: HTMLInputElement
+  }
+}
+
 const Auth = (props: Props) => {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [query] = useSearchParams()
   const [redirectURL, setredirectURL] = useState<string | null>(null)
   const { authType } = useParams()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false)
-    }, 3000)
-  }, [])
-
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (
+    e: React.FormEvent<HTMLFormElement> & LoginEvent,
+  ) => {
     e.preventDefault()
-    // login ka code likh lena
-    console.log('Login')
-    // if redirect url exists
-    if (redirectURL) {
-      navigate(redirectURL)
+    const loginSuccess = await User.Login(e)
+    if (loginSuccess) {
+      if (redirectURL) {
+        navigate(redirectURL)
+      } else navigate('/dashboard')
     }
   }
-  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (
+    e: React.FormEvent<HTMLFormElement> & SignupEvent,
+  ) => {
     e.preventDefault()
-    console.log('signup')
+    const loginSuccess = await User.Signup(e)
+    if (loginSuccess) {
+      if (redirectURL) {
+        navigate(redirectURL)
+      } else navigate('/dashboard')
+    }
   }
 
   useEffect(() => {
@@ -44,9 +65,9 @@ const Auth = (props: Props) => {
       {loading ? (
         <Loader />
       ) : (
-        <div className="flex  w-full h-full justify-center items-center font-josefin py-20">
-          <div className="flex-row text-center border-2 border-primary-light py-4 px-2 md:py-10 md:px-10 ">
-            <p className="text-xl md:text-3xl py-3">
+        <div className="flex justify-center items-center py-20 w-full h-full font-josefin">
+          <div className="flex-row border-2 border-primary-light px-2 md:px-10 py-4 md:py-10 text-center">
+            <p className="py-3 text-xl md:text-3xl">
               Welcome to {''}
               <span className="font-title text-3xl md:text-5xl">
                 Plan
@@ -58,49 +79,86 @@ const Auth = (props: Props) => {
               <form onSubmit={handleLogin}>
                 {/* login form */}
                 <input
-                  className="min-w-60 md:min-w-80 px-2 py-1 my-1 border-b border-primary-light bg-background-light focus:outline-none focus:border-b-2"
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
                   type="text"
                   placeholder="Email"
+                  name="email"
                 />
                 <br />
                 <input
-                  className="min-w-60 md:min-w-80 px-2 py-1 my-1 border-b border-primary-light bg-background-light focus:outline-none focus:border-b-2"
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
                   type="password"
                   placeholder="Password"
+                  name="password"
                 />
                 <br />
                 <p className="py-4">
                   If you don’t have an account already.
                   <br /> Please{' '}
-                  <Link href="/auth/register"> Create an Account.</Link>
+                  <Link
+                    href={
+                      redirectURL
+                        ? `/auth/register?redirect=${redirectURL}`
+                        : '/auth/register'
+                    }
+                  >
+                    {' '}
+                    Create an Account.
+                  </Link>
                 </p>
                 <br />
                 <Button onClick={() => {}} children={'Login'} />
               </form>
             ) : (
-              <form onSubmit={handleSignup}>
+              <form onSubmit={handleSignup} className="flex flex-col">
                 {/* signup form */}{' '}
                 <input
-                  className="min-w-60 md:min-w-80 px-2 py-1 my-1 border-b border-primary-light bg-background-light focus:outline-none focus:border-b-2"
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
                   type="text"
                   placeholder="Email"
+                  name="email"
                 />
-                <br />
                 <input
-                  className="min-w-60 md:min-w-80 px-2 py-1 my-1 border-b border-primary-light bg-background-light focus:outline-none focus:border-b-2"
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
+                  type="text"
+                  placeholder="Name"
+                  name="name"
+                />
+                <input
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
+                  type="tel"
+                  placeholder="Phone"
+                  name="phone"
+                />
+                <textarea
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
+                  placeholder="About"
+                  name="about"
+                />
+                <input
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
                   type="password"
                   placeholder="Password"
+                  name="password"
                 />
-                <br />
                 <input
-                  className="min-w-60 md:min-w-80 px-2 py-1 my-1 border-b border-primary-light bg-background-light focus:outline-none focus:border-b-2"
+                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
                   type="password"
                   placeholder="Confirm Password"
+                  name="confirmPassword"
                 />
-                <br />
                 <p className="py-4">
                   If you have an account already.
-                  <br /> Please <Link href="/auth/login">Login.</Link>
+                  <br /> Please{' '}
+                  <Link
+                    href={
+                      redirectURL
+                        ? `/auth/login?redirect=${redirectURL}`
+                        : '/auth/login'
+                    }
+                  >
+                    Login.
+                  </Link>
                 </p>
                 <br />
                 <Button onClick={() => {}} children={'Signup'} />

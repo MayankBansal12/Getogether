@@ -14,24 +14,13 @@ import eventRouter from './routes/event-router'
 import groupRouter from './routes/group-router'
 import channelRouter from './routes/channel-router'
 import userRouter from './routes/user-router'
+import authRouter from './routes/auth-router'
 
 app.use('/user', userRouter)
 app.use('/event', eventRouter)
 app.use('/group', groupRouter)
 app.use('/channel', channelRouter)
-
-// Ye mai dummy likh raha, jab auth decide karlenge tab sahi wala likh lenge
-app.post('/auth/me', (req, res) => {
-  res.send({
-    user: {
-      id: 1,
-      name: 'Mohit',
-      email: 'random@gmail.com',
-      phone: '1234567891',
-      about: 'Hey there Im using whatsapp',
-    },
-  })
-})
+app.use('/auth', authRouter)
 
 // Todo - Setting up socket server for connection
 
