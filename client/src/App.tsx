@@ -11,6 +11,8 @@ import AlertDialog from './components/alert-dialog'
 import Auth from './pages/auth/auth'
 import PageNotFound from './pages/page-not-found'
 import Navbar from './components/navbar/navbar'
+import AllEvents from './pages/allevents'
+import SideNav from './components/sidenavs/primarynav'
 
 const router = createBrowserRouter([
   {
@@ -18,8 +20,16 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
+    path: '/allevents',
+    element: <AllEvents />,
+  },
+  {
     path: '/auth/:authType?',
     element: <Auth />,
+  },
+  {
+    path: '/testcmp',
+    element: <SideNav />,
   },
   {
     path: '/test',
