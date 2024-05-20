@@ -1,9 +1,12 @@
 // This component lists all the subevent
-
+import React from 'react'
 import { Box } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 
 const Subevents = () => {
   const total = 10
+
+  const navigate = useNavigate()
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
       <Box className="flex justify-between items-center bg-background-extralight my-4 px-4 md:px-8 py-4">

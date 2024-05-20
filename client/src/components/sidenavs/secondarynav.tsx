@@ -1,7 +1,4 @@
-// this is the secondary navbar which contains participants, events etc etc
-// This is the navbar consisting of home, dm, calender, etc..
-
-import * as React from 'react'
+import React, { useState } from 'react'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -10,20 +7,19 @@ import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import bday from '../../assets/bday.png'
 import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
 import {
   Accordion,
-  AccordionActions,
   AccordionDetails,
   AccordionSummary,
-  Avatar,
-  ListItemAvatar,
   ListItemButton,
-  ListItemIcon,
-  ListItemText,
 } from '@mui/material'
+import Participants from '../eventcomponents/participants'
+import Subevents from '../eventcomponents/subevent'
+import SingleSubEvent from '../eventcomponents/singlesubevent'
+import Budget from '../eventcomponents/budget'
+import PaymentHistory from '../eventcomponents/paymenthistory'
+import Default from './Default'
 
 const drawerWidth = 250
 
@@ -33,8 +29,9 @@ type Props = {
 
 export default function SidebarNav(props: Props) {
   const { window } = props
-  const [mobileOpen, setMobileOpen] = React.useState(false)
-  const [isClosing, setIsClosing] = React.useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
+  const [rendercomponent, setRenderComponent] = useState('')
 
   const handleDrawerClose = () => {
     setIsClosing(true)
@@ -53,15 +50,22 @@ export default function SidebarNav(props: Props) {
 
   const drawer = (
     <div className="font-josefin">
-      <div className="px-3 py-3 ">
-        <span className="text-xl font-bold">Mayank's Bday</span>
+      <div className="px-3 py-3">
+        <span className="font-bold text-xl">Mayank's Bday</span>
       </div>
       <Divider />
       <List>
-        <ListItem className="bg-white text-lg font-medium">
-          <ListItemButton>@ Participants</ListItemButton>
+        <ListItem className="bg-white font-medium text-lg">
+          <ListItemButton onClick={() => setRenderComponent('Participants')}>
+            @ Participants
+          </ListItemButton>
         </ListItem>
-        <ListItem className="bg-white text-lg font-medium">
+        <ListItem className="bg-white font-medium text-lg">
+          <ListItemButton onClick={() => setRenderComponent('Sub Events')}>
+            @ Events
+          </ListItemButton>
+        </ListItem>
+        <ListItem className="bg-white font-medium text-lg">
           <Accordion className="!border-0 !shadow-none">
             <AccordionSummary
               expandIcon={
@@ -83,24 +87,32 @@ export default function SidebarNav(props: Props) {
               aria-controls="panel1-content"
               id="panel1-header"
             >
-              <p className="w-40"> @ Events</p>
+              <p className="w-40"> @ Sub Events</p>
             </AccordionSummary>
             <AccordionDetails>
-              <p className="ml-3 font-josefin font-md text-black"># Event 1</p>
+              <ListItemButton
+                className="ml-3 font-josefin font-md text-black"
+                onClick={() => setRenderComponent('Information')}
+              >
+                # Celebrating
+              </ListItemButton>
             </AccordionDetails>
           </Accordion>
         </ListItem>
-        <ListItem className="bg-white text-lg font-medium">
-          <ListItemButton>@ Budget</ListItemButton>
+        <ListItem className="bg-white font-medium text-lg">
+          <ListItemButton onClick={() => setRenderComponent('Budget')}>
+            @ Budget
+          </ListItemButton>
         </ListItem>
-        <ListItem className="bg-white text-lg font-medium">
-          <ListItemButton>@ Payment History</ListItemButton>
+        <ListItem className="bg-white font-medium text-lg">
+          <ListItemButton onClick={() => setRenderComponent('Payment History')}>
+            @ Payment History
+          </ListItemButton>
         </ListItem>
       </List>
     </div>
   )
 
-  // Remove this const when copying and pasting into your project.
   const container =
     window !== undefined ? () => window().document.body : undefined
 
@@ -114,7 +126,7 @@ export default function SidebarNav(props: Props) {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar>
+        <Toolbar className="bg-white font-josefin text-primary-light">
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -137,9 +149,9 @@ export default function SidebarNav(props: Props) {
               />
             </svg>
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Responsive drawer
-          </Typography>
+          <p className="font-bold font-josefin text-center text-xl">
+            {rendercomponent}
+          </p>
         </Toolbar>
       </AppBar>
       <Box
@@ -147,7 +159,6 @@ export default function SidebarNav(props: Props) {
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="mailbox folders"
       >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           container={container}
           variant="temporary"
@@ -190,6 +201,12 @@ export default function SidebarNav(props: Props) {
         }}
       >
         <Toolbar />
+        {rendercomponent === '' && <Default />}
+        {rendercomponent === 'Participants' && <Participants />}
+        {rendercomponent === 'Sub Events' && <Subevents />}
+        {rendercomponent === 'Information' && <SingleSubEvent />}
+        {rendercomponent === 'Budget' && <Budget />}
+        {rendercomponent === 'Payment History' && <PaymentHistory />}
       </Box>
     </Box>
   )
