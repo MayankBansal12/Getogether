@@ -1,3 +1,5 @@
+// This is the navbar consisting of home, dm, calender, etc..
+
 import * as React from 'react'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -7,14 +9,16 @@ import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
 import bday from '../../assets/bday.png'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
+import { Avatar, ListItemAvatar } from '@mui/material'
 
 const drawerWidth = 75
+
+type Props = {
+  window?: () => Window
+}
 
 export default function SideNav(props: Props) {
   const { window } = props
@@ -46,16 +50,16 @@ export default function SideNav(props: Props) {
       </div>
       <Divider />
       <List>
-        <ListItem>
-          <ListItemButton>
-            <ListItemIcon>
+        <ListItem className="bg-white">
+          <ListItemAvatar className="bg-white">
+            <Avatar className="hover:bg-background-light transition-colors duration-200 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-6 h-6 text-black transition-colors duration-200"
               >
                 <path
                   strokeLinecap="round"
@@ -63,19 +67,19 @@ export default function SideNav(props: Props) {
                   d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
                 />
               </svg>
-            </ListItemIcon>
-          </ListItemButton>
+            </Avatar>
+          </ListItemAvatar>
         </ListItem>
         <ListItem>
-          <ListItemButton>
-            <ListItemIcon>
+          <ListItemAvatar>
+            <Avatar className="hover:bg-background-light transition-colors duration-200 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-6 h-6 text-black transition-colors duration-200"
               >
                 <path
                   strokeLinecap="round"
@@ -83,19 +87,19 @@ export default function SideNav(props: Props) {
                   d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
                 />
               </svg>
-            </ListItemIcon>
-          </ListItemButton>
+            </Avatar>
+          </ListItemAvatar>
         </ListItem>
         <ListItem>
-          <ListItemButton>
-            <ListItemIcon>
+          <ListItemAvatar>
+            <Avatar className="hover:bg-background-light transition-colors duration-200 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-6 h-6 text-black transition-colors duration-200"
               >
                 <path
                   strokeLinecap="round"
@@ -103,19 +107,19 @@ export default function SideNav(props: Props) {
                   d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
                 />
               </svg>
-            </ListItemIcon>
-          </ListItemButton>
+            </Avatar>
+          </ListItemAvatar>
         </ListItem>
         <ListItem>
-          <ListItemButton>
-            <ListItemIcon>
+          <ListItemAvatar>
+            <Avatar className="hover:bg-background-light transition-colors duration-200 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-6 h-6 text-black transition-colors duration-200"
               >
                 <path
                   strokeLinecap="round"
@@ -123,8 +127,8 @@ export default function SideNav(props: Props) {
                   d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
               </svg>
-            </ListItemIcon>
-          </ListItemButton>
+            </Avatar>
+          </ListItemAvatar>
         </ListItem>
       </List>
     </div>
@@ -167,9 +171,6 @@ export default function SideNav(props: Props) {
               />
             </svg>
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Responsive drawer
-          </Typography>
         </Toolbar>
       </AppBar>
       <Box
