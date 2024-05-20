@@ -12,7 +12,8 @@ import Auth from './pages/auth/auth'
 import PageNotFound from './pages/page-not-found'
 import Navbar from './components/navbar/navbar'
 import AllEvents from './pages/allevents'
-import SideNav from './components/sidenavs/primarynav'
+import SingleSubEvent from './components/eventcomponents/singlesubevent'
+import Subevents from './components/eventcomponents/subevent'
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/testcmp',
-    element: <SideNav />,
+    element: <SingleSubEvent />,
   },
   {
     path: '/test',
