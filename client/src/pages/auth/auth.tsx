@@ -5,6 +5,7 @@ import Button from '../../components/button'
 import { Link } from '@mui/material'
 import Loader from '../../components/loader'
 import User from '../../services/user'
+import useSnackbar from '../../hooks/use-snackbar'
 
 type Props = {}
 
@@ -31,13 +32,23 @@ const Auth = (props: Props) => {
   const [redirectURL, setredirectURL] = useState<string | null>(null)
   const { authType } = useParams()
   const navigate = useNavigate()
+  const setOpenSnackbar = useSnackbar()
 
   const handleLogin = async (
     e: React.FormEvent<HTMLFormElement> & LoginEvent,
   ) => {
     e.preventDefault()
     const loginSuccess = await User.Login(e)
-    if (loginSuccess) {
+
+    console.log(loginSuccess)
+
+    setOpenSnackbar({
+      open: true,
+      content: loginSuccess.message,
+      type: loginSuccess.type,
+    })
+
+    if (loginSuccess.success) {
       if (redirectURL) {
         navigate(redirectURL)
       } else navigate('/dashboard')
@@ -47,8 +58,15 @@ const Auth = (props: Props) => {
     e: React.FormEvent<HTMLFormElement> & SignupEvent,
   ) => {
     e.preventDefault()
-    const loginSuccess = await User.Signup(e)
-    if (loginSuccess) {
+    const signupSuccess = await User.Signup(e)
+
+    setOpenSnackbar({
+      open: true,
+      content: signupSuccess.message,
+      type: signupSuccess.type,
+    })
+
+    if (signupSuccess.success) {
       if (redirectURL) {
         navigate(redirectURL)
       } else navigate('/dashboard')

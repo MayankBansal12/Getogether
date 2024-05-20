@@ -3,7 +3,7 @@ import prisma from '../db/db'
 import jwt from 'jsonwebtoken'
 import { IUser, IUserAttributes } from '../types/types'
 
-const secret = process.env.SECRET || ''
+const secret = process.env.SECRET_KEY || ''
 
 interface AuthMidReqType extends Request {
   headers: {
@@ -24,13 +24,14 @@ const authMiddleware = async (
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    const decoded = jwt.verify(token, secret) as { id: number }
+    const decoded = jwt.verify(token, secret) as { userId: number }
+    console.log(decoded)
     if (!decoded) {
       console.log('==authMiddleware==\n Invalid token')
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } })
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } })
     if (!user) {
       console.log('==authMiddleware==\n Invalid token')
       return res.status(401).json({ message: 'Unauthorized' })
