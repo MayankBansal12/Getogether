@@ -1,10 +1,10 @@
 // Component for the all event page
 
 import React from 'react'
-import bday from '../assets/bday.png'
+import bday from '../../assets/bday.png'
 import { Box } from '@mui/material'
 
-const EventBox = ({ image, title, date, host }) => {
+const EventBox = ({ image, title, date, host, onClick }) => {
   return (
     <Box
       my={1}
@@ -13,16 +13,17 @@ const EventBox = ({ image, title, date, host }) => {
       alignItems="center"
       p={2}
       sx={{ border: '2px solid #8477D7' }}
-      className="bg-background-extralight hover:bg-white gap-2 md:gap-4 "
+      className="gap-2 md:gap-4 bg-background-extralight hover:bg-white"
+      onClick={onClick}
     >
       {/** Chage the Image src accordingly */}
       <img
         src={bday}
-        className="w-[55px] h-[55px] md:w-[75px] md:h-[75px] rounded-xl "
+        className="rounded-xl w-[55px] md:w-[75px] h-[55px] md:h-[75px]"
       />
       <div className="md:min-w-96">
         <h1 className="font-bold text-lg md:text-xl">{title}</h1>
-        <p className="text-sm md:text-md text-dull">
+        <p className="text-dull text-sm md:text-md">
           Date: {date} | Host: {host}
         </p>
       </div>

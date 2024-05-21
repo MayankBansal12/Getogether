@@ -72,7 +72,7 @@ const SingleSubEvent = () => {
         gap={2}
         className="flex flex-col bg-background-extralight my-4 px-4 md:px-8 py-8"
       >
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex md:flex-row flex-col justify-between items-center">
           <span className="font-bold text-xl">Groups</span>
           <Button onClick={() => {}} children={'+ Add Group'} />
         </div>

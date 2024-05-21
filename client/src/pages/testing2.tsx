@@ -9,13 +9,15 @@ const Testing2 = (props: Props) => {
   const handle = () => {
     setAlert({
       open: true,
-      // title: 'Hello Sakshi',
-      // text: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Unde necessitatibus repellendus veniam recusandae aspernatur adipisci quo nihil distinctio minima asperiores!',
-      // primaryButton: 'Ok',
-      // secondaryButton: 'not Ok',
-      // primaryAction: () => {},
-      // secondaryAction: () => {},
-      // noSecondaryButton: true,
+      title: 'Hello Sakshi',
+      text: 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Unde necessitatibus repellendus veniam recusandae aspernatur adipisci quo nihil distinctio minima asperiores!',
+      primaryButton: 'Ok',
+      secondaryButton: 'not Ok',
+      primaryAction: () => {
+        closeAlert
+      },
+      secondaryAction: () => {},
+      noSecondaryButton: true,
     })
   }
 

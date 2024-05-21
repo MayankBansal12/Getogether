@@ -51,7 +51,7 @@ const Auth = (props: Props) => {
     if (loginSuccess.success) {
       if (redirectURL) {
         navigate(redirectURL)
-      } else navigate('/dashboard')
+      } else navigate('/allevents')
     }
   }
   const handleSignup = async (
@@ -69,7 +69,7 @@ const Auth = (props: Props) => {
     if (signupSuccess.success) {
       if (redirectURL) {
         navigate(redirectURL)
-      } else navigate('/dashboard')
+      } else navigate('/allevents')
     }
   }
 

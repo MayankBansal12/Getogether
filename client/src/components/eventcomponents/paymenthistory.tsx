@@ -13,9 +13,15 @@ export default function PaymentHistory() {
         <Table className="font-josefin">
           <TableHead>
             <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Vendor</TableCell>
+              <TableCell>
+                <p className="font-bold font-josefin text-xl">Date</p>
+              </TableCell>
+              <TableCell>
+                <p className="font-bold font-josefin text-xl">Amount</p>
+              </TableCell>
+              <TableCell>
+                <p className="font-bold font-josefin text-xl">Vendor</p>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
