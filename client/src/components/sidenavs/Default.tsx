@@ -12,7 +12,7 @@ const Default = () => {
           </span>
         </p>
         <p className="py-4 font-medium text-2xl text-dull underline">
-          New Event Created.
+          Checkout this event
         </p>
         <p className="font-medium text-dull text-xl">
           You can now manage all your events using a single Platform.

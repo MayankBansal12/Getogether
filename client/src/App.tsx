@@ -13,6 +13,7 @@ import PageNotFound from './pages/page-not-found'
 import Navbar from './components/navbar/navbar'
 import AllEvents from './pages/allevents'
 import Host from './pages/host'
+import CreateEvent from './components/eventcomponents/create'
 
 const router = createBrowserRouter([
   {
@@ -24,11 +25,15 @@ const router = createBrowserRouter([
     element: <AllEvents />,
   },
   {
+    path: '/createevent',
+    element: <CreateEvent />,
+  },
+  {
     path: '/auth/:authType?',
     element: <Auth />,
   },
   {
-    path: '/host',
+    path: '/dashboard',
     element: <Host />,
   },
   {
