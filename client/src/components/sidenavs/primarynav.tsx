@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router-dom'
 import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
 
-const drawerWidth = 320
+const drawerWidth = 300
 
 type Props = {
   window?: () => Window
@@ -39,7 +39,7 @@ export default function SidebarNav(props: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [rendercomponent, setRenderComponent] = useState('')
-  const [renderList, setRenderList] = useState('')
+  const [renderList, setRenderList] = useState('Home')
   const handleHome = () => {
     setRenderComponent('')
     setRenderList('Home')
@@ -199,7 +199,7 @@ export default function SidebarNav(props: Props) {
                   aria-controls="panel1-content"
                   id="panel1-header"
                 >
-                  <p className="w-40"> @ Sub Events</p>
+                  <p className="w-32"> @ Sub Events</p>
                 </AccordionSummary>
                 <AccordionDetails>
                   <ListItemButton

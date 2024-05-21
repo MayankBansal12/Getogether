@@ -9,55 +9,55 @@ export default function Chat() {
             <div className="flex items-start">
               <img
                 alt="User Avatar"
-                className="mr-3 rounded-full w-8 h-8"
+                className="mr-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
                 src="/placeholder.svg"
               />
               <div>
                 <p className="font-medium">John Doe</p>
-                <p className="bg-gray-100 p-3 rounded-lg">
+                <p className="bg-gray-100 p-3 rounded-lg max-w-xs sm:max-w-md">
                   Great, let's connect later today. I have a few things I'd like
                   to discuss with you.
                 </p>
               </div>
             </div>
             <div className="flex justify-end items-start">
-              <div>
+              <div className="text-right">
                 <p className="font-medium">Jane Smith</p>
-                <p className="bg-primary-light p-3 rounded-lg text-white">
+                <p className="bg-primary-light p-3 rounded-lg max-w-xs sm:max-w-md text-white">
                   Sounds good, I'll be available after 4 pm. Talk to you then!
                 </p>
               </div>
               <img
                 alt="User Avatar"
-                className="ml-3 rounded-full w-8 h-8"
+                className="ml-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
                 src="/placeholder.svg"
               />
             </div>
             <div className="flex items-start">
               <img
                 alt="User Avatar"
-                className="mr-3 rounded-full w-8 h-8"
+                className="mr-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
                 src="/placeholder.svg"
               />
               <div>
                 <p className="font-medium text-gray-500">John Doe</p>
-                <p className="bg-gray-100 p-3 rounded-lg">
+                <p className="bg-gray-100 p-3 rounded-lg max-w-xs sm:max-w-md">
                   Hey, how's it going? I wanted to follow up on our last
                   conversation.
                 </p>
               </div>
             </div>
             <div className="flex justify-end items-start">
-              <div>
+              <div className="text-right">
                 <p className="font-medium text-gray-500">Jane Smith</p>
-                <p className="bg-primary-light p-3 rounded-lg text-white">
+                <p className="bg-primary-light p-3 rounded-lg max-w-xs sm:max-w-md text-white">
                   Hi John, I'm doing well, thanks for asking. I'm free to chat
                   whenever you're available.
                 </p>
               </div>
               <img
                 alt="User Avatar"
-                className="ml-3 rounded-full w-8 h-8"
+                className="ml-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
                 src="/placeholder.svg"
               />
             </div>
@@ -69,7 +69,7 @@ export default function Chat() {
             placeholder="Type your message..."
             type="text"
           />
-          <div className="mx-2">
+          <div className="ml-2">
             <Button
               children={'Send'}
               onClick={() => {
