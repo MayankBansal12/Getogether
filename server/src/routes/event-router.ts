@@ -7,14 +7,14 @@ const router = Router();
 
 // /event/create -> For creating new event
 router.post("/create", async (req: Request, res: Response) => {
-    const { name, description, date } = req.body;
+    const { name, desc } = req.body;
 
     try {
         const newEvent = await prisma.event.create({
             data: {
                 name: name,
-                desc: description,
-                date: new Date(date)
+                desc: desc,
+                date: new Date()
             },
         });
 
@@ -26,13 +26,38 @@ router.post("/create", async (req: Request, res: Response) => {
 })
 
 // /event/list -> For listing all sub events (and groups if param passed)
-router.get("/list", async (req: Request, res: Response) => {
+router.post("/list", async (req: Request, res: Response) => {
+    try {
+        const { eventId, includeGroup } = req.body;
 
+        const events = await prisma.event.findUnique({
+            where: { id: eventId },
+            include: {
+                Channel: {
+                    include: {
+                        ChannelService: true,
+                        ChannelParticipant: true,
+                        GroupRelation: includeGroup ? {
+                            include: {
+                                Group: true,
+                            },
+                        } : false,
+                    },
+                },
+            },
+        });
+
+        res.json({ message: "All event list fetched!", events });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "An error occurred while fetching the events" });
+    }
 })
 
 // /event/join -> Inviting a new user to event
 router.post("/join", async (req: Request, res: Response) => {
-    const { userId, eventId, role, status } = req.body;
+    const { userId, eventId, role } = req.body;
+    const status = 0;
 
     try {
         const participant = await prisma.eventParticipant.create({
@@ -40,7 +65,7 @@ router.post("/join", async (req: Request, res: Response) => {
                 userId,
                 eventId,
                 role,
-                status,
+                status
             },
         });
 
@@ -48,6 +73,60 @@ router.post("/join", async (req: Request, res: Response) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to add user to event" });
+    }
+})
+
+// /event/accept -> User Accepting/Declining the invitation
+router.post("/accept", async (req: Request, res: Response) => {
+    const { userId, eventId } = req.body;
+
+    try {
+        const participant = await prisma.eventParticipant.updateMany({
+            where: {
+                userId,
+                eventId,
+                status: 0
+            },
+            data: {
+                status: 1
+            }
+        })
+
+        if (participant.count === 0) {
+            return res.status(404).json({ error: "Invitation not found or already processed" });
+        }
+
+        return res.status(200).json({ message: "Invitation accepted!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to accept invitation to event" });
+    }
+})
+
+// /event/decline -> User Declined the invitation
+router.post("/decline", async (req: Request, res: Response) => {
+    const { userId, eventId } = req.body;
+
+    try {
+        const participant = await prisma.eventParticipant.updateMany({
+            where: {
+                userId,
+                eventId,
+                status: 0
+            },
+            data: {
+                status: -1
+            }
+        })
+
+        if (participant.count === 0) {
+            return res.status(404).json({ error: "Invitation not found or already processed" });
+        }
+
+        return res.status(200).json({ message: "Invitation declined!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to decline invitation to event" });
     }
 })
 
@@ -63,7 +142,7 @@ router.post("/remove", async (req: Request, res: Response) => {
             },
         });
 
-        return res.status(204).json({ message: "User removed from the event!", participant });
+        return res.status(200).json({ message: "User removed from the event!" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to remove user from event" });
@@ -71,7 +150,8 @@ router.post("/remove", async (req: Request, res: Response) => {
 })
 
 // /event/user/role -> Assigning/changing a user role
-router.post("/role", async (req: Request, res: Response) => {
+// role -> "host", "vendor", "guest"
+router.put("/user/role", async (req: Request, res: Response) => {
     const { userId, eventId, role } = req.body;
 
     try {
@@ -91,65 +171,6 @@ router.post("/role", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to update user role" });
     }
 })
-
-// /event/:eventId -> For fetching, editing, deleting event details with that id
-router.route("/:eventId")
-    .get(async (req: Request, res: Response) => {
-        const { eventId } = req.params;
-
-        try {
-            const event = await prisma.event.findUnique({
-                where: { id: Number(eventId) },
-                include: {
-                    Channel: true,
-                    EventParticipant: true,
-                },
-            });
-
-            if (!event) {
-                return res.status(404).json({ error: "Event not found!" });
-            }
-
-            return res.status(200).json({ message: "Event Details fetched!", event });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: "Failed to fetch event details" });
-        }
-    })
-    .put(async (req: Request, res: Response) => {
-        const { eventId } = req.params;
-        const { name, desc, date } = req.body;
-
-        try {
-            const updatedEvent = await prisma.event.update({
-                where: { id: Number(eventId) },
-                data: {
-                    name,
-                    desc,
-                    date: new Date(date),
-                },
-            });
-
-            res.json(updatedEvent);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: "Failed to update event details" });
-        }
-    })
-    .delete(async (req: Request, res: Response) => {
-        const { eventId } = req.params;
-
-        try {
-            await prisma.event.delete({
-                where: { id: Number(eventId) },
-            });
-
-            res.status(204).send();
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: "Failed to delete event" });
-        }
-    })
 
 // /event/channel/create -> Creating a new sub evet inside a event
 router.post("/channel/create", async (req: Request, res: Response) => {
@@ -184,12 +205,75 @@ router.get("/participants", async (req: Request, res: Response) => {
                 User: true,
             },
         });
+        const users = [];
+        participants.map(participant => {
+            users.push({ ...participant.User, "role": participant.role })
+        });
 
-        return res.status(200).json({ messsage: "Event Participants fetched!", participants });
+        return res.status(200).json({ messsage: "Event Participants fetched!", users });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to fetch event participants" });
     }
 });
+
+// /event/:eventId -> For fetching, editing, deleting event details with that id
+router.route("/:eventId")
+    .get(async (req: Request, res: Response) => {
+        const { eventId } = req.params;
+
+        try {
+            const event = await prisma.event.findUnique({
+                where: { id: Number(eventId) },
+                include: {
+                    Channel: true,
+                    EventParticipant: true,
+                },
+            });
+
+            if (!event) {
+                return res.status(404).json({ error: "Event not found!" });
+            }
+
+            return res.status(200).json({ message: "Event Details fetched!", event });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to fetch event details" });
+        }
+    })
+    .put(async (req: Request, res: Response) => {
+        const { eventId } = req.params;
+        const { name, desc } = req.body;
+
+        try {
+            const updatedEvent = await prisma.event.update({
+                where: { id: Number(eventId) },
+                data: {
+                    name,
+                    desc,
+                    date: new Date(),
+                },
+            });
+
+            res.json(updatedEvent);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to update event details" });
+        }
+    })
+    .delete(async (req: Request, res: Response) => {
+        const { eventId } = req.params;
+
+        try {
+            await prisma.event.delete({
+                where: { id: Number(eventId) },
+            });
+
+            res.status(204).send();
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to delete event" });
+        }
+    })
 
 export default router;
