@@ -60,6 +60,18 @@ router.post("/join", async (req: Request, res: Response) => {
     const status = 0;
 
     try {
+        // Check if the participant already exists
+        const existingParticipant = await prisma.eventParticipant.findUnique({
+            where: {
+                userId,
+                eventId,
+            },
+        });
+
+        if (existingParticipant) {
+            return res.status(400).json({ message: "User already added to the event" });
+        }
+
         const participant = await prisma.eventParticipant.create({
             data: {
                 userId,
