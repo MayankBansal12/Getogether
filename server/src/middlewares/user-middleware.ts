@@ -18,18 +18,22 @@ const authMiddleware = async (
   next: Function,
 ) => {
   try {
+    if (!req.headers.authorization) {
+      console.log('==authMiddleware==\n No token')
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
     const token = req.headers.authorization.split(' ')[1]
     if (!token) {
       console.log('==authMiddleware==\n No token')
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    const decoded = jwt.verify(token, secret) as { id: number }
+    const decoded = jwt.verify(token, secret) as { userId: number }
     if (!decoded) {
-      console.log('==authMiddleware==\n Invalid token')
+      console.log('==authMiddleware==\n Invalid token', decoded)
       return res.status(401).json({ message: 'Unauthorized' })
     }
-    const userId = decoded.id;
+    const userId = decoded.userId
 
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) {
