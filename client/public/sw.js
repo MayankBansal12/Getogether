@@ -2,7 +2,7 @@ self.addEventListener('push', (e) => {
   const payload = e.data.json()
   const options = {
     body: payload.body,
-    icon: 'images/example.png', // Check the image path
+    icon: 'images/logo.png', // Check the image path
     vibrate: [100, 50, 100], // Adjust the vibration pattern
     data: {
       dateOfArrival: Date.now(),
@@ -12,9 +12,9 @@ self.addEventListener('push', (e) => {
       {
         action: 'explore',
         title: 'Explore world',
-        icon: 'images/checkmark.png',
+        icon: 'images/check.png',
       },
-      { action: 'close', title: 'Close', icon: 'images/xmark.png' },
+      { action: 'close', title: 'Close', icon: 'images/cross.png' },
     ],
   }
 
