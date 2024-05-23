@@ -178,6 +178,7 @@ model Chat {
   senderId                 Int
   receiverId               Int
   message                  String
+  photos                   String
   time                     DateTime
   ChatParticipant          ChatParticipant[]
   Event                    Event             @relation(fields: [eventId], references: [id])

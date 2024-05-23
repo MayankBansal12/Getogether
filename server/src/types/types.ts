@@ -171,6 +171,25 @@ interface IChatParticipant {
   Event: IEvent
 }
 
+interface JoinChannelPayload {
+  userId: number;
+  groupId: number;
+}
+
+interface SendMessagePayload {
+  userId: number;
+  groupId: number;
+  message: string;
+  photoLink: string;
+}
+interface PersonalMessagePayLoad {
+  eventId: number;
+  senderId: number;
+  receiverId: number;
+  message: string;
+  photoLink: string;
+}
+
 interface IFCMAttributes {
   userId: number
   endPoint: String
@@ -196,5 +215,8 @@ export {
   IPhoto,
   IPhotographer,
   IVendor,
+  JoinChannelPayload,
+  SendMessagePayload,
+  PersonalMessagePayLoad
   IFCMAttributes,
 }

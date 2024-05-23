@@ -137,6 +137,51 @@ router.get('/:userId/event', async (req: Request, res: Response) => {
   }
 })
 
+// router.post("/dm-list", async (req: Request, res: Response) => {
+//   const { eventId, participantId } = req.body;
+
+//   try {
+//     const chatParticipants = await prisma.chatParticipant.findMany({
+//       where: {
+//         eventId,
+//         OR: [
+//           { participantId: participantId },
+//         ]
+//       },
+//       include: {
+//         EventParticipant: true
+//       }
+//     });
+
+//     return res.status(200).json({ message: "Successfully fetched DM list!", chatParticipants });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'An error occurred while fetching DM list!' })
+//   }
+// });
+
+router.post("/messages", async (req: Request, res: Response) => {
+  const { eventId, participantId, userId } = req.body;
+  try {
+    const messages = await prisma.chat.findMany({
+      where: {
+        eventId,
+        OR: [
+          { senderId: userId, receiverId: participantId },
+          { senderId: participantId, receiverId: userId }
+        ]
+      },
+      orderBy: {
+        time: 'asc'
+      }
+    });
+    return res.status(200).json({ message: "Successfully fetched the messages!", messages })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'An error occurred while fetching messages!' })
+  }
+})
+
 interface FCMReqType {
   body: {
     endpoint: string
