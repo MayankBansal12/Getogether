@@ -42,7 +42,7 @@ const AllEvents = () => {
         <div className="flex justify-center items-center my-4 w-full">
           <Button
             onClick={() => {
-              navigate('/dashboard')
+              navigate('/createevent')
             }}
             children={'+ Create Event'}
           />

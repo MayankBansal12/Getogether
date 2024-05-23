@@ -14,17 +14,17 @@ datasource db {
 }
 
 model User {
-  id               Int               @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   name             String
-  email            String            @unique
+  email            String             @unique
   password         String
   phone            String
   about            String
   Photographer     Photographer?
-  EventParticipant EventParticipant?
+  EventParticipant EventParticipant[]
   Vendor           Vendor?
-  Payer            Payment[]         @relation(name: "Payer")
-  Payee            Payment[]         @relation(name: "Payee")
+  Payer            Payment[]          @relation(name: "Payer")
+  Payee            Payment[]          @relation(name: "Payee")
   FCM              FCM?
 }
 
@@ -92,7 +92,7 @@ model ChannelParticipant {
   participantId    Int
   channelId        Int
   Channel          Channel          @relation(fields: [channelId], references: [id])
-  EventParticipant EventParticipant @relation(fields: [participantId], references: [userId])
+  EventParticipant EventParticipant @relation(fields: [participantId], references: [id])
   GroupMessage     GroupMessage[]
 }
 
@@ -134,12 +134,12 @@ model ChannelService {
 model EventParticipant {
   id                 Int                  @id @default(autoincrement())
   eventId            Int
-  userId             Int                  @unique
+  userId             Int
   role               String
   status             Int
   Event              Event                @relation(fields: [eventId], references: [id])
   User               User                 @relation(fields: [userId], references: [id])
-  ChatParticipant    ChatParticipant?
+  ChatParticipant    ChatParticipant[]
   SendChat           Chat[]               @relation(name: "SenderEventParticipant")
   ReceivedChat       Chat[]               @relation(name: "ReceiverEventParticipant")
   ChannelParticipant ChannelParticipant[]
@@ -184,7 +184,7 @@ model Chat {
 model ChatParticipant {
   id               Int              @id @default(autoincrement())
   eventId          Int
-  participantId    Int              @unique
+  participantId    Int
   chatId           Int
   Chat             Chat             @relation(fields: [chatId], references: [id])
   EventParticipant EventParticipant @relation(fields: [participantId], references: [id])
