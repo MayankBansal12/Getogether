@@ -23,11 +23,19 @@ const router = createBrowserRouter([
   },
   {
     path: '/allevents',
-    element: <AllEvents />,
+    element: (
+      <Protected>
+        <AllEvents />
+      </Protected>
+    ),
   },
   {
     path: '/createevent',
-    element: <CreateEvent />,
+    element: (
+      <Protected>
+        <CreateEvent />
+      </Protected>
+    ),
   },
   {
     path: '/auth/:authType?',
