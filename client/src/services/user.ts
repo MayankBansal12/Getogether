@@ -33,6 +33,9 @@ class User {
       const data = await resp.json()
       if (resp.ok) {
         setUser(data.user)
+        await this.Unsubscribe()
+        await this.SetupServiceWorker()
+        this.Subscribe()
         return true
       } else {
         localStorage.removeItem('token')
@@ -156,6 +159,55 @@ class User {
     } catch (error) {
       console.log(error)
       return { success: false, message: 'Some error occured', type: 'error' }
+    }
+  }
+
+  public static async Unsubscribe() {
+    try {
+      const swRegistration = await navigator.serviceWorker.ready
+      const pushSubscription =
+        await swRegistration.pushManager.getSubscription()
+      if (pushSubscription) {
+        await pushSubscription.unsubscribe()
+        console.log('Unsubscribed')
+      }
+    } catch (error) {
+      console.error('Unsubscribe error:', error)
+    }
+  }
+
+  public static async SetupServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      try {
+        const sw = await navigator.serviceWorker.register('sw.js')
+        console.log('Service worker registered:', sw)
+      } catch (error) {
+        console.error('Service worker registration failed:', error)
+      }
+    }
+  }
+
+  public static async Subscribe() {
+    try {
+      const swRegistration = await navigator.serviceWorker.ready
+      const pushSubscription = await swRegistration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey:
+          'BCykaAlOtZwChaoyEILvMBUlaE3_aTj1opSk185cbvMa9EAwDyGS--ckZ_4HfLEYzB7hI-c1ZHiAYDlkDTpZKow',
+      })
+      console.log('Push subscription:\n', JSON.stringify(pushSubscription))
+
+      const response = await fetch('http://localhost:5000/user/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(pushSubscription),
+      })
+      console.log('Subscription response:', response)
+    } catch (error) {
+      console.error('Subscription error:', error)
     }
   }
 }

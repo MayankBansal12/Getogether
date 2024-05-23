@@ -169,6 +169,13 @@ interface IChatParticipant {
   Event: IEvent
 }
 
+interface IFCMAttributes {
+  userId: number
+  endPoint: String
+  p256dh: String
+  auth: String
+}
+
 export {
   IUser,
   IUserAttributes,
@@ -187,4 +194,5 @@ export {
   IPhoto,
   IPhotographer,
   IVendor,
+  IFCMAttributes,
 }

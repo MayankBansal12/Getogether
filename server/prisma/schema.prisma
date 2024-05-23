@@ -25,6 +25,15 @@ model User {
   Vendor           Vendor?
   Payer            Payment[]         @relation(name: "Payer")
   Payee            Payment[]         @relation(name: "Payee")
+  FCM              FCM?
+}
+
+model FCM {
+  userId   Int    @id @unique
+  endPoint String
+  p256dh   String
+  auth     String
+  User     User   @relation(fields: [userId], references: [id])
 }
 
 model Budget {
