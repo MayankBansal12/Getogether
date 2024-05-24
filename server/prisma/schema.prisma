@@ -143,6 +143,8 @@ model EventParticipant {
   SendChat           Chat[]               @relation(name: "SenderEventParticipant")
   ReceivedChat       Chat[]               @relation(name: "ReceiverEventParticipant")
   ChannelParticipant ChannelParticipant[]
+
+  @@unique([eventId, userId], name: "UserEventUnique")
 }
 
 model Vendor {
