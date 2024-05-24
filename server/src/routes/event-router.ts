@@ -67,10 +67,12 @@ router.post('/join', async (req: Request, res: Response) => {
 
   try {
     // Check if the participant already exists
-    const existingParticipant = await prisma.eventParticipant.findFirst({
+    const existingParticipant = await prisma.eventParticipant.findUnique({
       where: {
-        userId,
-        eventId,
+        UserEventUnique: {
+          userId,
+          eventId,
+        },
       },
     })
 
