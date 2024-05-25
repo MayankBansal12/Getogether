@@ -1,5 +1,6 @@
 import { useUserStore } from '../global-store/store'
 import { LoginEvent, SignupEvent } from '../pages/auth/auth'
+import ImageHelper from './image'
 
 const BACKEND = 'http://localhost:5000'
 
@@ -57,6 +58,8 @@ class User {
       const about = e.target.about.value
       const password = e.target.password.value
       const confirmPassword = e.target.confirmPassword.value
+      const image = await ImageHelper.ConvertBase64(e.target.image.files[0])
+      const imageName = e.target.image.files[0]?.name
 
       if (
         !email ||
@@ -64,7 +67,9 @@ class User {
         !phone ||
         !about ||
         !password ||
-        !confirmPassword
+        !confirmPassword ||
+        !image ||
+        !imageName
       ) {
         return {
           success: false,
@@ -86,7 +91,15 @@ class User {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, name, phone, about, password }),
+        body: JSON.stringify({
+          email,
+          name,
+          phone,
+          about,
+          password,
+          image,
+          imageName,
+        }),
       })
 
       const data = await res.json()
@@ -180,7 +193,7 @@ class User {
     if ('serviceWorker' in navigator) {
       try {
         const sw = await navigator.serviceWorker.register('sw.js')
-        console.log('Service worker registered:', sw)
+        // console.log('Service worker registered:', sw)
       } catch (error) {
         console.error('Service worker registration failed:', error)
       }
@@ -195,7 +208,7 @@ class User {
         applicationServerKey:
           'BCykaAlOtZwChaoyEILvMBUlaE3_aTj1opSk185cbvMa9EAwDyGS--ckZ_4HfLEYzB7hI-c1ZHiAYDlkDTpZKow',
       })
-      console.log('Push subscription:\n', JSON.stringify(pushSubscription))
+      // console.log('Push subscription:\n', JSON.stringify(pushSubscription))
 
       const response = await fetch('http://localhost:5000/user/subscribe', {
         method: 'POST',
@@ -205,7 +218,7 @@ class User {
         },
         body: JSON.stringify(pushSubscription),
       })
-      console.log('Subscription response:', response)
+      // console.log('Subscription response:', response)
     } catch (error) {
       console.error('Subscription error:', error)
     }

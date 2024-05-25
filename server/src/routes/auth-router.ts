@@ -15,6 +15,8 @@ interface SignupReqType extends Request {
     name?: string
     phone?: string
     about?: string
+    image?: string
+    imageName?: string
   }
 }
 interface loginRequestType extends Request {
@@ -26,8 +28,16 @@ interface loginRequestType extends Request {
 
 router.post('/signup', async (req: SignupReqType, res) => {
   try {
-    const { email, password, name, phone, about } = req.body
-    if (!email || !password || !name || !phone || !about) {
+    const { email, password, name, phone, about, image, imageName } = req.body
+    if (
+      !email ||
+      !password ||
+      !name ||
+      !phone ||
+      !about ||
+      !image ||
+      !imageName
+    ) {
       return res.status(400).json({ message: 'All fields are required' })
     }
 
@@ -48,6 +58,8 @@ router.post('/signup', async (req: SignupReqType, res) => {
         name,
         phone,
         about,
+        profilePic: '',
+        PicName: '',
       },
     })
     // 3. generate token
