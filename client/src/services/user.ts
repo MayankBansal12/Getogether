@@ -180,7 +180,7 @@ class User {
     if ('serviceWorker' in navigator) {
       try {
         const sw = await navigator.serviceWorker.register('sw.js')
-        console.log('Service worker registered:', sw)
+        // console.log('Service worker registered:', sw)
       } catch (error) {
         console.error('Service worker registration failed:', error)
       }
@@ -195,7 +195,7 @@ class User {
         applicationServerKey:
           'BCykaAlOtZwChaoyEILvMBUlaE3_aTj1opSk185cbvMa9EAwDyGS--ckZ_4HfLEYzB7hI-c1ZHiAYDlkDTpZKow',
       })
-      console.log('Push subscription:\n', JSON.stringify(pushSubscription))
+      // console.log('Push subscription:\n', JSON.stringify(pushSubscription))
 
       const response = await fetch('http://localhost:5000/user/subscribe', {
         method: 'POST',
@@ -205,7 +205,7 @@ class User {
         },
         body: JSON.stringify(pushSubscription),
       })
-      console.log('Subscription response:', response)
+      // console.log('Subscription response:', response)
     } catch (error) {
       console.error('Subscription error:', error)
     }
