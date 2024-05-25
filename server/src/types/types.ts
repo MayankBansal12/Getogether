@@ -207,6 +207,7 @@ interface PersonalMessagePayLoad {
   receiverId: number;
   message: string;
   photoLink: string;
+  roomId: string;
 }
 
 interface IFCMAttributes {
@@ -217,7 +218,7 @@ interface IFCMAttributes {
 }
 
 export {
-  SignupReqType, 
+  SignupReqType,
   loginRequestType,
   IUser,
   IUserAttributes,
