@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken'
 import { UserReqType } from '../types/req'
 import authMiddleware from '../middlewares/user-middleware'
 import push from 'web-push'
+import UploadImg from '../helper/upload-img'
+
 const router = Router()
 
 const SECRET_KEY = process.env.SECRET_KEY
@@ -52,15 +54,23 @@ router.post('/login', async (req: Request, res: Response) => {
     }
     res
       .status(500)
-      .json({ error: 'Internal server error!', message: error.message })
+      .json({ message: 'Internal server error!', error: error.message })
   }
 })
 
 // /user/signup -> User signup
 router.post('/signup', async (req: Request, res: Response) => {
-  const { name, email, phone, about, password } = req.body
+  const { name, email, phone, about, password, image, imageName } = req.body
 
-  if (!email || !password || !name || !phone || !about) {
+  if (
+    !email ||
+    !password ||
+    !name ||
+    !phone ||
+    !about ||
+    !image ||
+    !imageName
+  ) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -70,6 +80,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     if (userExist > 0) {
       return res.status(400).json({ message: 'User already exists' })
     }
+    const ImageUrl = await UploadImg(image)
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -80,6 +91,8 @@ router.post('/signup', async (req: Request, res: Response) => {
         phone,
         about,
         password: hashedPassword,
+        profilePic: ImageUrl,
+        PicName: imageName,
       },
     })
 
@@ -92,7 +105,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     }
     res
       .status(500)
-      .json({ error: 'Internal server error', message: error.message })
+      .json({ message: 'Internal server error', error: error.message })
   }
 })
 

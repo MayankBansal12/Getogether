@@ -1,5 +1,6 @@
 import { useUserStore } from '../global-store/store'
 import { LoginEvent, SignupEvent } from '../pages/auth/auth'
+import ImageHelper from './image'
 
 const BACKEND = 'http://localhost:5000'
 
@@ -57,6 +58,8 @@ class User {
       const about = e.target.about.value
       const password = e.target.password.value
       const confirmPassword = e.target.confirmPassword.value
+      const image = await ImageHelper.ConvertBase64(e.target.image.files[0])
+      const imageName = e.target.image.files[0]?.name
 
       if (
         !email ||
@@ -64,7 +67,9 @@ class User {
         !phone ||
         !about ||
         !password ||
-        !confirmPassword
+        !confirmPassword ||
+        !image ||
+        !imageName
       ) {
         return {
           success: false,
@@ -86,7 +91,15 @@ class User {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, name, phone, about, password }),
+        body: JSON.stringify({
+          email,
+          name,
+          phone,
+          about,
+          password,
+          image,
+          imageName,
+        }),
       })
 
       const data = await res.json()

@@ -20,6 +20,8 @@ model User {
   password         String
   phone            String
   about            String
+  profilePic       String
+  PicName          String
   Photographer     Photographer?
   EventParticipant EventParticipant[]
   Vendor           Vendor?

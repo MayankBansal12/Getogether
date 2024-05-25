@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import convertBase64 from '../services/helper'
+import ImageHelper from '../services/image'
+import ImageUploader from '../components/image-uploader'
 
 type Props = {}
 
@@ -17,7 +18,8 @@ const Test = (props: Props) => {
   ) => {
     e.preventDefault()
     try {
-      const img = await convertBase64(e.target.image.files[0])
+      // Ayse convert karna hoga
+      const img = await ImageHelper.ConvertBase64(e.target.image.files[0])
       const res = await fetch('http://localhost:5000/image/upload-image', {
         method: 'POST',
         headers: {
@@ -36,8 +38,9 @@ const Test = (props: Props) => {
   return (
     <div className="flex flex-col gap-4 p-4 h-screen">
       <h1>Test</h1>
+      {/* encType likhna important hai */}
       <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <input type="file" name="image" accept="image/*" id="image" />
+        <ImageUploader />
         <button type="submit">Send</button>
       </form>
 

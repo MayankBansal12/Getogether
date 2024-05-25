@@ -5,7 +5,9 @@ import Button from '../../components/button'
 import { Link } from '@mui/material'
 import Loader from '../../components/loader'
 import User from '../../services/user'
+import ImageUploader from '../../components/image-uploader'
 import useSnackbar from '../../hooks/use-snackbar'
+import ImageHelper from '../../services/image'
 
 type Props = {}
 
@@ -17,6 +19,7 @@ export interface SignupEvent {
     about: HTMLTextAreaElement
     password: HTMLInputElement
     confirmPassword: HTMLInputElement
+    image: HTMLInputElement
   }
 }
 export interface LoginEvent {
@@ -128,10 +131,15 @@ const Auth = (props: Props) => {
                 <Button onClick={() => {}} children={'Login'} />
               </form>
             ) : (
-              <form onSubmit={handleSignup} className="flex flex-col">
-                {/* signup form */}{' '}
+              <form
+                onSubmit={handleSignup}
+                encType="multipart/form-data"
+                className="flex flex-col items-center"
+              >
+                {/* signup form */}
+                <ImageUploader />
                 <input
-                  className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
+                  className="border-primary-light bg-background-light my-1 mt-2 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
                   type="text"
                   placeholder="Email"
                   name="email"
@@ -178,7 +186,6 @@ const Auth = (props: Props) => {
                     Login.
                   </Link>
                 </p>
-                <br />
                 <Button onClick={() => {}} children={'Signup'} />
               </form>
             )}

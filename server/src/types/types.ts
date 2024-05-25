@@ -5,6 +5,8 @@ interface IUserAttributes {
   password: string
   phone: string
   about: string
+  profilePic: string
+  PicName: string
 }
 
 interface IUser extends IUserAttributes {
