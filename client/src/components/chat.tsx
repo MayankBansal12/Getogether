@@ -1,6 +1,9 @@
+import React, { useEffect, useState } from 'react';
 import { Avatar, Button } from '@mui/material'
-
 import SendIcon from '@mui/icons-material/Send';
+import { useSocket } from "../context/SocketContext.jsx";
+import { Socket } from 'socket.io-client';
+
 
 const chat = [
   {
@@ -81,6 +84,59 @@ function formatTime(date: string) {
 
 export default function Chat() {
 
+  const socket = useSocket();
+  const [messages, setMessages] = useState<any[]>([]);
+  const [message, setMessage] = useState('');
+  const isGroup = false;
+
+  useEffect(() => {
+    if (socket) {
+
+      if (isGroup) {
+        socket.emit('join-group', { userId: "", groupId: "" });
+        const handleMessage = (newMessage: any) => {
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
+        };
+        socket.on('message', handleMessage);
+
+        return () => {
+          socket.off('message', handleMessage);
+          socket.emit('leave-group', { userId: "", groupId: "" });
+        }
+      } else {
+        const roomId = `${"eventId"}_${"userId"}_${"receiverId"}`;
+        socket.emit('join-dm', { roomId: "" });
+        const handleNewDirectMessage = (newMessage: any) => {
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
+        };
+
+        socket.on('newDirectMessage', handleNewDirectMessage);
+
+        return () => {
+          socket.off('newDirectMessage', handleNewDirectMessage);
+          socket.on('leave-dm', { roomId: "" });
+        }
+      }
+    } else {
+      console.log("Error connecting socket!")
+    }
+  }, [socket]);
+
+
+  const handleSendMessage = () => {
+    if (socket) {
+      socket.emit('personal-message', { eventId: "", senderId: "", receiverId: "", message, photoLink: null, roomId: "" });
+      setMessage('');
+    }
+  };
+
+  const handleSendGroupMessage = () => {
+    if (socket) {
+      socket.emit('send-message', { userId: '1', groupId: '1', message, photoLink: null });
+      setMessage('');
+    }
+  }
+
   const renderMessages = () => {
     let lastDate = null;
     let lastSender = null;
@@ -123,13 +179,15 @@ export default function Chat() {
       </div>
       <div className="bottom-4 sticky flex gap-2 items-center bg-gray-100 px-4 py-1">
         <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           className="flex-1 bg-transparent px-4 py-2 rounded-lg outline-none"
           placeholder="Type your message..."
           type="text"
         />
         <Button
           onClick={() => {
-            console.log('sent')
+            console.log('sent message', message)
           }}
         >
           <SendIcon />
