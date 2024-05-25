@@ -1,84 +1,140 @@
-import Button from './button'
+import { Avatar, Button } from '@mui/material'
+
+import SendIcon from '@mui/icons-material/Send';
+
+const chat = [
+  {
+    name: "John",
+    message: "Great, let's connect later today. I have a few things I'd like to discuss with you.",
+    timestamp: "2024-05-25T12:00:00Z"
+  },
+  {
+    name: "Mayank",
+    message: "Sure, let's do it!",
+    timestamp: "2024-05-25T12:02:00Z"
+  },
+  {
+    name: "Mayank",
+    message: "Hey!",
+    timestamp: "2024-05-26T12:02:00Z"
+  },
+  {
+    name: "Mayank",
+    message: "WHere are you??",
+    timestamp: "2024-05-26T12:02:00Z"
+  },
+  {
+    name: "John",
+    message: "Heya!",
+    timestamp: "2024-05-27T12:02:00Z"
+  }
+]
+
+function stringToColor(string: string) {
+  let hash = 0;
+  let i;
+
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = '#';
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+
+  return color;
+}
+
+function stringAvatar(name: string) {
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+    },
+    children: `${name.substring(0, 1)}`,
+  };
+}
+
+const formatDate = (timestamp: string) => {
+  let date = new Date(timestamp);
+
+  let months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  let day = date.getUTCDate();
+  let monthName = months[date.getUTCMonth()];
+  let year = date.getUTCFullYear();
+
+  return `${day} ${monthName} ${year}`;
+};
+
+function formatTime(date: string) {
+  const now = new Date(date);
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
 
 export default function Chat() {
-  return (
-    <>
-      <div className="flex flex-col h-screen">
-        <div className="flex-1 p-4 overflow-auto">
-          <div className="space-y-4">
-            <div className="flex items-start">
-              <img
-                alt="User Avatar"
-                className="mr-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
-                src="/placeholder.svg"
-              />
-              <div>
-                <p className="font-medium">John Doe</p>
-                <p className="bg-gray-100 p-3 rounded-lg max-w-xs sm:max-w-md">
-                  Great, let's connect later today. I have a few things I'd like
-                  to discuss with you.
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-end items-start">
-              <div className="text-right">
-                <p className="font-medium">Jane Smith</p>
-                <p className="bg-primary-light p-3 rounded-lg max-w-xs sm:max-w-md text-white">
-                  Sounds good, I'll be available after 4 pm. Talk to you then!
-                </p>
-              </div>
-              <img
-                alt="User Avatar"
-                className="ml-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
-                src="/placeholder.svg"
-              />
-            </div>
-            <div className="flex items-start">
-              <img
-                alt="User Avatar"
-                className="mr-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
-                src="/placeholder.svg"
-              />
-              <div>
-                <p className="font-medium text-gray-500">John Doe</p>
-                <p className="bg-gray-100 p-3 rounded-lg max-w-xs sm:max-w-md">
-                  Hey, how's it going? I wanted to follow up on our last
-                  conversation.
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-end items-start">
-              <div className="text-right">
-                <p className="font-medium text-gray-500">Jane Smith</p>
-                <p className="bg-primary-light p-3 rounded-lg max-w-xs sm:max-w-md text-white">
-                  Hi John, I'm doing well, thanks for asking. I'm free to chat
-                  whenever you're available.
-                </p>
-              </div>
-              <img
-                alt="User Avatar"
-                className="ml-3 rounded-full w-8 sm:w-10 h-8 sm:h-10"
-                src="/placeholder.svg"
-              />
-            </div>
+
+  const renderMessages = () => {
+    let lastDate = null;
+    let lastSender = null;
+
+    return chat.map((item, i) => {
+      const messageDate = new Date(item.timestamp).toDateString();
+      const showDate = messageDate !== lastDate;
+      const showSender = item.name !== lastSender;
+      lastDate = messageDate;
+      lastSender = item.name;
+
+      return (
+        <div key={i}>
+          {showDate && <div className="mt-4 flex items-center gap-2">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <p className="text-center text-[14px] text-gray-500">{formatDate(item.timestamp)}</p>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>}
+
+          {(showSender || showDate) && <div className="mt-4 flex gap-2 items-center">
+            <Avatar {...stringAvatar(item.name)} />
+            <p className="font-medium text-[18px]">{item.name}</p>
+          </div>}
+
+          <div className="flex gap-2 items-center">
+            <p className="pl-11 text-gray-600">{item.message}</p>
+            <p className="text-[13px] text-gray-500">{formatTime(item.timestamp)}</p>
           </div>
         </div>
-        <div className="bottom-4 sticky flex items-center bg-gray-100 px-4 py-3">
-          <input
-            className="flex-1 border-primary-light px-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-light"
-            placeholder="Type your message..."
-            type="text"
-          />
-          <div className="ml-2">
-            <Button
-              children={'Send'}
-              onClick={() => {
-                console.log('sent')
-              }}
-            />
-          </div>
+      );
+    });
+  };
+
+  return (
+    <div className="flex flex-col h-screen">
+      <div className="flex-1 p-4 overflow-auto">
+        <div>
+          {renderMessages()}
         </div>
       </div>
-    </>
+      <div className="bottom-4 sticky flex gap-2 items-center bg-gray-100 px-4 py-1">
+        <input
+          className="flex-1 bg-transparent px-4 py-2 rounded-lg outline-none"
+          placeholder="Type your message..."
+          type="text"
+        />
+        <Button
+          onClick={() => {
+            console.log('sent')
+          }}
+        >
+          <SendIcon />
+        </Button>
+      </div>
+    </div>
   )
 }
