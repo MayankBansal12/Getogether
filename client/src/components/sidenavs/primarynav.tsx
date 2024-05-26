@@ -109,6 +109,10 @@ export default function SidebarNav(props: Props) {
       name: 'Payment History',
       action: () => setRenderComponent('Payment History'),
     },
+    {
+      name: 'Book My Table',
+      action: () => setRenderComponent('booktable'),
+    },
   ]
   // List for DM delete this later
   const dmList = [

@@ -15,11 +15,16 @@ import SnackbarComp from './components/snackbar'
 import AllEvents from './pages/allevents'
 import Host from './pages/host'
 import CreateEvent from './components/eventcomponents/create'
+import BookTable from './components/booktable'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Home />,
+  },
+  {
+    path: '/book-table',
+    element: <BookTable />,
   },
   {
     path: '/allevents',
