@@ -57,7 +57,7 @@ const Budget = () => {
           <input
             className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
             type="text"
-            placeholder="Remaining Amout"
+            placeholder="Amount Spent"
             name="amount"
           />
           <br />
