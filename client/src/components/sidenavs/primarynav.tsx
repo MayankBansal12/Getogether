@@ -26,6 +26,7 @@ import bday from '../../assets/bday.png'
 import { useNavigate } from 'react-router-dom'
 import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
+import Groups from '../groupchats'
 
 const drawerWidth = 300
 
@@ -39,9 +40,13 @@ export default function SidebarNav(props: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [rendercomponent, setRenderComponent] = useState('')
-  const [renderList, setRenderList] = useState('Home')
-  const handleHome = () => {
+  const [renderList, setRenderList] = useState('Dash')
+  const handleDash = () => {
     setRenderComponent('')
+    setRenderList('Dash')
+  }
+  const handleHome = () => {
+    setRenderComponent('Groups')
     setRenderList('Home')
   }
   const handleDm = () => {
@@ -66,6 +71,73 @@ export default function SidebarNav(props: Props) {
       setMobileOpen(!mobileOpen)
     }
   }
+  // List for icons on the extreme right
+  const iconData = [
+    {
+      handler: handleHome,
+      path: 'M2.25 12L11.204 3.045c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25',
+    },
+    {
+      handler: handleDash,
+      path: 'M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25',
+    },
+    {
+      handler: handleDm,
+      path: 'M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z',
+    },
+    {
+      handler: handleCalender,
+      path: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z',
+    },
+  ]
+  // Dashboard Items
+  const dashlistitems = [
+    { name: 'Participants', action: () => setRenderComponent('Participants') },
+    { name: 'Events', action: () => setRenderComponent('Sub Events') },
+    {
+      name: 'Sub Events',
+      accordion: true,
+      details: [
+        {
+          name: 'Celebrating',
+          action: () => setRenderComponent('Information'),
+        },
+      ],
+    },
+    { name: 'Budget', action: () => setRenderComponent('Budget') },
+    {
+      name: 'Payment History',
+      action: () => setRenderComponent('Payment History'),
+    },
+  ]
+  // List for DM delete this later
+  const dmList = [
+    {
+      name: 'Saakshi',
+      joinedDate: 'Joined on 25th May, 2024',
+      action: () => setRenderComponent('Chat'),
+    },
+    {
+      name: 'Arghya',
+      joinedDate: 'Joined on 26th May, 2024',
+      action: () => setRenderComponent('Chat'),
+    },
+    // Add more items as needed
+  ]
+  // Show all the events
+  const calendarList = [
+    {
+      event: '@ Game Zone',
+      date: 'On 25th May, 2024',
+      action: () => setRenderComponent('Event Schedule'),
+    },
+    {
+      event: '@ Bday Party',
+      date: 'On 25h May, 2024',
+      action: () => setRenderComponent('Event Schedule'),
+    },
+    // Add more items as needed
+  ]
 
   const drawer = (
     <div className="flex flex-col font-josefin">
@@ -81,182 +153,134 @@ export default function SidebarNav(props: Props) {
       <Divider />
       <div className="flex">
         <List>
-          <ListItem className="bg-white">
-            <ListItemAvatar className="bg-white" onClick={handleHome}>
-              <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 text-black transition-colors duration-200"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-                  />
-                </svg>
-              </Avatar>
-            </ListItemAvatar>
-          </ListItem>
-          <ListItem>
-            <ListItemAvatar onClick={handleDm}>
-              <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 text-black transition-colors duration-200"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-                  />
-                </svg>
-              </Avatar>
-            </ListItemAvatar>
-          </ListItem>
-          <ListItem>
-            <ListItemAvatar onClick={handleCalender}>
-              <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 text-black transition-colors duration-200"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
-                  />
-                </svg>
-              </Avatar>
-            </ListItemAvatar>
-          </ListItem>
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 text-black transition-colors duration-200"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
-              </Avatar>
-            </ListItemAvatar>
-          </ListItem>
+          {iconData.map((item, index) => (
+            <ListItem key={index} className="bg-white">
+              <ListItemAvatar className="bg-white" onClick={item.handler}>
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 text-black transition-colors duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d={item.path}
+                    />
+                  </svg>
+                </Avatar>
+              </ListItemAvatar>
+            </ListItem>
+          ))}
         </List>
         <Divider />
+        {/** Home */}
         {renderList === 'Home' && (
           <List>
-            <ListItem className="bg-white font-medium text-lg">
+            <ListItem className="flex-col bg-white font-medium text-lg">
+              <p className="w-32"> @ Sub Events</p>
               <ListItemButton
-                onClick={() => setRenderComponent('Participants')}
+                className="ml-3 font-josefin font-md text-black"
+                onClick={() => setRenderComponent('Groups')}
               >
-                @ Participants
+                # Celebrating
               </ListItemButton>
             </ListItem>
-            <ListItem className="bg-white font-medium text-lg">
-              <ListItemButton onClick={() => setRenderComponent('Sub Events')}>
-                @ Events
-              </ListItemButton>
-            </ListItem>
-            <ListItem className="bg-white font-medium text-lg">
-              <Accordion className="!border-0 !shadow-none">
-                <AccordionSummary
-                  expandIcon={
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6 text-black"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-                      />
-                    </svg>
-                  }
-                  aria-controls="panel1-content"
-                  id="panel1-header"
-                >
-                  <p className="w-32"> @ Sub Events</p>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <ListItemButton
-                    className="ml-3 font-josefin font-md text-black"
-                    onClick={() => setRenderComponent('Information')}
-                  >
-                    # Celebrating
-                  </ListItemButton>
-                </AccordionDetails>
-              </Accordion>
-            </ListItem>
-            <ListItem className="bg-white font-medium text-lg">
-              <ListItemButton onClick={() => setRenderComponent('Budget')}>
-                @ Budget
-              </ListItemButton>
-            </ListItem>
-            <ListItem className="bg-white font-medium text-lg">
-              <ListItemButton
-                onClick={() => setRenderComponent('Payment History')}
-              >
-                @ Payment History
-              </ListItemButton>
-            </ListItem>
+            <Divider className="m-0" />
           </List>
         )}
+        {/* Dashboard */}
+        {renderList === 'Dash' && (
+          <List>
+            {dashlistitems.map((item, index) => (
+              <ListItem key={index} className="bg-white font-medium text-lg">
+                {item.accordion ? (
+                  <Accordion className="!border-0 !shadow-none">
+                    <AccordionSummary
+                      expandIcon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-black"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                          />
+                        </svg>
+                      }
+                      aria-controls={`panel${index}-content`}
+                      id={`panel${index}-header`}
+                    >
+                      <p className="w-32">@ {item.name}</p>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {item.details.map((detail, idx) => (
+                        <ListItemButton
+                          key={idx}
+                          className="ml-3 font-josefin font-md text-black"
+                          onClick={detail.action}
+                        >
+                          # {detail.name}
+                        </ListItemButton>
+                      ))}
+                    </AccordionDetails>
+                  </Accordion>
+                ) : (
+                  <ListItemButton onClick={item.action}>
+                    @ {item.name}
+                  </ListItemButton>
+                )}
+              </ListItem>
+            ))}
+          </List>
+        )}
+
         {/** Chat List */}
         {renderList === 'Dm' && (
           <List>
-            <ListItem className="bg-white font-medium text-lg">
-              <ListItemButton onClick={() => setRenderComponent('Chat')}>
-                <p>
-                  <span>Saakshi</span>
-                  <br />
-                  <span className="text-dull text-xs">
-                    Joined on 25th May, 2024
-                  </span>
-                </p>
-              </ListItemButton>
-            </ListItem>
-            <Divider />
+            {dmList.map((item, index) => (
+              <React.Fragment key={index}>
+                <ListItem className="bg-white font-medium text-lg">
+                  <ListItemButton onClick={item.action}>
+                    <p>
+                      <span>{item.name}</span>
+                      <br />
+                      <span className="text-dull text-xs">
+                        {item.joinedDate}
+                      </span>
+                    </p>
+                  </ListItemButton>
+                </ListItem>
+                {index < dmList.length - 1 && <Divider />}
+              </React.Fragment>
+            ))}
           </List>
         )}
         {/* calender */}
         {renderList === 'Calender' && (
           <List>
-            <ListItem className="bg-white font-medium text-lg">
-              <ListItemButton
-                onClick={() => setRenderComponent('Event Schedule')}
-              >
-                <p>
-                  <span>@ Game Zone</span>
-                  <br />
-                  <span className="text-dull text-xs">On 25th May, 2024</span>
-                </p>
-              </ListItemButton>
-            </ListItem>
-            <Divider />
+            {calendarList.map((item, index) => (
+              <React.Fragment key={index}>
+                <ListItem className="bg-white font-medium text-lg">
+                  <ListItemButton onClick={item.action}>
+                    <p>
+                      <span>{item.event}</span>
+                      <br />
+                      <span className="text-dull text-xs">{item.date}</span>
+                    </p>
+                  </ListItemButton>
+                </ListItem>
+                {index < calendarList.length - 1 && <Divider />}
+              </React.Fragment>
+            ))}
           </List>
         )}
       </div>
@@ -351,7 +375,9 @@ export default function SidebarNav(props: Props) {
         }}
       >
         <Toolbar />
-        {rendercomponent === '' && renderList === 'Home' && <Default />}
+        {rendercomponent === '' && renderList === 'Dash' && <Default />}
+        {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
+
         {rendercomponent === 'Participants' && <Participants />}
         {rendercomponent === 'Sub Events' && <Subevents />}
         {rendercomponent === 'Information' && <SingleSubEvent />}
