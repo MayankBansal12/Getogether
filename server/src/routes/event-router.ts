@@ -41,10 +41,10 @@ router.post('/list', async (req: Request, res: Response) => {
             ChannelParticipant: true,
             GroupRelation: includeGroup
               ? {
-                  include: {
-                    Group: true,
-                  },
-                }
+                include: {
+                  Group: true,
+                },
+              }
               : false,
           },
         },
@@ -247,7 +247,7 @@ router.get('/participants', async (req: Request, res: Response) => {
     })
     const users = []
     participants.map((participant) => {
-      users.push({ ...participant.User, role: participant.role })
+      users.push({ ...participant.User, role: participant.role, inviteStatus: participant.status })
     })
 
     return res
