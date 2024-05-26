@@ -45,14 +45,14 @@ const BookTable = () => {
                 <img
                   src={Table}
                   alt="Table"
-                  className={`mx-2 ${isMobile ? 'size-6' : ''}`}
+                  className={`mx-2 ${isMobile ? 'size-6' : 'size-12'}`}
                 />
                 {/* Second Table Flipped Horizontally */}
                 <img
                   src={Table}
                   alt="Flipped Table"
                   className={`mx-2 transform scale-x-[-1]  ${
-                    isMobile ? 'size-6' : ''
+                    isMobile ? 'size-6' : 'size-12'
                   }`}
                 />
               </div>
@@ -65,13 +65,13 @@ const BookTable = () => {
             <img
               src={Table}
               alt="Table"
-              className={`mx-2 ${isMobile ? 'w-6 h-6' : ''}`}
+              className={`mx-2 ${isMobile ? 'w-6 h-6' : 'size-12'}`}
             />
             <img
               src={Table}
               alt="Flipped Table"
               className={`mx-2 transform scale-x-[-1] ${
-                isMobile ? 'w-6 h-6' : ''
+                isMobile ? 'w-6 h-6' : 'size-12'
               }`}
             />
           </button>

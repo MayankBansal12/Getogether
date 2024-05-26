@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom'
 import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
 import Groups from '../groupchats'
+import BookTable from '../booktable'
 
 const drawerWidth = 300
 
@@ -381,7 +382,7 @@ export default function SidebarNav(props: Props) {
         <Toolbar />
         {rendercomponent === '' && renderList === 'Dash' && <Default />}
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
-
+        {rendercomponent === 'booktable' && <BookTable />}
         {rendercomponent === 'Participants' && <Participants />}
         {rendercomponent === 'Sub Events' && <Subevents />}
         {rendercomponent === 'Information' && <SingleSubEvent />}
