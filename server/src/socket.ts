@@ -8,12 +8,17 @@ export default function (io: Server) {
 
         // For personal messages
         // For connecting the dm with a user
-        socket.on("join-dm", ({ eventId, userId }) => {
-            const roomId = `${eventId}_${userId}`;
+        socket.on("join-dm", ({ roomId }) => {
             socket.join(roomId);
         })
 
-        socket.on("personal-message", async ({ eventId, senderId, receiverId, message, photoLink }: PersonalMessagePayLoad) => {
+        // Leave dm
+        socket.on("leave-dm", ({ roomId }) => {
+            socket.leave(roomId);
+        });
+
+        // For sending message
+        socket.on("personal-message", async ({ eventId, senderId, receiverId, message, photoLink, roomId }: PersonalMessagePayLoad) => {
             const newMessage = await prisma.chat.create({
                 data: {
                     eventId,
@@ -25,12 +30,8 @@ export default function (io: Server) {
                 },
             });
 
-            const senderRoomId = `${eventId}_${senderId}`;
-            const receiverRoomId = `${eventId}_${receiverId}`;
-
-            // Emit message to the sender and receiver
-            io.to(senderRoomId).emit('newDirectMessage', newMessage);
-            io.to(receiverRoomId).emit('newDirectMessage', newMessage);
+            // emit message to the room
+            io.to(roomId).emit('newDirectMessage', newMessage);
         })
 
         // For group messages
@@ -39,6 +40,12 @@ export default function (io: Server) {
             console.log("User with userId ", userId, " connected in group: ", groupId);
             socket.join(groupId.toString());
         })
+
+        // Leave group room
+        socket.on("leave-group", ({ userId, groupId }) => {
+            console.log("User with userId ", userId, " left group: ", groupId);
+            socket.leave(groupId.toString());
+        });
 
         // Send messages in a group
         socket.on("send-message", async ({ userId, groupId, message, photoLink }: SendMessagePayload) => {

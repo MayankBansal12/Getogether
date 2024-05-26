@@ -67,9 +67,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     !password ||
     !name ||
     !phone ||
-    !about ||
-    !image ||
-    !imageName
+    !about
   ) {
     return res.status(400).json({ message: 'All fields are required' })
   }
@@ -80,7 +78,8 @@ router.post('/signup', async (req: Request, res: Response) => {
     if (userExist > 0) {
       return res.status(400).json({ message: 'User already exists' })
     }
-    const ImageUrl = await UploadImg(image)
+    let imageUrl = "";
+    if (image) imageUrl = await UploadImg(image)
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -91,8 +90,8 @@ router.post('/signup', async (req: Request, res: Response) => {
         phone,
         about,
         password: hashedPassword,
-        profilePic: ImageUrl,
-        PicName: imageName,
+        profilePic: imageUrl,
+        PicName: imageName || "",
       },
     })
 
@@ -109,7 +108,7 @@ router.post('/signup', async (req: Request, res: Response) => {
   }
 })
 
-// /user/:userId/event -> For fetching all events that user is part of
+  ;// /user/:userId/event -> For fetching all events that user is part of
 router.get('/:userId/event', async (req: Request, res: Response) => {
   const { userId } = req.params
 

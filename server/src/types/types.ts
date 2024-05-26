@@ -1,3 +1,22 @@
+import { Request } from "express";
+
+interface SignupReqType extends Request {
+  body: {
+    email?: string
+    password?: string
+    name?: string
+    phone?: string
+    about?: string
+    image?: string
+    imageName?: string
+  }
+}
+interface loginRequestType extends Request {
+  body: {
+    email: string
+    password: string
+  }
+}
 interface IUserAttributes {
   id: number
   name: string
@@ -188,16 +207,19 @@ interface PersonalMessagePayLoad {
   receiverId: number;
   message: string;
   photoLink: string;
+  roomId: string;
 }
 
 interface IFCMAttributes {
-  userId: number
-  endPoint: String
-  p256dh: String
-  auth: String
+  userId: number;
+  endPoint: string;
+  p256dh: string;
+  auth: string;
 }
 
 export {
+  SignupReqType,
+  loginRequestType,
   IUser,
   IUserAttributes,
   IBudget,
@@ -217,6 +239,6 @@ export {
   IVendor,
   JoinChannelPayload,
   SendMessagePayload,
-  PersonalMessagePayLoad
+  PersonalMessagePayLoad,
   IFCMAttributes,
 }

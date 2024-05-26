@@ -1,30 +1,13 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { Request, Router } from 'express'
-import { AuthReqType, UserReqType } from '../types/req'
+import { Router } from 'express'
+import { UserReqType } from '../types/req'
 import authMiddleware from '../middlewares/user-middleware'
 import prisma from '../db/db'
+import { SignupReqType, loginRequestType } from '../types/types'
 
 const router = Router()
 const secret = process.env.SECRET || ''
-
-interface SignupReqType extends Request {
-  body: {
-    email?: string
-    password?: string
-    name?: string
-    phone?: string
-    about?: string
-    image?: string
-    imageName?: string
-  }
-}
-interface loginRequestType extends Request {
-  body: {
-    email: string
-    password: string
-  }
-}
 
 router.post('/signup', async (req: SignupReqType, res) => {
   try {
@@ -47,10 +30,8 @@ router.post('/signup', async (req: SignupReqType, res) => {
       return res.status(400).json({ message: 'User already exists' })
     }
 
-    // Create user
-    // 1. hash password
     const hashedPassword = await bcrypt.hash(password, 10)
-    // 2. save user to db
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -62,9 +43,9 @@ router.post('/signup', async (req: SignupReqType, res) => {
         PicName: '',
       },
     })
-    // 3. generate token
+
     const token = jwt.sign({ id: user.id }, secret)
-    // 4. send response
+
     res.status(200).json({ token, message: 'Signup successful' })
   } catch (error) {
     console.log('==auth/signup==\n', error)
