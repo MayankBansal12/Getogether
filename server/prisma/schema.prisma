@@ -28,6 +28,7 @@ model User {
   Payer            Payment[]          @relation(name: "Payer")
   Payee            Payment[]          @relation(name: "Payee")
   FCM              FCM?
+  Event            Event[]
 }
 
 model FCM {
@@ -45,7 +46,7 @@ model Budget {
   spent       Int
   Event       Event @relation(fields: [eventId], references: [id])
 }
- 
+
 model Photographer {
   id     Int     @id @default(autoincrement())
   userId Int     @unique
@@ -67,12 +68,15 @@ model Event {
   name             String
   desc             String
   date             DateTime
+  hostId           Int
+  image            String             @default("")
   EventParticipant EventParticipant[]
   Photo            Photo[]
   Vendor           Vendor[]
   Budget           Budget?
   Channel          Channel[]
   ChatParticipant  ChatParticipant[]
+  Host             User               @relation(fields: [hostId], references: [id])
 }
 
 model Channel {
@@ -170,14 +174,14 @@ model Payment {
 }
 
 model Chat {
-  id                       Int               @id @default(autoincrement())
-  eventId                  Int
-  senderId                 Int
-  receiverId               Int
-  message                  String
-  photos                   String
-  time                     DateTime
-  ChatParticipant          ChatParticipant[]
+  id              Int               @id @default(autoincrement())
+  eventId         Int
+  senderId        Int
+  receiverId      Int
+  message         String
+  photos          String
+  time            DateTime
+  ChatParticipant ChatParticipant[]
 }
 
 model ChatParticipant {

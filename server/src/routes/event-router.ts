@@ -2,11 +2,66 @@
 
 import { Router, Request, Response } from 'express'
 import prisma from '../db/db'
+import authMiddleware from '../middlewares/user-middleware'
+import { UserReqType } from '../types/req'
+import UploadImg from '../helper/upload-img'
 
 const router = Router()
 
+interface CreateAllReq extends UserReqType {
+  body: {
+    name: string
+    desc: string
+    budget: number
+    image: string
+    subEvents: {
+      name: string
+      venue: string
+      startTime: Date
+      endTime: Date
+    }[]
+  }
+}
+
+// /event/all -> For fetching all events
+router.get('/all', authMiddleware, async (req: UserReqType, res: Response) => {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        OR: [
+          {
+            EventParticipant: {
+              some: {
+                userId: req.user.id,
+              },
+            },
+          },
+          {
+            hostId: req.user.id,
+          },
+        ],
+      },
+      include: {
+        Host: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+    })
+
+    return res
+      .status(200)
+      .json({ message: 'Successfully fetched the event details!', events })
+  } catch (error) {
+    console.log('==/event/all\n', error)
+    res.status(400).json({ message: 'Internal server error' })
+  }
+})
+
 // /event/create -> For creating new event
-router.post('/create', async (req: Request, res: Response) => {
+router.post('/create', async (req: UserReqType, res: Response) => {
   const { name, desc } = req.body
 
   try {
@@ -15,6 +70,7 @@ router.post('/create', async (req: Request, res: Response) => {
         name: name,
         desc: desc,
         date: new Date(),
+        hostId: req.user.id,
       },
     })
 
@@ -26,6 +82,56 @@ router.post('/create', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to create event' })
   }
 })
+
+// /event/create-all -> For creating new event with all details
+router.post(
+  '/create-all',
+  authMiddleware,
+  async (req: CreateAllReq, res: Response) => {
+    const { name, desc, budget, image, subEvents } = req.body
+    if (!name || !desc || !budget || !image || !subEvents) {
+      return res.status(400).json({ error: 'Please fill all the details' })
+    }
+
+    try {
+      const imageURL = await UploadImg(image)
+      const newEvent = await prisma.event.create({
+        data: {
+          name: name,
+          desc: desc,
+          date: new Date(),
+          hostId: req.user.id,
+          image: imageURL,
+        },
+      })
+      const budgetCreated = await prisma.budget.create({
+        data: {
+          eventId: newEvent.id,
+          spent: 0,
+          totalAmount: budget,
+        },
+      })
+      const newSubEvents = await Promise.all(
+        subEvents.map((subEvent) =>
+          prisma.channel.create({
+            data: {
+              eventId: newEvent.id,
+              name: subEvent.name,
+              venue: subEvent.venue,
+              startTime: new Date(subEvent.startTime),
+              endTime: new Date(subEvent.endTime),
+            },
+          }),
+        ),
+      )
+
+      return res.status(201).json({ message: 'Events created successfully' })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Failed to create event' })
+    }
+  },
+)
 
 // /event/list -> For listing all sub events (and groups if param passed)
 router.post('/list', async (req: Request, res: Response) => {
