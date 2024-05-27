@@ -11,6 +11,12 @@ interface AuthSuccess {
 }
 
 class User {
+  public static async setNotification() {
+    await this.Unsubscribe()
+    await this.SetupServiceWorker()
+    this.Subscribe()
+  }
+
   public static async IsLoggedIn(): Promise<boolean> {
     // Check if token exists
     const token = localStorage.getItem('token')
@@ -34,9 +40,7 @@ class User {
       const data = await resp.json()
       if (resp.ok) {
         setUser(data.user)
-        await this.Unsubscribe()
-        await this.SetupServiceWorker()
-        this.Subscribe()
+        this.setNotification();
         return true
       } else {
         localStorage.removeItem('token')
