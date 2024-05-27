@@ -76,7 +76,6 @@ model Event {
   Budget           Budget?
   Channel          Channel[]
   ChatParticipant  ChatParticipant[]
-  Chat             Chat[]
   Host             User               @relation(fields: [hostId], references: [id])
 }
 
@@ -146,8 +145,6 @@ model EventParticipant {
   Event              Event                @relation(fields: [eventId], references: [id])
   User               User                 @relation(fields: [userId], references: [id])
   ChatParticipant    ChatParticipant[]
-  SendChat           Chat[]               @relation(name: "SenderEventParticipant")
-  ReceivedChat       Chat[]               @relation(name: "ReceiverEventParticipant")
   ChannelParticipant ChannelParticipant[]
 
   @@unique([eventId, userId], name: "UserEventUnique")
@@ -177,16 +174,14 @@ model Payment {
 }
 
 model Chat {
-  id                       Int               @id @default(autoincrement())
-  eventId                  Int
-  senderId                 Int
-  receiverId               Int
-  message                  String
-  time                     DateTime
-  ChatParticipant          ChatParticipant[]
-  Event                    Event             @relation(fields: [eventId], references: [id])
-  SenderEventParticipant   EventParticipant  @relation(name: "SenderEventParticipant", fields: [senderId], references: [id])
-  ReceiverEventParticipant EventParticipant  @relation(name: "ReceiverEventParticipant", fields: [receiverId], references: [id])
+  id              Int               @id @default(autoincrement())
+  eventId         Int
+  senderId        Int
+  receiverId      Int
+  message         String
+  photos          String
+  time            DateTime
+  ChatParticipant ChatParticipant[]
 }
 
 model ChatParticipant {

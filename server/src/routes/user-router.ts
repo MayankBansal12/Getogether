@@ -67,9 +67,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     !password ||
     !name ||
     !phone ||
-    !about ||
-    !image ||
-    !imageName
+    !about
   ) {
     return res.status(400).json({ message: 'All fields are required' })
   }
@@ -80,7 +78,8 @@ router.post('/signup', async (req: Request, res: Response) => {
     if (userExist > 0) {
       return res.status(400).json({ message: 'User already exists' })
     }
-    const ImageUrl = await UploadImg(image)
+    let imageUrl = "";
+    if (image) imageUrl = await UploadImg(image)
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -91,8 +90,8 @@ router.post('/signup', async (req: Request, res: Response) => {
         phone,
         about,
         password: hashedPassword,
-        profilePic: ImageUrl,
-        PicName: imageName,
+        profilePic: imageUrl,
+        PicName: imageName || "",
       },
     })
 
@@ -109,7 +108,7 @@ router.post('/signup', async (req: Request, res: Response) => {
   }
 })
 
-// /user/:userId/event -> For fetching all events that user is part of
+  ;// /user/:userId/event -> For fetching all events that user is part of
 router.get('/:userId/event', async (req: Request, res: Response) => {
   const { userId } = req.params
 
@@ -134,6 +133,51 @@ router.get('/:userId/event', async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: 'An error occurred while fetching events!' })
+  }
+})
+
+// router.post("/dm-list", async (req: Request, res: Response) => {
+//   const { eventId, participantId } = req.body;
+
+//   try {
+//     const chatParticipants = await prisma.chatParticipant.findMany({
+//       where: {
+//         eventId,
+//         OR: [
+//           { participantId: participantId },
+//         ]
+//       },
+//       include: {
+//         EventParticipant: true
+//       }
+//     });
+
+//     return res.status(200).json({ message: "Successfully fetched DM list!", chatParticipants });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'An error occurred while fetching DM list!' })
+//   }
+// });
+
+router.post("/messages", async (req: Request, res: Response) => {
+  const { eventId, participantId, userId } = req.body;
+  try {
+    const messages = await prisma.chat.findMany({
+      where: {
+        eventId,
+        OR: [
+          { senderId: userId, receiverId: participantId },
+          { senderId: participantId, receiverId: userId }
+        ]
+      },
+      orderBy: {
+        time: 'asc'
+      }
+    });
+    return res.status(200).json({ message: "Successfully fetched the messages!", messages })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'An error occurred while fetching messages!' })
   }
 })
 

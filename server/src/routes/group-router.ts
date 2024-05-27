@@ -5,12 +5,6 @@ import prisma from "../db/db";
 const router = Router();
 
 
-// /group/message/send -> sending a new message in that group
-router.post("/message/send", (req: Request, res: Response) => {
-
-})
-
-
 // /group/message/list -> listing all messages from that group
 router.post("/message/list", async (req: Request, res: Response) => {
     try {

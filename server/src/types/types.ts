@@ -1,3 +1,22 @@
+import { Request } from "express";
+
+interface SignupReqType extends Request {
+  body: {
+    email?: string
+    password?: string
+    name?: string
+    phone?: string
+    about?: string
+    image?: string
+    imageName?: string
+  }
+}
+interface loginRequestType extends Request {
+  body: {
+    email: string
+    password: string
+  }
+}
 interface IUserAttributes {
   id: number
   name: string
@@ -171,14 +190,36 @@ interface IChatParticipant {
   Event: IEvent
 }
 
+interface JoinChannelPayload {
+  userId: number;
+  groupId: number;
+}
+
+interface SendMessagePayload {
+  userId: number;
+  groupId: number;
+  message: string;
+  photoLink: string;
+}
+interface PersonalMessagePayLoad {
+  eventId: number;
+  senderId: number;
+  receiverId: number;
+  message: string;
+  photoLink: string;
+  roomId: string;
+}
+
 interface IFCMAttributes {
-  userId: number
-  endPoint: String
-  p256dh: String
-  auth: String
+  userId: number;
+  endPoint: string;
+  p256dh: string;
+  auth: string;
 }
 
 export {
+  SignupReqType,
+  loginRequestType,
   IUser,
   IUserAttributes,
   IBudget,
@@ -196,5 +237,8 @@ export {
   IPhoto,
   IPhotographer,
   IVendor,
+  JoinChannelPayload,
+  SendMessagePayload,
+  PersonalMessagePayLoad,
   IFCMAttributes,
 }
