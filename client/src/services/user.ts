@@ -62,18 +62,15 @@ class User {
       const about = e.target.about.value
       const password = e.target.password.value
       const confirmPassword = e.target.confirmPassword.value
-      const image = await ImageHelper.ConvertBase64(e.target.image.files[0])
-      const imageName = e.target.image.files[0]?.name
+      const image = e.target.image ? await ImageHelper.ConvertBase64(e.target.image.files[0]) : ""
+      const imageName = e.target.image ? e.target.image.files[0]?.name : ""
 
       if (
         !email ||
         !name ||
         !phone ||
-        !about ||
         !password ||
-        !confirmPassword ||
-        !image ||
-        !imageName
+        !confirmPassword
       ) {
         return {
           success: false,

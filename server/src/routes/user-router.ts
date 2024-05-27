@@ -50,7 +50,7 @@ router.post('/login', async (req: Request, res: Response) => {
 router.post('/signup', async (req: Request, res: Response) => {
   const { name, email, phone, about, password, image, imageName } = req.body
 
-  if (!email || !password || !name || !phone || !about) {
+  if (!email || !password || !name || !phone) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -70,7 +70,7 @@ router.post('/signup', async (req: Request, res: Response) => {
         name,
         email,
         phone,
-        about,
+        about: about || "",
         password: hashedPassword,
         profilePic: imageUrl,
         PicName: imageName || '',

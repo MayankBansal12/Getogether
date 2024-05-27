@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import ImageHelper from '../services/image'
+import { Avatar } from '@mui/material'
 
 interface Props {
   label?: string
@@ -22,13 +23,13 @@ const ImageUploader = ({
           htmlFor="image"
           className="flex flex-col items-center gap-1 cursor-pointer"
         >
-          <img src={state} className="w-14 h-14" alt="demo" />
+          <Avatar src={state} sx={{ width: '100px', height: '100px' }} />
           <p className="font-bold text-primary-light text-sm">Change Image</p>
         </label>
       ) : (
         <label
           htmlFor="image"
-          className="flex justify-center items-center border-4 border-slate-400 hover:border-primary-light mb-2 p-4 border-dashed w-28 h-28 cursor-pointer"
+          className="flex justify-center items-center border-4 border-slate-400 hover:border-primary-light mb-2 p-4 border-dashed w-32 h-32 rounded-md cursor-pointer"
         >
           {label}
         </label>
