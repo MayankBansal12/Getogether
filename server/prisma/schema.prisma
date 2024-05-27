@@ -29,6 +29,7 @@ model User {
   Payee            Payment[]          @relation(name: "Payee")
   FCM              FCM?
   Event            Event[]
+  SingleTable      SingleTable[]
 }
 
 model FCM {
@@ -77,6 +78,7 @@ model Event {
   Channel          Channel[]
   ChatParticipant  ChatParticipant[]
   Host             User               @relation(fields: [hostId], references: [id])
+  EventTable       EventTable[]
 }
 
 model Channel {
@@ -192,4 +194,24 @@ model ChatParticipant {
   Chat             Chat             @relation(fields: [chatId], references: [id])
   EventParticipant EventParticipant @relation(fields: [participantId], references: [id])
   Event            Event            @relation(fields: [eventId], references: [id])
+}
+
+model EventTable {
+  id          Int           @id @default(autoincrement())
+  eventId     Int
+  table_size  Int
+  total_row   Int
+  total_col   Int
+  Event       Event         @relation(fields: [eventId], references: [id])
+  SingleTable SingleTable[]
+}
+
+model SingleTable {
+  id         Int        @id @default(autoincrement())
+  tableId    Int
+  userId     Int
+  row        Int
+  col        Int
+  EventTable EventTable @relation(fields: [tableId], references: [id])
+  User       User       @relation(fields: [userId], references: [id])
 }

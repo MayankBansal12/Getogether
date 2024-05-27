@@ -5,23 +5,11 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { UserReqType } from '../types/req'
 import authMiddleware from '../middlewares/user-middleware'
-import push from 'web-push'
 import UploadImg from '../helper/upload-img'
+import push from '../helper/push-notify'
 
 const router = Router()
-
 const SECRET_KEY = process.env.SECRET_KEY
-const vapidKeys = {
-  publicKey:
-    'BCykaAlOtZwChaoyEILvMBUlaE3_aTj1opSk185cbvMa9EAwDyGS--ckZ_4HfLEYzB7hI-c1ZHiAYDlkDTpZKow',
-  privateKey: process.env.FCM_PRIVATE_KEY,
-}
-
-push.setVapidDetails(
-  'mailto:arghyadas242004@gmail.com',
-  vapidKeys.publicKey,
-  vapidKeys.privateKey,
-)
 
 // /user/login -> User login
 router.post('/login', async (req: Request, res: Response) => {
@@ -62,13 +50,7 @@ router.post('/login', async (req: Request, res: Response) => {
 router.post('/signup', async (req: Request, res: Response) => {
   const { name, email, phone, about, password, image, imageName } = req.body
 
-  if (
-    !email ||
-    !password ||
-    !name ||
-    !phone ||
-    !about
-  ) {
+  if (!email || !password || !name || !phone || !about) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -78,7 +60,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     if (userExist > 0) {
       return res.status(400).json({ message: 'User already exists' })
     }
-    let imageUrl = "";
+    let imageUrl = ''
     if (image) imageUrl = await UploadImg(image)
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -91,7 +73,7 @@ router.post('/signup', async (req: Request, res: Response) => {
         about,
         password: hashedPassword,
         profilePic: imageUrl,
-        PicName: imageName || "",
+        PicName: imageName || '',
       },
     })
 
@@ -106,9 +88,7 @@ router.post('/signup', async (req: Request, res: Response) => {
       .status(500)
       .json({ message: 'Internal server error', error: error.message })
   }
-})
-
-  ;// /user/:userId/event -> For fetching all events that user is part of
+}) // /user/:userId/event -> For fetching all events that user is part of
 router.get('/:userId/event', async (req: Request, res: Response) => {
   const { userId } = req.params
 
@@ -159,25 +139,29 @@ router.get('/:userId/event', async (req: Request, res: Response) => {
 //   }
 // });
 
-router.post("/messages", async (req: Request, res: Response) => {
-  const { eventId, participantId, userId } = req.body;
+router.post('/messages', async (req: Request, res: Response) => {
+  const { eventId, participantId, userId } = req.body
   try {
     const messages = await prisma.chat.findMany({
       where: {
         eventId,
         OR: [
           { senderId: userId, receiverId: participantId },
-          { senderId: participantId, receiverId: userId }
-        ]
+          { senderId: participantId, receiverId: userId },
+        ],
       },
       orderBy: {
-        time: 'asc'
-      }
-    });
-    return res.status(200).json({ message: "Successfully fetched the messages!", messages })
+        time: 'asc',
+      },
+    })
+    return res
+      .status(200)
+      .json({ message: 'Successfully fetched the messages!', messages })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ message: 'An error occurred while fetching messages!' })
+    res
+      .status(500)
+      .json({ message: 'An error occurred while fetching messages!' })
   }
 })
 
@@ -227,45 +211,44 @@ router.post(
 )
 
 // dummy notification /user/notify
-router.get(
-  '/notify',
-  authMiddleware,
-  async (req: UserReqType, res: Response) => {
-    try {
-      const fcm = await prisma.fCM.findFirst({
-        where: {
-          userId: req.user.id,
-        },
-      })
+router.post('/notify', authMiddleware, async (req: Request, res: Response) => {
+  const { userId, title, body } = req.body
+  if (!userId || !title || !body)
+    return res.status(400).json({ message: 'All fields are required' })
+  try {
+    const fcm = await prisma.fCM.findFirst({
+      where: {
+        userId: userId,
+      },
+    })
 
-      if (!fcm) {
-        return res.status(400).json({ message: 'No subscription found' })
-      }
-
-      const notificationData = {
-        title: 'Saari umra bhar joker',
-        body: 'Tere picche ih zindagi circus ho gayi',
-      }
-
-      push.sendNotification(
-        {
-          endpoint: fcm.endPoint,
-          expirationTime: null,
-          keys: {
-            auth: fcm.auth,
-            p256dh: fcm.p256dh,
-          },
-        },
-        JSON.stringify(notificationData),
-      )
-      res.status(200).json({ message: 'Notification sent successfully' })
-    } catch (error) {
-      console.error(error)
-      res
-        .status(500)
-        .json({ message: 'An error occurred while sending notification' })
+    if (!fcm) {
+      return res.status(400).json({ message: 'No subscription found' })
     }
-  },
-)
+
+    const notificationData = {
+      title: title,
+      body: body,
+    }
+
+    push.sendNotification(
+      {
+        endpoint: fcm.endPoint,
+        expirationTime: null,
+        keys: {
+          auth: fcm.auth,
+          p256dh: fcm.p256dh,
+        },
+      },
+      JSON.stringify(notificationData),
+    )
+    res.status(200).json({ message: 'Notification sent successfully' })
+  } catch (error) {
+    console.error(error)
+    res
+      .status(500)
+      .json({ message: 'An error occurred while sending notification' })
+  }
+})
 
 export default router
