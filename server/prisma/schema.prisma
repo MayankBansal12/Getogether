@@ -28,6 +28,7 @@ model User {
   Payer            Payment[]          @relation(name: "Payer")
   Payee            Payment[]          @relation(name: "Payee")
   FCM              FCM?
+  Event            Event[]
 }
 
 model FCM {
@@ -67,6 +68,8 @@ model Event {
   name             String
   desc             String
   date             DateTime
+  hostId           Int
+  image            String             @default("")
   EventParticipant EventParticipant[]
   Photo            Photo[]
   Vendor           Vendor[]
@@ -74,6 +77,7 @@ model Event {
   Channel          Channel[]
   ChatParticipant  ChatParticipant[]
   Chat             Chat[]
+  Host             User               @relation(fields: [hostId], references: [id])
 }
 
 model Channel {

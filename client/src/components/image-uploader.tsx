@@ -28,7 +28,7 @@ const ImageUploader = ({
       ) : (
         <label
           htmlFor="image"
-          className="flex justify-center items-center border-4 border-slate-400 mb-2 p-4 border-dashed w-28 h-28 cursor-pointer"
+          className="flex justify-center items-center border-4 border-slate-400 hover:border-primary-light mb-2 p-4 border-dashed w-28 h-28 cursor-pointer"
         >
           {label}
         </label>

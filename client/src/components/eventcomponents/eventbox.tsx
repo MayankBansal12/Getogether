@@ -18,7 +18,7 @@ const EventBox = ({ image, title, date, host, onClick }) => {
     >
       {/** Chage the Image src accordingly */}
       <img
-        src={bday}
+        src={image}
         className="rounded-xl w-[55px] md:w-[75px] h-[55px] md:h-[75px]"
       />
       <div className="md:min-w-96">
