@@ -13,7 +13,7 @@ import PageNotFound from './pages/page-not-found'
 import Navbar from './components/navbar/navbar'
 import SnackbarComp from './components/snackbar'
 import AllEvents from './pages/allevents'
-import Host from './pages/host'
+import Dash from './pages/Dash'
 import CreateEvent from './components/eventcomponents/create'
 import BookTable from './components/booktable'
 
@@ -47,8 +47,12 @@ const router = createBrowserRouter([
     element: <Auth />,
   },
   {
-    path: '/dashboard',
-    element: <Host />,
+    path: '/event/:eventId',
+    element: (
+      <Protected>
+        <Dash />
+      </Protected>
+    ),
   },
   {
     path: '/test',

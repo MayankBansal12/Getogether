@@ -26,8 +26,8 @@ interface Props {
   >
   eventData: {
     name: string
-    image: string
-    budget: number
+    image?: string
+    budget?: number
     desc: string
   }
 }
@@ -56,8 +56,6 @@ export default function StepsPanes({
 
   async function createEvent() {
     try {
-      // console.log('eventData:', eventData)
-      // console.log('subEvents:', subEvents)
       setLoading(true)
       const response = await fetch(`${BACKEND}/event/create-all`, {
         method: 'POST',
@@ -86,6 +84,13 @@ export default function StepsPanes({
       }
     } catch (error) {
       console.log(error)
+      setOpenSnackbar({
+        open: true,
+        content: 'Error creating event, try again!',
+        type: 'error',
+      })
+      closeAlert()
+      navigate('/createEvent')
     } finally {
       setLoading(false)
     }
@@ -111,8 +116,8 @@ export default function StepsPanes({
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
         ? // It's the last step, but not all steps have been completed,
-          // find the first step that has been completed
-          subEvents.findIndex((step, i) => !(i in completed))
+        // find the first step that has been completed
+        subEvents.findIndex((step, i) => !(i in completed))
         : activeStep + 1
     setActiveStep(newActiveStep)
 
@@ -158,8 +163,8 @@ export default function StepsPanes({
   }
 
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
-      <Stepper nonLinear activeStep={activeStep} alternativeLabel>
+    <Box sx={{ width: '90%', height: '90%' }}>
+      <Stepper nonLinear activeStep={activeStep} alternativeLabel className="pt-2 pb-6">
         {subEvents.map((subEvent, index) => (
           <Step key={index} completed={completed[index]}>
             <StepButton color="inherit" onClick={handleStep(index)}>
@@ -170,43 +175,26 @@ export default function StepsPanes({
       </Stepper>
       <div className="h-[calc(100%-160px)]">
         {allStepsCompleted() ? (
-          <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1 }}>
-              Great job, Your event is being created
-            </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                pt: 2,
-              }}
-            >
-              <Box sx={{ flex: '1 1 auto' }} />
-              <Button onClick={handleReset}>Reset</Button>
-            </Box>
-          </React.Fragment>
+          <div className="flex flex-col h-full justify-center items-center">
+            <h1>{eventData.name}</h1>
+            <h2>
+              Great job, Your event is being created...
+            </h2>
+            <h3>You will redirected to the event dashboard once completed...#hold up</h3>
+          </div>
         ) : (
           <React.Fragment>
-            <Typography sx={{ mt: 2, pt: 1, ml: 9, fontSize: '25px' }}>
+            <h2 className="text-xl py-2">
               {subEvents[activeStep].name}
-              {/* Step {activeStep + 1} */}
-            </Typography>
+            </h2>
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: 'column',
                 pt: 2,
                 height: '100%',
               }}
             >
-              <Button
-                // color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
               <Box
                 sx={{
                   display: 'flex',
@@ -217,19 +205,20 @@ export default function StepsPanes({
                   px: 4,
                 }}
               >
-                <div className="flex flex-col px-4 w-full h-full">
-                  <div className="flex flex-col justify-center h-full">
+                <div className="flex flex-col w-full h-full justify-center gap-8">
+                  <div className="flex flex-col justify-center gap-2">
                     <label htmlFor="venue">Venue</label>
                     <input
                       type="text"
                       name="venue"
                       value={subEvents[activeStep].venue}
                       onChange={(e) => changeField(e.target.value, 'venue')}
-                      className="border-2 px-1 py-1"
+                      className="border-primary-light bg-background-light text-[18px] my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
+                      required
                     />
                   </div>
-                  <div className="flex flex-col h-full">
-                    <p className="ml-1">Select start and end dates</p>
+                  <div className="flex flex-col gap-2">
+                    <p>Select start and end dates</p>
                     <Datepicker
                       value={{
                         startDate: subEvents[activeStep].startTime,
@@ -241,42 +230,36 @@ export default function StepsPanes({
                   </div>
                 </div>
               </Box>
-              {activeStep !== subEvents.length - 1 ? (
+              <div className="flex justify-between my-2">
                 <Button
-                  onClick={() => {
-                    handleComplete()
-                    // handleNext()
-                  }}
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
                   sx={{ mr: 1 }}
                 >
-                  Next
+                  Back
                 </Button>
-              ) : (
-                <Button
-                  onClick={() => {
-                    handleComplete()
-                    // handleNext()
-                  }}
-                  sx={{ mr: 1 }}
-                >
-                  Finish
-                </Button>
-              )}
-              {/* {activeStep !== subEvents.length &&
-                (completed[activeStep] ? (
-                  <Typography
-                    variant="caption"
-                    sx={{ display: 'inline-block' }}
+                {activeStep !== subEvents.length - 1 ? (
+                  <Button
+                    onClick={() => {
+                      handleComplete()
+                      // handleNext()
+                    }}
+                    sx={{ mr: 1 }}
                   >
-                    Step {activeStep + 1} already completed
-                  </Typography>
-                ) : (
-                  <Button onClick={handleComplete}>
-                    {completedSteps() === totalSteps() - 1
-                      ? 'Finish'
-                      : 'Complete Step'}
+                    Next
                   </Button>
-                ))} */}
+                ) : (
+                  <Button
+                    onClick={() => {
+                      handleComplete()
+                      // handleNext()
+                    }}
+                    sx={{ mr: 1 }}
+                  >
+                    Finish
+                  </Button>
+                )}
+              </div>
             </Box>
           </React.Fragment>
         )}

@@ -2,11 +2,11 @@ import { Box, CssBaseline, Toolbar } from '@mui/material'
 import SideNav from '../components/sidenavs/primarynav'
 import SidebarNav from '../components/sidenavs/secondarynav'
 
-const Host = () => {
+const Dash = () => {
   return (
     <>
       <SideNav />
     </>
   )
 }
-export default Host
+export default Dash

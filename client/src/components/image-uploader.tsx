@@ -23,7 +23,7 @@ const ImageUploader = ({
           htmlFor="image"
           className="flex flex-col items-center gap-1 cursor-pointer"
         >
-          <Avatar src={state} sx={{ width: '100px', height: '100px' }} />
+          <Avatar src={state} variant="rounded" sx={{ width: '100px', height: '100px' }} />
           <p className="font-bold text-primary-light text-sm">Change Image</p>
         </label>
       ) : (
