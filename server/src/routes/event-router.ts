@@ -89,12 +89,14 @@ router.post(
   authMiddleware,
   async (req: CreateAllReq, res: Response) => {
     const { name, desc, budget, image, subEvents } = req.body
-    if (!name || !desc || !budget || !image || !subEvents) {
+    if (!name || !desc || !subEvents) {
       return res.status(400).json({ error: 'Please fill all the details' })
     }
 
     try {
-      const imageURL = await UploadImg(image)
+      let imageURL = "";
+      if (image) imageURL = await UploadImg(image);
+
       const newEvent = await prisma.event.create({
         data: {
           name: name,
@@ -108,9 +110,19 @@ router.post(
         data: {
           eventId: newEvent.id,
           spent: 0,
-          totalAmount: budget,
+          totalAmount: budget || 0,
         },
       })
+
+      const hostParticipant = await prisma.eventParticipant.create({
+        data: {
+          eventId: newEvent.id,
+          userId: req.user.id,
+          role: 'host',
+          status: 1,
+        },
+      });
+
       const newSubEvents = await Promise.all(
         subEvents.map((subEvent) =>
           prisma.channel.create({

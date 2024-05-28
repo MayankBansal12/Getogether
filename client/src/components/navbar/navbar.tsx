@@ -1,10 +1,10 @@
 const Navbar = () => {
   return (
-    <nav className="flex w-full h-[50px] justify-between items-center px-4 md:px-20 overflow-x-hidden	">
+    <nav className="flex w-full h-[50px] justify-between items-center px-4 py-8 md:px-20 overflow-x-hidden	">
       {/* Logo */}
       <span className="text-4xl md:text-5xl text-center font-title">
-        Plan
-        <span className="text-primary-light">it.</span>
+        Get
+        <span className="text-primary-light">ogether.</span>
       </span>
       {/* Items */}
       <span className="text-lg space-x-4 font-josefin">

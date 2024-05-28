@@ -13,13 +13,14 @@ const EventBox = ({ image, title, date, host, onClick }) => {
       alignItems="center"
       p={2}
       sx={{ border: '2px solid #8477D7' }}
-      className="gap-2 md:gap-4 bg-background-extralight hover:bg-white"
+      className="gap-2 md:gap-4 bg-background-extralight hover:bg-white rounded-md transition-all cursor-pointer"
       onClick={onClick}
     >
       {/** Chage the Image src accordingly */}
       <img
         src={image}
         className="rounded-xl w-[55px] md:w-[75px] h-[55px] md:h-[75px]"
+        alt="event profile"
       />
       <div className="md:min-w-96">
         <h1 className="font-bold text-lg md:text-xl">{title}</h1>

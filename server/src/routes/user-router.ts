@@ -50,7 +50,7 @@ router.post('/login', async (req: Request, res: Response) => {
 router.post('/signup', async (req: Request, res: Response) => {
   const { name, email, phone, about, password, image, imageName } = req.body
 
-  if (!email || !password || !name || !phone || !about) {
+  if (!email || !password || !name || !phone) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -70,7 +70,7 @@ router.post('/signup', async (req: Request, res: Response) => {
         name,
         email,
         phone,
-        about,
+        about: about || "",
         password: hashedPassword,
         profilePic: imageUrl,
         PicName: imageName || '',
@@ -139,31 +139,38 @@ router.get('/:userId/event', async (req: Request, res: Response) => {
 //   }
 // });
 
-router.post('/messages', async (req: Request, res: Response) => {
-  const { eventId, participantId, userId } = req.body
+router.post("/messages", async (req: Request, res: Response) => {
+  const { eventId, participantId, userId } = req.body;
   try {
     const messages = await prisma.chat.findMany({
       where: {
         eventId,
         OR: [
           { senderId: userId, receiverId: participantId },
-          { senderId: participantId, receiverId: userId },
-        ],
+          { senderId: participantId, receiverId: userId }
+        ]
       },
       orderBy: {
-        time: 'asc',
+        time: 'asc'
       },
-    })
-    return res
-      .status(200)
-      .json({ message: 'Successfully fetched the messages!', messages })
+      include: {
+        ChatParticipant: {
+          select: {
+            EventParticipant: {
+              select: {
+                User: true
+              }
+            }
+          }
+        }
+      }
+    });
+    return res.status(200).json({ message: "Fetched all the messages!", messages })
   } catch (error) {
-    console.error(error)
-    res
-      .status(500)
-      .json({ message: 'An error occurred while fetching messages!' })
+    console.log(error);
+    return res.status(500).json({ message: 'An error occurred while fetching messages!' })
   }
-})
+});
 
 interface FCMReqType {
   body: {

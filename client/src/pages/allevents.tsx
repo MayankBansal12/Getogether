@@ -48,18 +48,23 @@ const AllEvents = () => {
   }, [])
 
   return (
-    <>
-      <div className="flex-col justify-center items-center py-10 w-full h-full font-josefin container">
-        <div className="flex flex-col justify-center items-center my-6 p-4 rounded-lg">
-          <img
-            src={user.profilePic || monkey}
-            width={100}
-            className="border-4 border-primary-light mb-2 rounded-2xl"
-          />
-          <span>{user.name}</span>
-        </div>
-        <div className="flex flex-col justify-center items-center">
-          {AllEvents.map((event, index) => (
+    <div className="flex flex-col gap-4 justify-center items-center py-10 w-full h-screen font-josefin">
+      <div className="font-title text-3xl md:text-5xl">
+        Get
+        <span className="text-primary-light">ogether.</span>
+      </div>
+
+      <div className="flex flex-col gap-2 justify-center items-center p-4 rounded-lg">
+        <img
+          src={user.profilePic || monkey}
+          className="border-4 border-primary-light rounded-2xl w-[130px] h-[125px]"
+          alt={user.name + " profile pic"}
+        />
+        <span>{user.name}</span>
+      </div>
+      <div className="flex flex-col overflow-y-scroll">
+        {AllEvents.length > 0 ? (
+          AllEvents.map((event, index) => (
             <EventBox
               key={index}
               image={event.image.length > 0 ? event.image : bday}
@@ -71,21 +76,26 @@ const AllEvents = () => {
               })}
               host={event.hostId === user.id ? 'You' : event.Host.name}
               onClick={() => {
-                navigate('/dashboard')
+                navigate('/event/' + event.id)
               }}
             />
-          ))}
-        </div>
-        <div className="flex justify-center items-center my-4 w-full">
-          <Button
-            onClick={() => {
-              navigate('/createevent')
-            }}
-            children={'+ Create Event'}
-          />
-        </div>
+          ))) : (
+          <div className="flex flex-col text-center mb-3">
+            <span>No Events to show!</span>
+            <span> Wait till you are invited to @join any </span>
+            <span>or create your own #event</span>
+          </div>
+        )}
       </div>
-    </>
+      <div className="flex justify-center items-center my-4 w-full">
+        <Button
+          onClick={() => {
+            navigate('/createevent')
+          }}
+          children={'+ Create Event'}
+        />
+      </div>
+    </div>
   )
 }
 

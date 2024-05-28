@@ -10,7 +10,7 @@ const Home = () => {
   return (
     <>
       <Navbar />
-      <div className="flex-row justify-center items-center px-4 md:px-20 py-20 w-full font-josefin container">
+      <div className="flex-row justify-center items-center px-4 md:px-20 py-20 w-full font-josefin">
         <p className="py-10 font-black font-title text-7xl text-center md:text-9xl">
           <span>YAY!! IT’S </span>
           <span className="bg-clip-text bg-gradient-to-b from-primary-light to-accent-light font-bold text-transparent">
