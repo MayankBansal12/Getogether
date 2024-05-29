@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -13,8 +13,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Avatar,
-  ListItemAvatar,
   ListItemButton,
+  Tooltip
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
 import Subevents from '../eventcomponents/subevent'
@@ -22,14 +22,15 @@ import SingleSubEvent from '../eventcomponents/singlesubevent'
 import Budget from '../eventcomponents/budget'
 import PaymentHistory from '../eventcomponents/paymenthistory'
 import Default from './Default'
-import bday from '../../assets/bday.png'
+import { formatDate } from "../../helpers/formatDate";
 import { useNavigate } from 'react-router-dom'
+import { useEventStore, useUserStore } from '../../global-store/store'
 import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
 import Groups from '../groupchats'
 import BookTable from '../booktable'
 
-const drawerWidth = 300
+const drawerWidth = 350
 
 type Props = {
   window?: () => Window
@@ -42,6 +43,9 @@ export default function SidebarNav(props: Props) {
   const [isClosing, setIsClosing] = useState(false)
   const [rendercomponent, setRenderComponent] = useState('')
   const [renderList, setRenderList] = useState('Dash')
+  const user = useUserStore((state) => state.user)
+  const event = useEventStore((state) => state.event)
+
   const handleDash = () => {
     setRenderComponent('')
     setRenderList('Dash')
@@ -58,6 +62,7 @@ export default function SidebarNav(props: Props) {
     setRenderComponent('Event Schedule')
     setRenderList('Calender')
   }
+
   const handleDrawerClose = () => {
     setIsClosing(true)
     setMobileOpen(false)
@@ -72,25 +77,12 @@ export default function SidebarNav(props: Props) {
       setMobileOpen(!mobileOpen)
     }
   }
-  // List for icons on the extreme right
-  const iconData = [
-    {
-      handler: handleHome,
-      path: 'M2.25 12L11.204 3.045c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25',
-    },
-    {
-      handler: handleDash,
-      path: 'M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25',
-    },
-    {
-      handler: handleDm,
-      path: 'M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z',
-    },
-    {
-      handler: handleCalender,
-      path: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z',
-    },
-  ]
+
+  useEffect(() => {
+    console.log("User details: ", user);
+    console.log("Eent details: on primary ", event);
+  }, [])
+
   // Dashboard Items
   const dashlistitems = [
     { name: 'Participants', action: () => setRenderComponent('Participants') },
@@ -127,40 +119,39 @@ export default function SidebarNav(props: Props) {
       joinedDate: 'Joined on 26th May, 2024',
       action: () => setRenderComponent('Chat'),
     },
-    // Add more items as needed
   ]
   // Show all the events
-  const calendarList = [
-    {
-      event: '@ Game Zone',
-      date: 'On 25th May, 2024',
-      action: () => setRenderComponent('Event Schedule'),
-    },
-    {
-      event: '@ Bday Party',
-      date: 'On 25h May, 2024',
-      action: () => setRenderComponent('Event Schedule'),
-    },
-    // Add more items as needed
-  ]
+  // const calendarList = [
+  //   {
+  //     event: '@ Game Zone',
+  //     date: 'On 25th May, 2024',
+  //     action: () => setRenderComponent('Event Schedule'),
+  //   },
+  //   {
+  //     event: '@ Bday Party',
+  //     date: 'On 25h May, 2024',
+  //     action: () => setRenderComponent('Event Schedule'),
+  //   },
+  //   // Add more items as needed
+  // ]
 
   const drawer = (
-    <div className="flex flex-col font-josefin">
-      <div className="flex justify-center items-center gap-2 px-2 py-2">
+    <div className="flex flex-col font-josefin h-full">
+      <div className="flex justify-center items-center gap-3 p-2">
         <img
-          src={bday}
-          className="border-4 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
+          src={event?.image}
+          className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
+          alt="event profile"
         />{' '}
-        <div className="px-3 py-3 h-[71px]">
-          <span className="font-bold text-2xl">Mayank's Bday</span>
-        </div>
+        <span className="font-bold text-2xl">{event?.name || "Event"}</span>
       </div>
       <Divider />
-      <div className="flex">
-        <List>
-          {iconData.map((item, index) => (
-            <ListItem key={index} className="bg-white">
-              <ListItemAvatar className="bg-white" onClick={item.handler}>
+      <div className="flex h-full">
+        <div className="flex flex-col justify-between items-center my-2">
+          <List>
+            {/* Dashboard */}
+            <Tooltip title="Dashboard" disableInteractive placement="bottom-end">
+              <ListItem className="bg-white cursor-pointer" onClick={handleDash}>
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -173,20 +164,109 @@ export default function SidebarNav(props: Props) {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d={item.path}
+                      d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
                     />
                   </svg>
                 </Avatar>
-              </ListItemAvatar>
-            </ListItem>
-          ))}
-        </List>
+              </ListItem>
+            </Tooltip>
+
+            {/* Home */}
+            <Tooltip title="Home" disableInteractive placement="bottom-end">
+              <ListItem className="bg-white cursor-pointer" onClick={handleHome}>
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 text-black transition-colors duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.25 12L11.204 3.045c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+                    />
+                  </svg>
+                </Avatar>
+              </ListItem>
+            </Tooltip>
+
+            {/* DMS */}
+            <Tooltip title="Messages" disableInteractive placement="bottom-end">
+              <ListItem className="bg-white cursor-pointer" onClick={handleDm}>
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 text-black transition-colors duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                    />
+                  </svg>
+                </Avatar>
+              </ListItem>
+            </Tooltip>
+
+            {/* Schedule */}
+            <Tooltip title="Check Schedule" disableInteractive placement="bottom-end">
+              <ListItem className="bg-white cursor-pointer" onClick={handleCalender}>
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 text-black transition-colors duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+                    />
+                  </svg>
+                </Avatar>
+              </ListItem>
+            </Tooltip>
+
+            {/* More */}
+            <Tooltip title="More">
+              <ListItem className="bg-white cursor-pointer">
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 text-black transition-colors duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z M8 13C7.44 13 7 12.55 7 12C7 11.45 7.45 11 8 11C8.55 11 9 11.45 9 12C9 12.55 8.56 13 8 13Z M16 13C15.44 13 15 12.55 15 12C15 11.45 15.45 11 16 11C16.55 11 17 11.45 17 12C17 12.55 16.56 13 16 13Z M8 13C7.44 13 7 12.55 7 12C7 11.45 7.45 11 8 11C8.55 11 9 11.45 9 12C9 12.55 8.56 13 8 13Z"
+                    />
+                  </svg>
+                </Avatar>
+              </ListItem>
+            </Tooltip>
+          </List>
+          <Avatar src={user.profilePic} sx={{ width: 50, height: 50 }} className="cursor-pointer" />
+        </div>
         <Divider />
         {/** Home */}
         {renderList === 'Home' && (
-          <List>
+          <List className="w-full">
             <ListItem className="flex-col bg-white font-medium text-lg">
-              <p className="w-32"> @ Sub Events</p>
+              @Sub Events
               <ListItemButton
                 className="ml-3 font-josefin font-md text-black"
                 onClick={() => setRenderComponent('Groups')}
@@ -272,18 +352,18 @@ export default function SidebarNav(props: Props) {
         {/* calender */}
         {renderList === 'Calender' && (
           <List>
-            {calendarList.map((item, index) => (
+            {event?.Channel?.map((item, index) => (
               <React.Fragment key={index}>
                 <ListItem className="bg-white font-medium text-lg">
-                  <ListItemButton onClick={item.action}>
-                    <p>
-                      <span>{item.event}</span>
+                  <ListItemButton onClick={() => setRenderComponent('Event Schedule')}>
+                    <p className="text-center">
+                      <span className="text-dull text-sm">{formatDate(item.startTime, item.endTime)}</span>
                       <br />
-                      <span className="text-dull text-xs">{item.date}</span>
+                      <span className="text-md">{item.name}</span>
                     </p>
                   </ListItemButton>
                 </ListItem>
-                {index < calendarList.length - 1 && <Divider />}
+                {index < event?.Channel?.length - 1 && <Divider />}
               </React.Fragment>
             ))}
           </List>

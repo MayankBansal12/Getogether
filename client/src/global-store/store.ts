@@ -1,9 +1,14 @@
 import { create } from 'zustand'
-import { UserType } from '../global-types/model'
+import { UserType, EventType } from '../global-types/model'
 
 type UserStoreType = {
   user: UserType | null
   setUser: (user: UserType) => void
+}
+
+type EventStoreType = {
+  event: EventType | null
+  setEvent: (event: EventType) => void
 }
 
 interface AlertStoreDataType {
@@ -36,6 +41,12 @@ const useUserStore = create<UserStoreType>()((set) => ({
   setUser: (state: UserType) => set({ user: state }),
 }))
 
+// Event Store
+const useEventStore = create<EventStoreType>()((set) => ({
+  event: null,
+  setEvent: (state: EventType) => set({ event: state }),
+}))
+
 // Alert Store
 const useAlertStore = create<AlertStoreType>((set) => ({
   open: false,
@@ -44,8 +55,8 @@ const useAlertStore = create<AlertStoreType>((set) => ({
   noSecondaryButton: false,
   primaryButton: 'Confirm',
   secondaryButton: 'Cancel',
-  primaryAction: () => {},
-  secondaryAction: () => {},
+  primaryAction: () => { },
+  secondaryAction: () => { },
   // A function that sets all the values except open
   setAlertStore: (alert: AlertStoreType) => set(alert),
   setOpen: (open: boolean) => set({ open }),
@@ -60,4 +71,4 @@ const useSnackbarStore = create<SnackbarStoreType>((set) => ({
     set({ open: state.open, content: state.content, type: state.type }),
 }))
 
-export { useUserStore, useAlertStore, useSnackbarStore }
+export { useUserStore, useEventStore, useAlertStore, useSnackbarStore }
