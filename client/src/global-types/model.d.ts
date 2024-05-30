@@ -7,6 +7,7 @@ interface UserType {
   about: string
   profilePic: string
   PicName: string
+  role?: string
 }
 
 interface BudgetType {
