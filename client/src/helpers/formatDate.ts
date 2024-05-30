@@ -46,3 +46,9 @@ export const formatDate = (startTime: Date, endTime: Date) => {
     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
     return start.toLocaleDateString('en-GB', options);
 }
+
+export const getDate = (date: Date) => {
+    date = new Date(date);
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+    return date.toLocaleDateString('en-GB', options);
+}

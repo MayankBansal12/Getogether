@@ -41,9 +41,10 @@ export default function SidebarNav(props: Props) {
   const { window } = props
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const [channel, setChannel] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
-  const [renderList, setRenderList] = useState('Dash')
   const user = useUserStore((state) => state.user)
+  const [renderList, setRenderList] = useState('Home')
   const event = useEventStore((state) => state.event)
 
   const handleDash = () => {
@@ -79,9 +80,10 @@ export default function SidebarNav(props: Props) {
   }
 
   useEffect(() => {
-    console.log("User details: ", user);
-    console.log("Eent details: on primary ", event);
-  }, [])
+    if (user.role === "host") {
+      setRenderList("Dash");
+    }
+  }, [user])
 
   // Dashboard Items
   const dashlistitems = [
@@ -93,7 +95,10 @@ export default function SidebarNav(props: Props) {
       details: [
         {
           name: 'Celebrating',
-          action: () => setRenderComponent('Information'),
+          action: () => {
+            setRenderComponent('Information')
+            setChannel('Celebrating')
+          },
         },
       ],
     },
@@ -150,7 +155,7 @@ export default function SidebarNav(props: Props) {
         <div className="flex flex-col justify-between items-center my-2">
           <List>
             {/* Dashboard */}
-            <Tooltip title="Dashboard" disableInteractive placement="bottom-end">
+            {user && user.role === "host" && <Tooltip title="Dashboard" disableInteractive placement="bottom-end">
               <ListItem className="bg-white cursor-pointer" onClick={handleDash}>
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
@@ -169,7 +174,7 @@ export default function SidebarNav(props: Props) {
                   </svg>
                 </Avatar>
               </ListItem>
-            </Tooltip>
+            </Tooltip>}
 
             {/* Home */}
             <Tooltip title="Home" disableInteractive placement="bottom-end">
@@ -277,6 +282,7 @@ export default function SidebarNav(props: Props) {
             <Divider className="m-0" />
           </List>
         )}
+
         {/* Dashboard */}
         {renderList === 'Dash' && (
           <List>
@@ -463,9 +469,9 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === '' && renderList === 'Dash' && <Default />}
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
         {rendercomponent === 'booktable' && <BookTable />}
-        {rendercomponent === 'Participants' && <Participants />}
-        {rendercomponent === 'Sub Events' && <Subevents />}
-        {rendercomponent === 'Information' && <SingleSubEvent />}
+        {rendercomponent === 'Participants' && <Participants participants={event.EventParticipant} />}
+        {rendercomponent === 'Sub Events' && <Subevents channels={event.Channel} />}
+        {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
         {rendercomponent === 'Chat' && renderList === 'Dm' && <Chat />}
