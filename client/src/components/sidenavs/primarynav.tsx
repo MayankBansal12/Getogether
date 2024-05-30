@@ -14,7 +14,8 @@ import {
   AccordionSummary,
   Avatar,
   ListItemButton,
-  Tooltip
+  ListItemText,
+  Tooltip,
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
 import Subevents from '../eventcomponents/subevent'
@@ -22,7 +23,7 @@ import SingleSubEvent from '../eventcomponents/singlesubevent'
 import Budget from '../eventcomponents/budget'
 import PaymentHistory from '../eventcomponents/paymenthistory'
 import Default from './Default'
-import { formatDate } from "../../helpers/formatDate";
+import { formatDate } from '../../helpers/formatDate'
 import { useNavigate } from 'react-router-dom'
 import { useEventStore, useUserStore } from '../../global-store/store'
 import Chat from '../chat'
@@ -79,8 +80,8 @@ export default function SidebarNav(props: Props) {
   }
 
   useEffect(() => {
-    console.log("User details: ", user);
-    console.log("Eent details: on primary ", event);
+    console.log('User details: ', user)
+    console.log('Eent details: on primary ', event)
   }, [])
 
   // Dashboard Items
@@ -136,22 +137,32 @@ export default function SidebarNav(props: Props) {
   // ]
 
   const drawer = (
-    <div className="flex flex-col font-josefin h-full">
-      <div className="flex justify-center items-center gap-3 p-2">
+    <div className="py-4 font-josefin">
+      <div
+        className="top-0 left-0 z-10 fixed flex justify-start items-center gap-3 bg-white px-4 py-8 w-full h-[70px] font-josefin"
+        style={{ width: `${drawerWidth}px` }}
+      >
         <img
           src={event?.image}
           className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
           alt="event profile"
-        />{' '}
-        <span className="font-bold text-2xl">{event?.name || "Event"}</span>
+        />
+        <span className="font-bold text-2xl">Saakshi's Bday</span>
       </div>
       <Divider />
-      <div className="flex h-full">
-        <div className="flex flex-col justify-between items-center my-2">
+      <div className="flex mt-[50px] h-full">
+        <div className="left-2 z-10 fixed flex flex-col justify-between items-center my-2 overscroll-none">
           <List>
             {/* Dashboard */}
-            <Tooltip title="Dashboard" disableInteractive placement="bottom-end">
-              <ListItem className="bg-white cursor-pointer" onClick={handleDash}>
+            <Tooltip
+              title="Dashboard"
+              disableInteractive
+              placement="bottom-end"
+            >
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleDash}
+              >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +184,10 @@ export default function SidebarNav(props: Props) {
 
             {/* Home */}
             <Tooltip title="Home" disableInteractive placement="bottom-end">
-              <ListItem className="bg-white cursor-pointer" onClick={handleHome}>
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleHome}
+              >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -216,8 +230,15 @@ export default function SidebarNav(props: Props) {
             </Tooltip>
 
             {/* Schedule */}
-            <Tooltip title="Check Schedule" disableInteractive placement="bottom-end">
-              <ListItem className="bg-white cursor-pointer" onClick={handleCalender}>
+            <Tooltip
+              title="Check Schedule"
+              disableInteractive
+              placement="bottom-end"
+            >
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleCalender}
+              >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -259,115 +280,121 @@ export default function SidebarNav(props: Props) {
               </ListItem>
             </Tooltip>
           </List>
-          <Avatar src={user.profilePic} sx={{ width: 50, height: 50 }} className="cursor-pointer" />
+          <Avatar
+            src={user.profilePic}
+            sx={{ width: 50, height: 50 }}
+            className="cursor-pointer"
+          />
         </div>
         <Divider />
-        {/** Home */}
-        {renderList === 'Home' && (
-          <List className="w-full">
-            <ListItem className="flex-col bg-white font-medium text-lg">
-              @Sub Events
-              <ListItemButton
-                className="ml-3 font-josefin font-md text-black"
-                onClick={() => setRenderComponent('Groups')}
-              >
-                # Celebrating
-              </ListItemButton>
-            </ListItem>
-            <Divider className="m-0" />
-          </List>
-        )}
-        {/* Dashboard */}
-        {renderList === 'Dash' && (
-          <List>
-            {dashlistitems.map((item, index) => (
-              <ListItem key={index} className="bg-white font-medium text-lg">
-                {item.accordion ? (
-                  <Accordion className="!border-0 !shadow-none">
-                    <AccordionSummary
-                      expandIcon={
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6 text-black"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-                          />
-                        </svg>
-                      }
-                      aria-controls={`panel${index}-content`}
-                      id={`panel${index}-header`}
-                    >
-                      <p className="w-32">@ {item.name}</p>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {item.details.map((detail, idx) => (
-                        <ListItemButton
-                          key={idx}
-                          className="ml-3 font-josefin font-md text-black"
-                          onClick={detail.action}
-                        >
-                          # {detail.name}
-                        </ListItemButton>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                ) : (
-                  <ListItemButton onClick={item.action}>
-                    @ {item.name}
-                  </ListItemButton>
-                )}
+        <div className="ml-[50px] pl-4 w-full h-full font-josefin">
+          {/* // Home */}
+          {renderList === 'Home' && (
+            <List>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton>@ Subevents </ListItemButton>
               </ListItem>
-            ))}
-          </List>
-        )}
-
-        {/** Chat List */}
-        {renderList === 'Dm' && (
-          <List>
-            {dmList.map((item, index) => (
-              <React.Fragment key={index}>
-                <ListItem className="bg-white font-medium text-lg">
-                  <ListItemButton onClick={item.action}>
-                    <p>
-                      <span>{item.name}</span>
-                      <br />
-                      <span className="text-dull text-xs">
-                        {item.joinedDate}
-                      </span>
-                    </p>
-                  </ListItemButton>
+              <ListItem>
+                <ListItemButton># Celebrate</ListItemButton>
+              </ListItem>
+              <Divider className="m-0" />
+            </List>
+          )}
+          {/* // Dashboard */}
+          {renderList === 'Dash' && (
+            <List>
+              {dashlistitems.map((item, index) => (
+                <ListItem key={index} className="bg-white font-medium text-lg">
+                  {item.accordion ? (
+                    <Accordion className="!border-0 !shadow-none">
+                      <AccordionSummary
+                        expandIcon={
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6 text-black"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                            />
+                          </svg>
+                        }
+                        aria-controls={`panel${index}-content`}
+                        id={`panel${index}-header`}
+                      >
+                        <p className="w-32">@ {item.name}</p>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {item.details.map((detail, idx) => (
+                          <ListItemButton
+                            key={idx}
+                            className="ml-3 font-josefin font-md text-black"
+                            onClick={detail.action}
+                          >
+                            # {detail.name}
+                          </ListItemButton>
+                        ))}
+                      </AccordionDetails>
+                    </Accordion>
+                  ) : (
+                    <ListItemButton onClick={item.action}>
+                      @ {item.name}
+                    </ListItemButton>
+                  )}
                 </ListItem>
-                {index < dmList.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        )}
-        {/* calender */}
-        {renderList === 'Calender' && (
-          <List>
-            {event?.Channel?.map((item, index) => (
-              <React.Fragment key={index}>
-                <ListItem className="bg-white font-medium text-lg">
-                  <ListItemButton onClick={() => setRenderComponent('Event Schedule')}>
-                    <p className="text-center">
-                      <span className="text-dull text-sm">{formatDate(item.startTime, item.endTime)}</span>
-                      <br />
-                      <span className="text-md">{item.name}</span>
-                    </p>
-                  </ListItemButton>
-                </ListItem>
-                {index < event?.Channel?.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        )}
+              ))}
+            </List>
+          )}
+          {/* // Chat List */}
+          {renderList === 'Dm' && (
+            <List>
+              {dmList.map((item, index) => (
+                <React.Fragment key={index}>
+                  <ListItem className="bg-white font-medium text-lg">
+                    <ListItemButton onClick={item.action}>
+                      <p>
+                        <span>{item.name}</span>
+                        <br />
+                        <span className="text-dull text-xs">
+                          {item.joinedDate}
+                        </span>
+                      </p>
+                    </ListItemButton>
+                  </ListItem>
+                  {index < dmList.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </List>
+          )}
+          {/* // calender */}
+          {renderList === 'Calender' && (
+            <List>
+              {event?.Channel?.map((item, index) => (
+                <React.Fragment key={index}>
+                  <ListItem className="bg-white font-medium text-lg">
+                    <ListItemButton
+                      onClick={() => setRenderComponent('Event Schedule')}
+                    >
+                      <p className="text-center">
+                        <span className="text-dull text-sm">
+                          {formatDate(item.startTime, item.endTime)}
+                        </span>
+                        <br />
+                        <span className="text-md">{item.name}</span>
+                      </p>
+                    </ListItemButton>
+                  </ListItem>
+                  {index < event?.Channel?.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </List>
+          )}
+        </div>
       </div>
     </div>
   )
