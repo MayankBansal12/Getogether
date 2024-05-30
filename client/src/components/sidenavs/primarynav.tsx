@@ -41,9 +41,10 @@ export default function SidebarNav(props: Props) {
   const { window } = props
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const [channel, setChannel] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
-  const [renderList, setRenderList] = useState('Home')
   const user = useUserStore((state) => state.user)
+  const [renderList, setRenderList] = useState('Home')
   const event = useEventStore((state) => state.event)
 
   const handleDash = () => {
@@ -79,8 +80,9 @@ export default function SidebarNav(props: Props) {
   }
 
   useEffect(() => {
-    console.log("User details: ", user);
-    console.log("Eent details: on primary ", event);
+    if (user.role === "host") {
+      setRenderList("Dash");
+    }
   }, [user])
 
   // Dashboard Items
@@ -93,7 +95,10 @@ export default function SidebarNav(props: Props) {
       details: [
         {
           name: 'Celebrating',
-          action: () => setRenderComponent('Information'),
+          action: () => {
+            setRenderComponent('Information')
+            setChannel('Celebrating')
+          },
         },
       ],
     },
@@ -465,8 +470,8 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
         {rendercomponent === 'booktable' && <BookTable />}
         {rendercomponent === 'Participants' && <Participants participants={event.EventParticipant} />}
-        {rendercomponent === 'Sub Events' && <Subevents />}
-        {rendercomponent === 'Information' && <SingleSubEvent />}
+        {rendercomponent === 'Sub Events' && <Subevents channels={event.Channel} />}
+        {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
         {rendercomponent === 'Chat' && renderList === 'Dm' && <Chat />}

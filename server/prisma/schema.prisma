@@ -86,6 +86,7 @@ model Channel {
   eventId            Int
   name               String
   venue              String
+  desc               String               @default("")
   startTime          DateTime
   endTime            DateTime
   Event              Event                @relation(fields: [eventId], references: [id])
