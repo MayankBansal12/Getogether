@@ -9,7 +9,7 @@ import { EventType, UserType } from '../global-types/model'
 
 const Dash = () => {
   const { eventId } = useParams();
-  const setEvent = useEventStore((state) => state.setEvent);
+  const { event, setEvent } = useEventStore((state) => state);
   const { user, setUser } = useUserStore(state => state);
 
   const fetchUserRole = async (eventId: Number) => {

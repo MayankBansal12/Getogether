@@ -29,7 +29,7 @@ router.route("/")
     })
     .put(async (req: Request, res: Response) => {
         try {
-            const { channelId, eventId, name, venue, startTime, endTime } = req.body;
+            const { channelId, eventId, name, desc, venue, startTime, endTime } = req.body;
 
             if (!channelId || !eventId) {
                 return res.status(401).json({ message: "Event id or Channel id missing!" });
@@ -37,9 +37,9 @@ router.route("/")
 
             const channel = await prisma.channel.update({
                 where: { id: Number(channelId), eventId: Number(eventId) },
-                data: { name, venue, startTime, endTime },
+                data: { name, desc, venue, startTime, endTime },
             });
-            return res.status(201).json({ message: "Successfully changed the group details!", channel });
+            return res.status(201).json({ message: "Successfully changed the channel details!", channel });
         } catch (error) {
             res.status(500).json({ error: "Internal server error" });
         }
@@ -57,6 +57,7 @@ router.route("/")
             });
             res.status(204).json({ message: "Channel deleted successfully" });
         } catch (error) {
+            console.log(error)
             res.status(500).json({ error: "Internal server error" });
         }
     });

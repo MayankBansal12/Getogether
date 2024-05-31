@@ -311,19 +311,42 @@ router.route('/user/role')
   })
 
 // /event/channel/create -> Creating a new sub evet inside a event
-router.post('/channel/create', async (req: Request, res: Response) => {
-  const { eventId, name, venue, startTime, endTime } = req.body
+router.post('/channel/create', authMiddleware, async (req: UserReqType, res: Response) => {
+  const { eventId, name, desc, venue, startTime, endTime } = req.body
+
+  if (!name || !desc || !venue) {
+    return res.status(500).json({ error: 'All fields are not provided!' })
+  }
 
   try {
+    const participant = await prisma.eventParticipant.findFirstOrThrow({
+      where: { userId: Number(req.user.id), eventId: Number(eventId) }
+    })
+
+    console.log("participantid: ", participant);
+
+    if (!participant) {
+      return res.status(500).json({ error: 'User unauthorized!' })
+    }
+
     const newChannel = await prisma.channel.create({
       data: {
         eventId,
         name,
         venue,
+        desc,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
       },
     })
+
+
+    const hostParticipant = await prisma.channelParticipant.create({
+      data: {
+        channelId: Number(newChannel.id),
+        participantId: Number(participant.id),
+      },
+    });
 
     return res.status(201).json({
       message: 'Successfully created the channel!',
