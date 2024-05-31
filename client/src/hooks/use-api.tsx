@@ -15,7 +15,7 @@ const useApi = async (endpoint: string, method = 'GET', data = null) => {
             url: backend + endpoint,
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: token,
+                Authorization: `Bearer ${token}`,
             },
             data: data,
         };

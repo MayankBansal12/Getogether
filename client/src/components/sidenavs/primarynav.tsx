@@ -88,7 +88,7 @@ export default function SidebarNav(props: Props) {
   // Dashboard Items
   const dashlistitems = [
     { name: 'Participants', action: () => setRenderComponent('Participants') },
-    { name: 'Events', action: () => setRenderComponent('Sub Events') },
+    { name: 'Events List', action: () => setRenderComponent('Sub Events') },
     {
       name: 'Sub Events',
       accordion: true,
@@ -355,6 +355,7 @@ export default function SidebarNav(props: Props) {
             ))}
           </List>
         )}
+
         {/* calender */}
         {renderList === 'Calender' && (
           <List>
