@@ -323,8 +323,6 @@ router.post('/channel/create', authMiddleware, async (req: UserReqType, res: Res
       where: { userId: Number(req.user.id), eventId: Number(eventId) }
     })
 
-    console.log("participantid: ", participant);
-
     if (!participant) {
       return res.status(500).json({ error: 'User unauthorized!' })
     }
