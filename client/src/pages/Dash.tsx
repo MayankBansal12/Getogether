@@ -8,33 +8,35 @@ import { EventType, UserType } from '../global-types/model'
 // import SidebarNav from '../components/sidenavs/secondarynav'
 
 const Dash = () => {
-  const { eventId } = useParams();
-  const { event, setEvent } = useEventStore((state) => state);
-  const { user, setUser } = useUserStore(state => state);
+  const { eventId } = useParams()
+  const { event, setEvent } = useEventStore((state) => state)
+  const { user, setUser } = useUserStore((state) => state)
+  const callApi = useApi()
 
   const fetchUserRole = async (eventId: Number) => {
-    const res = await useApi("/event/user/role?eventId=" + eventId + "&userId=" + user.id);
-    const role: string = res.data.role;
+    const res = await callApi(
+      '/event/user/role?eventId=' + eventId + '&userId=' + user.id,
+    )
+    const role: string = res.data.role
 
-    setUser({ ...user, role });
+    setUser({ ...user, role })
   }
 
   const getEventDetails = async () => {
-    const res = await useApi("/event/" + eventId, "GET");
+    const res = await callApi('/event/' + eventId, 'GET')
     if (res) {
-      const eventDetails: EventType = res.data.event;
-      console.log("Event details: ", eventDetails);
-      setEvent(eventDetails);
-      fetchUserRole(eventDetails.id);
+      console.log('res.data\n', res.data)
+      const eventDetails: EventType = res.data.event
+      console.log('Event details: ', eventDetails)
+      setEvent(eventDetails)
+      fetchUserRole(eventDetails.id)
     }
   }
 
   useEffect(() => {
-    getEventDetails();
+    getEventDetails()
   }, [])
 
-  return (
-    <SideNav />
-  )
+  return <SideNav />
 }
 export default Dash
