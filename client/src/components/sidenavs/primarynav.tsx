@@ -274,25 +274,30 @@ export default function SidebarNav(props: Props) {
               </ListItem>
             </Tooltip>
           </List>
-          <Avatar
-            src={user.profilePic}
-            sx={{ width: 50, height: 50 }}
-            className="cursor-pointer"
-          />
+          <div className="bottom-0 flex">
+            <Avatar
+              src={user.profilePic}
+              sx={{ width: 50, height: 50 }}
+              className="cursor-pointer"
+            />
+          </div>
         </div>
         <Divider />
         {/** Home */}
         <div className="ml-[50px] pl-4 w-full h-full font-josefin">
           {renderList === 'Home' && (
-            <List className="w-full">
-              <ListItem className="flex-col bg-white font-medium text-lg">
-                @Sub Events
-                <ListItemButton
-                  className="ml-3 font-josefin font-md text-black"
-                  onClick={() => setRenderComponent('Groups')}
-                >
-                  # Celebrating
-                </ListItemButton>
+            <List>
+              <ListItem
+                className="bg-white font-medium text-lg"
+                onClick={() => setRenderComponent('Groups')}
+              >
+                @ Sub Events
+              </ListItem>
+              <ListItem
+                className="bg-white font-medium text-lg"
+                onClick={() => setRenderComponent('Groups')}
+              >
+                # Celebrating
               </ListItem>
               <Divider className="m-0" />
             </List>
