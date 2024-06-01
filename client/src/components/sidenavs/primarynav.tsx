@@ -14,7 +14,7 @@ import {
   AccordionSummary,
   Avatar,
   ListItemButton,
-  Tooltip
+  Tooltip,
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
 import Subevents from '../eventcomponents/subevent'
@@ -22,13 +22,14 @@ import SingleSubEvent from '../eventcomponents/singlesubevent'
 import Budget from '../eventcomponents/budget'
 import PaymentHistory from '../eventcomponents/paymenthistory'
 import Default from './Default'
-import { formatDate } from "../../helpers/formatDate";
+import { formatDate } from '../../helpers/formatDate'
 import { useNavigate } from 'react-router-dom'
 import { useEventStore, useUserStore } from '../../global-store/store'
 import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
 import Groups from '../groupchats'
 import BookTable from '../booktable'
+import EventPhotos from '../event-photos'
 
 const drawerWidth = 350
 
@@ -80,8 +81,8 @@ export default function SidebarNav(props: Props) {
   }
 
   useEffect(() => {
-    if (user.role === "host") {
-      setRenderList("Dash");
+    if (user.role === 'host') {
+      setRenderList('Dash')
     }
   }, [user])
 
@@ -141,44 +142,56 @@ export default function SidebarNav(props: Props) {
   // ]
 
   const drawer = (
-    <div className="flex flex-col font-josefin h-full">
+    <div className="flex flex-col h-full font-josefin">
       <div className="flex justify-center items-center gap-3 p-2">
         <img
           src={event?.image}
           className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
           alt="event profile"
         />{' '}
-        <span className="font-bold text-2xl">{event?.name || "Event"}</span>
+        <span className="font-bold text-2xl">{event?.name || 'Event'}</span>
       </div>
       <Divider />
       <div className="flex h-full">
         <div className="flex flex-col justify-between items-center my-2">
           <List>
             {/* Dashboard */}
-            {user && user.role === "host" && <Tooltip title="Dashboard" disableInteractive placement="bottom-end">
-              <ListItem className="bg-white cursor-pointer" onClick={handleDash}>
-                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6 text-black transition-colors duration-200"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
-                    />
-                  </svg>
-                </Avatar>
-              </ListItem>
-            </Tooltip>}
+            {user && user.role === 'host' && (
+              <Tooltip
+                title="Dashboard"
+                disableInteractive
+                placement="bottom-end"
+              >
+                <ListItem
+                  className="bg-white cursor-pointer"
+                  onClick={handleDash}
+                >
+                  <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6 text-black transition-colors duration-200"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
+                      />
+                    </svg>
+                  </Avatar>
+                </ListItem>
+              </Tooltip>
+            )}
 
             {/* Home */}
             <Tooltip title="Home" disableInteractive placement="bottom-end">
-              <ListItem className="bg-white cursor-pointer" onClick={handleHome}>
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleHome}
+              >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -221,8 +234,15 @@ export default function SidebarNav(props: Props) {
             </Tooltip>
 
             {/* Schedule */}
-            <Tooltip title="Check Schedule" disableInteractive placement="bottom-end">
-              <ListItem className="bg-white cursor-pointer" onClick={handleCalender}>
+            <Tooltip
+              title="Check Schedule"
+              disableInteractive
+              placement="bottom-end"
+            >
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleCalender}
+              >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -237,6 +257,37 @@ export default function SidebarNav(props: Props) {
                       strokeLinejoin="round"
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
                     />
+                  </svg>
+                </Avatar>
+              </ListItem>
+            </Tooltip>
+
+            {/* Photos */}
+            <Tooltip
+              title="Upload or View Photos"
+              disableInteractive
+              placement="bottom-end"
+            >
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={() => setRenderComponent('Photos')}
+              >
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <g transform="translate(2 3)">
+                      <path d="M20 16a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2v11z" />
+                      <circle cx="10" cy="10" r="4" />
+                    </g>
                   </svg>
                 </Avatar>
               </ListItem>
@@ -264,7 +315,11 @@ export default function SidebarNav(props: Props) {
               </ListItem>
             </Tooltip>
           </List>
-          <Avatar src={user.profilePic} sx={{ width: 50, height: 50 }} className="cursor-pointer" />
+          <Avatar
+            src={user.profilePic}
+            sx={{ width: 50, height: 50 }}
+            className="cursor-pointer"
+          />
         </div>
         <Divider />
         {/** Home */}
@@ -362,9 +417,13 @@ export default function SidebarNav(props: Props) {
             {event?.Channel?.map((item, index) => (
               <React.Fragment key={index}>
                 <ListItem className="bg-white font-medium text-lg">
-                  <ListItemButton onClick={() => setRenderComponent('Event Schedule')}>
+                  <ListItemButton
+                    onClick={() => setRenderComponent('Event Schedule')}
+                  >
                     <p className="text-center">
-                      <span className="text-dull text-sm">{formatDate(item.startTime, item.endTime)}</span>
+                      <span className="text-dull text-sm">
+                        {formatDate(item.startTime, item.endTime)}
+                      </span>
                       <br />
                       <span className="text-md">{item.name}</span>
                     </p>
@@ -470,8 +529,12 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === '' && renderList === 'Dash' && <Default />}
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
         {rendercomponent === 'booktable' && <BookTable />}
-        {rendercomponent === 'Participants' && <Participants participants={event.EventParticipant} />}
-        {rendercomponent === 'Sub Events' && <Subevents channels={event.Channel} />}
+        {rendercomponent === 'Participants' && (
+          <Participants participants={event.EventParticipant} />
+        )}
+        {rendercomponent === 'Sub Events' && (
+          <Subevents channels={event.Channel} />
+        )}
         {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
@@ -479,6 +542,7 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}
+        {rendercomponent === 'Photos' && <EventPhotos />}
       </Box>
     </Box>
   )

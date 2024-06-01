@@ -17,7 +17,6 @@ interface BudgetType {
   spent: number
 }
 
-
 interface EventType {
   id: number
   name: string
