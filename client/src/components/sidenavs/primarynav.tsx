@@ -30,6 +30,7 @@ import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
 import Groups from '../groupchats'
 import BookTable from '../booktable'
+import EventPhotos from '../event-photos'
 
 const drawerWidth = 350
 
@@ -139,8 +140,8 @@ export default function SidebarNav(props: Props) {
           src={event?.image}
           className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
           alt="event profile"
-        />
-        <span className="font-bold text-2xl">Saakshi's Bday</span>
+        />{' '}
+        <span className="font-bold text-2xl">{event?.name || 'Event'}</span>
       </div>
       <Divider />
       <div className="flex mt-[60px] h-full">
@@ -248,6 +249,37 @@ export default function SidebarNav(props: Props) {
                       strokeLinejoin="round"
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
                     />
+                  </svg>
+                </Avatar>
+              </ListItem>
+            </Tooltip>
+
+            {/* Photos */}
+            <Tooltip
+              title="Upload or View Photos"
+              disableInteractive
+              placement="bottom-end"
+            >
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={() => setRenderComponent('Photos')}
+              >
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <g transform="translate(2 3)">
+                      <path d="M20 16a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2v11z" />
+                      <circle cx="10" cy="10" r="4" />
+                    </g>
                   </svg>
                 </Avatar>
               </ListItem>
@@ -383,7 +415,7 @@ export default function SidebarNav(props: Props) {
                           <span>{item?.User?.name || ''}</span>
                           <br />
                           <span className="text-dull text-xs">
-                            Joined {getDate(item?.createdDate)}
+                            Joined {getDate(item?.createdAt)}
                           </span>
                         </p>
                       </ListItemButton>
@@ -520,6 +552,8 @@ export default function SidebarNav(props: Props) {
           <Participants participants={event.EventParticipant} />
         )}
         {rendercomponent === 'Sub Events' && (
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           <Subevents channels={event.Channel} />
         )}
         {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
@@ -531,6 +565,7 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}
+        {rendercomponent === 'Photos' && <EventPhotos />}
       </Box>
     </Box>
   )

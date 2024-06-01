@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request } from 'express'
 
 interface SignupReqType extends Request {
   body: {
@@ -26,6 +26,7 @@ interface IUserAttributes {
   about: string
   profilePic: string
   PicName: string
+  FaceEmbeddings?: Number[]
 }
 
 interface IUser extends IUserAttributes {
@@ -191,30 +192,30 @@ interface IChatParticipant {
 }
 
 interface JoinChannelPayload {
-  userId: number;
-  groupId: number;
+  userId: number
+  groupId: number
 }
 
 interface SendMessagePayload {
-  userId: number;
-  groupId: number;
-  message: string;
-  photoLink: string;
+  userId: number
+  groupId: number
+  message: string
+  photoLink: string
 }
 interface PersonalMessagePayLoad {
-  eventId: number;
-  senderId: number;
-  receiverId: number;
-  message: string;
-  photoLink: string;
-  roomId: string;
+  eventId: number
+  senderId: number
+  receiverId: number
+  message: string
+  photoLink: string
+  roomId: string
 }
 
 interface IFCMAttributes {
-  userId: number;
-  endPoint: string;
-  p256dh: string;
-  auth: string;
+  userId: number
+  endPoint: string
+  p256dh: string
+  auth: string
 }
 
 export {

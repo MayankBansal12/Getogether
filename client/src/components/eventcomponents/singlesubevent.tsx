@@ -5,7 +5,7 @@ import Button from '../button'
 import { ChannelType } from '../../global-types/model'
 import { getDate } from '../../helpers/formatDate'
 
-const SingleSubEvent = (channel: ChannelType) => {
+const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
       <Box
@@ -14,9 +14,7 @@ const SingleSubEvent = (channel: ChannelType) => {
         className="flex flex-col bg-background-extralight my-4 px-4 md:px-8 py-8 rounded-md"
       >
         <div className="flex md:flex-row flex-col justify-between items-center w-full">
-          <p className="font-bold text-center text-xl">
-            {channel?.name}
-          </p>
+          <p className="font-bold text-center text-xl">{channel?.name}</p>
           <div className="flex px-2 py-1 border border-black rounded-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -36,9 +34,7 @@ const SingleSubEvent = (channel: ChannelType) => {
             <span>{channel?.ChannelParticipant?.length || 0} People</span>
           </div>
         </div>
-        <p className="font-xl text-black text-md">
-          {channel?.desc}
-        </p>
+        <p className="font-xl text-black text-md">{channel?.desc}</p>
       </Box>
 
       <Box
@@ -46,13 +42,15 @@ const SingleSubEvent = (channel: ChannelType) => {
         gap={2}
         className="md:flex-row flex-col justify-between my-4 w-full"
       >
-        <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 text-center rounded-md">
+        <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 rounded-md text-center">
           <p className="py-2 font-bold text-xl underline">Venue</p>
           <p className="font-medium text-lg">{channel?.venue}</p>
         </div>
-        <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 text-center rounded-md">
+        <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 rounded-md text-center">
           <p className="py-2 font-bold text-xl underline">Time</p>
-          <p className="font-medium text-lg">{`${getDate(channel?.startTime)} - ${getDate(channel?.endTime)}`}</p>
+          <p className="font-medium text-lg">{`${getDate(
+            channel?.startTime,
+          )} - ${getDate(channel?.endTime)}`}</p>
         </div>
         {/* <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 text-center">
           <p className="py-2 font-bold text-xl underline">Venue</p>
@@ -68,7 +66,7 @@ const SingleSubEvent = (channel: ChannelType) => {
       >
         <div className="flex md:flex-row flex-col justify-between items-center">
           <span className="font-bold text-xl">Groups</span>
-          <Button onClick={() => { }} children={'+ Add Group'} />
+          <Button onClick={() => {}} children={'+ Add Group'} />
         </div>
         <Divider />
 

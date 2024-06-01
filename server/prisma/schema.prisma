@@ -22,6 +22,7 @@ model User {
   about            String
   profilePic       String
   PicName          String
+  FaceEmbeddings   Float[]            @default([])
   Photographer     Photographer?
   EventParticipant EventParticipant[]
   Vendor           Vendor?
@@ -49,19 +50,30 @@ model Budget {
 }
 
 model Photographer {
-  id     Int     @id @default(autoincrement())
-  userId Int     @unique
-  Photo  Photo[]
-  User   User    @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  // Photo  Photo[]
+  User   User @relation(fields: [userId], references: [id])
 }
 
 model Photo {
-  id             Int          @id @default(autoincrement())
-  photographerId Int
-  eventId        Int
-  private        Boolean
-  photographer   Photographer @relation(fields: [photographerId], references: [id])
-  Event          Event        @relation(fields: [eventId], references: [id])
+  id               Int                @id @default(autoincrement())
+  // photographerId   Int
+  eventId          Int
+  private          Boolean
+  url              String
+  embeddings       Float[]            @default([])
+  // photographer     Photographer?      @relation(fields: [photographerId], references: [id])
+  Event            Event              @relation(fields: [eventId], references: [id])
+  PhotoParticipant PhotoParticipant[]
+}
+
+model PhotoParticipant {
+  id               Int              @id @default(autoincrement())
+  photoId          Int
+  participantId    Int
+  Photo            Photo            @relation(fields: [photoId], references: [id])
+  EventParticipant EventParticipant @relation(fields: [participantId], references: [id])
 }
 
 model Event {
@@ -150,6 +162,7 @@ model EventParticipant {
   User               User                 @relation(fields: [userId], references: [id])
   ChatParticipant    ChatParticipant[]
   ChannelParticipant ChannelParticipant[]
+  PhotoParticipant   PhotoParticipant[]
 
   @@unique([eventId, userId], name: "UserEventUnique")
 }

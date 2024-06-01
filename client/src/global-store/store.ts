@@ -65,8 +65,8 @@ const useAlertStore = create<AlertStoreType>((set) => ({
   noSecondaryButton: false,
   primaryButton: 'Confirm',
   secondaryButton: 'Cancel',
-  primaryAction: () => { },
-  secondaryAction: () => { },
+  primaryAction: () => {},
+  secondaryAction: () => {},
   // A function that sets all the values except open
   setAlertStore: (alert: AlertStoreType) => set(alert),
   setOpen: (open: boolean) => set({ open }),
@@ -81,4 +81,10 @@ const useSnackbarStore = create<SnackbarStoreType>((set) => ({
     set({ open: state.open, content: state.content, type: state.type }),
 }))
 
-export { useUserStore, useEventStore, useChannelStore, useAlertStore, useSnackbarStore }
+export {
+  useUserStore,
+  useEventStore,
+  useChannelStore,
+  useAlertStore,
+  useSnackbarStore,
+}
