@@ -14,18 +14,16 @@ const Dash = () => {
   const callApi = useApi()
 
   const fetchUserRole = async (eventId: Number) => {
-    const res = await callApi(
-      '/event/user/role?eventId=' + eventId + '&userId=' + user.id,
-    )
+    const res = await callApi('/event/user/role?eventId=' + eventId + '&userId=' + user.id)
     const role: string = res.data.role
+    const participant = res.data.participant;
 
-    setUser({ ...user, role })
+    setUser({ ...user, role, "participantId": participant.id })
   }
 
   const getEventDetails = async () => {
     const res = await callApi('/event/' + eventId, 'GET')
     if (res) {
-      console.log('res.data\n', res.data)
       const eventDetails: EventType = res.data.event
       console.log('Event details: ', eventDetails)
       setEvent(eventDetails)

@@ -14,6 +14,7 @@ import {
   AccordionSummary,
   Avatar,
   ListItemButton,
+  ListItemText,
   Tooltip,
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
@@ -22,7 +23,7 @@ import SingleSubEvent from '../eventcomponents/singlesubevent'
 import Budget from '../eventcomponents/budget'
 import PaymentHistory from '../eventcomponents/paymenthistory'
 import Default from './Default'
-import { formatDate } from '../../helpers/formatDate'
+import { formatDate, getDate } from '../../helpers/formatDate'
 import { useNavigate } from 'react-router-dom'
 import { useEventStore, useUserStore } from '../../global-store/store'
 import Chat from '../chat'
@@ -43,6 +44,7 @@ export default function SidebarNav(props: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [channel, setChannel] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
   const user = useUserStore((state) => state.user)
   const [renderList, setRenderList] = useState('Home')
@@ -84,6 +86,7 @@ export default function SidebarNav(props: Props) {
     if (user.role === 'host') {
       setRenderList('Dash')
     }
+    console.log('User details: ', user)
   }, [user])
 
   // Dashboard Items
@@ -114,36 +117,25 @@ export default function SidebarNav(props: Props) {
     },
   ]
   // List for DM delete this later
-  const dmList = [
-    {
-      name: 'Saakshi',
-      joinedDate: 'Joined on 25th May, 2024',
-      action: () => setRenderComponent('Chat'),
-    },
-    {
-      name: 'Arghya',
-      joinedDate: 'Joined on 26th May, 2024',
-      action: () => setRenderComponent('Chat'),
-    },
-  ]
-  // Show all the events
-  // const calendarList = [
+  // const dmList = [
   //   {
-  //     event: '@ Game Zone',
-  //     date: 'On 25th May, 2024',
-  //     action: () => setRenderComponent('Event Schedule'),
+  //     name: 'Saakshi',
+  //     joinedDate: 'Joined on 25th May, 2024',
+  //     action: () => setRenderComponent('Chat'),
   //   },
   //   {
-  //     event: '@ Bday Party',
-  //     date: 'On 25h May, 2024',
-  //     action: () => setRenderComponent('Event Schedule'),
+  //     name: 'Arghya',
+  //     joinedDate: 'Joined on 26th May, 2024',
+  //     action: () => setRenderComponent('Chat'),
   //   },
-  //   // Add more items as needed
   // ]
 
   const drawer = (
     <div className="flex flex-col h-full font-josefin">
-      <div className="flex justify-center items-center gap-3 p-2">
+      <div
+        className="top-0 left-0 z-10 fixed flex justify-start items-center gap-3 bg-white px-4 py-8 w-full h-[70px] font-josefin"
+        style={{ width: `${drawerWidth}px` }}
+      >
         <img
           src={event?.image}
           className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
@@ -152,8 +144,8 @@ export default function SidebarNav(props: Props) {
         <span className="font-bold text-2xl">{event?.name || 'Event'}</span>
       </div>
       <Divider />
-      <div className="flex h-full">
-        <div className="flex flex-col justify-between items-center my-2">
+      <div className="flex mt-[60px] h-full">
+        <div className="left-2 z-10 fixed flex flex-col justify-between items-center my-2 overscroll-none">
           <List>
             {/* Dashboard */}
             {user && user.role === 'host' && (
@@ -303,137 +295,164 @@ export default function SidebarNav(props: Props) {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-6 h-6 text-black transition-colors duration-200"
+                    className="text-black transition-colors duration-200 size-6"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z M8 13C7.44 13 7 12.55 7 12C7 11.45 7.45 11 8 11C8.55 11 9 11.45 9 12C9 12.55 8.56 13 8 13Z M16 13C15.44 13 15 12.55 15 12C15 11.45 15.45 11 16 11C16.55 11 17 11.45 17 12C17 12.55 16.56 13 16 13Z M8 13C7.44 13 7 12.55 7 12C7 11.45 7.45 11 8 11C8.55 11 9 11.45 9 12C9 12.55 8.56 13 8 13Z"
+                      d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                     />
                   </svg>
                 </Avatar>
               </ListItem>
             </Tooltip>
           </List>
-          <Avatar
-            src={user.profilePic}
-            sx={{ width: 50, height: 50 }}
-            className="cursor-pointer"
-          />
+          <div className="bottom-0 flex">
+            <Avatar
+              src={user.profilePic}
+              sx={{ width: 50, height: 50 }}
+              className="cursor-pointer"
+            />
+          </div>
         </div>
         <Divider />
         {/** Home */}
-        {renderList === 'Home' && (
-          <List className="w-full">
-            <ListItem className="flex-col bg-white font-medium text-lg">
-              @Sub Events
-              <ListItemButton
-                className="ml-3 font-josefin font-md text-black"
-                onClick={() => setRenderComponent('Groups')}
-              >
-                # Celebrating
-              </ListItemButton>
-            </ListItem>
-            <Divider className="m-0" />
-          </List>
-        )}
-
-        {/* Dashboard */}
-        {renderList === 'Dash' && (
-          <List>
-            {dashlistitems.map((item, index) => (
-              <ListItem key={index} className="bg-white font-medium text-lg">
-                {item.accordion ? (
-                  <Accordion className="!border-0 !shadow-none">
-                    <AccordionSummary
-                      expandIcon={
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6 text-black"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-                          />
-                        </svg>
-                      }
-                      aria-controls={`panel${index}-content`}
-                      id={`panel${index}-header`}
-                    >
-                      <p className="w-32">@ {item.name}</p>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {item.details.map((detail, idx) => (
-                        <ListItemButton
-                          key={idx}
-                          className="ml-3 font-josefin font-md text-black"
-                          onClick={detail.action}
-                        >
-                          # {detail.name}
-                        </ListItemButton>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                ) : (
-                  <ListItemButton onClick={item.action}>
-                    @ {item.name}
-                  </ListItemButton>
-                )}
+        <div className="ml-[50px] pl-4 w-full h-full font-josefin">
+          {renderList === 'Home' && (
+            <List>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemText
+                  onClick={() => setRenderComponent('Groups')}
+                  disableTypography={true}
+                >
+                  @ Celebrate {/* name of the sub event */}
+                </ListItemText>
               </ListItem>
-            ))}
-          </List>
-        )}
+              <ListItem>
+                <ListItemButton># Announcements</ListItemButton>
+              </ListItem>
+              <ListItem>
+                <ListItemButton># General</ListItemButton>
+              </ListItem>
+              <ListItem>
+                <ListItemButton># Vendors</ListItemButton>
+              </ListItem>
+              <ListItem>
+                <ListItemButton># Photos</ListItemButton>
+              </ListItem>
+              <Divider className="m-0" />
+            </List>
+          )}
 
-        {/** Chat List */}
-        {renderList === 'Dm' && (
-          <List>
-            {dmList.map((item, index) => (
-              <React.Fragment key={index}>
-                <ListItem className="bg-white font-medium text-lg">
-                  <ListItemButton onClick={item.action}>
-                    <p>
-                      <span>{item.name}</span>
-                      <br />
-                      <span className="text-dull text-xs">
-                        {item.joinedDate}
-                      </span>
-                    </p>
-                  </ListItemButton>
+          {/* Dashboard */}
+          {renderList === 'Dash' && (
+            <List>
+              {dashlistitems.map((item, index) => (
+                <ListItem key={index} className="bg-white font-medium text-lg">
+                  {item.accordion ? (
+                    <Accordion className="!border-0 !shadow-none">
+                      <AccordionSummary
+                        expandIcon={
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6 text-black"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                            />
+                          </svg>
+                        }
+                        aria-controls={`panel${index}-content`}
+                        id={`panel${index}-header`}
+                      >
+                        <p className="w-32">@ {item.name}</p>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {item.details.map((detail, idx) => (
+                          <ListItemButton
+                            key={idx}
+                            className="ml-3 font-josefin font-md text-black"
+                            onClick={detail.action}
+                          >
+                            # {detail.name}
+                          </ListItemButton>
+                        ))}
+                      </AccordionDetails>
+                    </Accordion>
+                  ) : (
+                    <ListItemButton onClick={item.action}>
+                      @ {item.name}
+                    </ListItemButton>
+                  )}
                 </ListItem>
-                {index < dmList.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        )}
+              ))}
+            </List>
+          )}
 
-        {/* calender */}
-        {renderList === 'Calender' && (
-          <List>
-            {event?.Channel?.map((item, index) => (
-              <React.Fragment key={index}>
-                <ListItem className="bg-white font-medium text-lg">
-                  <ListItemButton
-                    onClick={() => setRenderComponent('Event Schedule')}
-                  >
-                    <p className="text-center">
-                      <span className="text-dull text-sm">
-                        {formatDate(item.startTime, item.endTime)}
-                      </span>
-                      <br />
-                      <span className="text-md">{item.name}</span>
-                    </p>
-                  </ListItemButton>
-                </ListItem>
-                {index < event?.Channel?.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        )}
+          {/** Chat List */}
+          {renderList === 'Dm' && (
+            <List>
+              {event.EventParticipant.length > 0 ? (
+                event.EventParticipant.map((item, index) => (
+                  <React.Fragment key={index}>
+                    <ListItem className="bg-white font-medium text-lg">
+                      <ListItemButton
+                        onClick={() => {
+                          setRenderComponent('Chat')
+                          setSelectedUser({
+                            participantId: item?.id,
+                            user: item?.User,
+                          })
+                        }}
+                      >
+                        <p>
+                          <span>{item?.User?.name || ''}</span>
+                          <br />
+                          <span className="text-dull text-xs">
+                            Joined {getDate(item?.createdAt)}
+                          </span>
+                        </p>
+                      </ListItemButton>
+                    </ListItem>
+                    <Divider />
+                  </React.Fragment>
+                ))
+              ) : (
+                <div>No Participants to show!</div>
+              )}
+            </List>
+          )}
+
+          {/* calender */}
+          {renderList === 'Calender' && (
+            <List>
+              {event?.Channel?.map((item, index) => (
+                <React.Fragment key={index}>
+                  <ListItem className="bg-white font-medium text-lg">
+                    <ListItemButton
+                      onClick={() => setRenderComponent('Event Schedule')}
+                    >
+                      <p className="text-center">
+                        <span className="text-dull text-sm">
+                          {formatDate(item.startTime, item.endTime)}
+                        </span>
+                        <br />
+                        <span className="text-md">{item.name}</span>
+                      </p>
+                    </ListItemButton>
+                  </ListItem>
+                  {index < event?.Channel?.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </List>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -533,12 +552,16 @@ export default function SidebarNav(props: Props) {
           <Participants participants={event.EventParticipant} />
         )}
         {rendercomponent === 'Sub Events' && (
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           <Subevents channels={event.Channel} />
         )}
         {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
-        {rendercomponent === 'Chat' && renderList === 'Dm' && <Chat />}
+        {rendercomponent === 'Chat' && renderList === 'Dm' && (
+          <Chat selectedUser={selectedUser} isGroup={false} />
+        )}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}

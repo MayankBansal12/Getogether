@@ -48,17 +48,17 @@ const AllEvents = () => {
   }, [])
 
   return (
-    <div className="flex flex-col gap-4 justify-center items-center py-10 w-full h-screen font-josefin">
+    <div className="flex flex-col justify-center items-center gap-4 py-10 w-full h-screen font-josefin">
       <div className="font-title text-3xl md:text-5xl">
         Get
         <span className="text-primary-light">ogether.</span>
       </div>
 
-      <div className="flex flex-col gap-2 justify-center items-center p-4 rounded-lg">
+      <div className="flex flex-col justify-center items-center gap-2 p-4 rounded-lg">
         <img
           src={user.profilePic || monkey}
           className="border-4 border-primary-light rounded-2xl w-[130px] h-[125px]"
-          alt={user.name + " profile pic"}
+          alt={user.name + ' profile pic'}
         />
         <span>{user.name}</span>
       </div>
@@ -79,11 +79,12 @@ const AllEvents = () => {
                 navigate('/event/' + event.id)
               }}
             />
-          ))) : (
-          <div className="flex flex-col text-center mb-3">
+          ))
+        ) : (
+          <div className="flex flex-col mb-3 font-medium text-center text-md md:text-lg">
             <span>No Events to show!</span>
             <span> Wait till you are invited to @join any </span>
-            <span>or create your own #event</span>
+            <span>or create your own #event.</span>
           </div>
         )}
       </div>

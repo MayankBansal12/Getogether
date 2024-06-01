@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { UserType, EventType } from '../global-types/model'
+import { UserType, EventType, ChannelType } from '../global-types/model'
 
 type UserStoreType = {
   user: UserType | null
@@ -9,6 +9,11 @@ type UserStoreType = {
 type EventStoreType = {
   event: EventType | null
   setEvent: (event: EventType) => void
+}
+
+type ChannelStoreType = {
+  channel: ChannelType[] | null
+  setChannel: (channel: ChannelType[]) => void
 }
 
 interface AlertStoreDataType {
@@ -47,6 +52,11 @@ const useEventStore = create<EventStoreType>()((set) => ({
   setEvent: (state: EventType) => set({ event: state }),
 }))
 
+const useChannelStore = create<ChannelStoreType>()((set) => ({
+  channel: null,
+  setChannel: (state: ChannelType[]) => set({ channel: state }),
+}))
+
 // Alert Store
 const useAlertStore = create<AlertStoreType>((set) => ({
   open: false,
@@ -55,8 +65,8 @@ const useAlertStore = create<AlertStoreType>((set) => ({
   noSecondaryButton: false,
   primaryButton: 'Confirm',
   secondaryButton: 'Cancel',
-  primaryAction: () => { },
-  secondaryAction: () => { },
+  primaryAction: () => {},
+  secondaryAction: () => {},
   // A function that sets all the values except open
   setAlertStore: (alert: AlertStoreType) => set(alert),
   setOpen: (open: boolean) => set({ open }),
@@ -71,4 +81,10 @@ const useSnackbarStore = create<SnackbarStoreType>((set) => ({
     set({ open: state.open, content: state.content, type: state.type }),
 }))
 
-export { useUserStore, useEventStore, useAlertStore, useSnackbarStore }
+export {
+  useUserStore,
+  useEventStore,
+  useChannelStore,
+  useAlertStore,
+  useSnackbarStore,
+}

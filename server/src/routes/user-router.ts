@@ -102,7 +102,9 @@ router.post('/signup', async (req: Request, res: Response) => {
       .status(500)
       .json({ message: 'Internal server error', error: error.message })
   }
-}) // /user/:userId/event -> For fetching all events that user is part of
+})
+
+// /user/:userId/event -> For fetching all events that user is part of
 router.get('/:userId/event', async (req: Request, res: Response) => {
   const { userId } = req.params
 
@@ -130,28 +132,33 @@ router.get('/:userId/event', async (req: Request, res: Response) => {
   }
 })
 
-// router.post("/dm-list", async (req: Request, res: Response) => {
-//   const { eventId, participantId } = req.body;
+// /user/dm-list -> For fetching list of user dms from that event
+router.post("/dm-list", async (req: Request, res: Response) => {
+  const { eventId, participantId } = req.body;
 
-//   try {
-//     const chatParticipants = await prisma.chatParticipant.findMany({
-//       where: {
-//         eventId,
-//         OR: [
-//           { participantId: participantId },
-//         ]
-//       },
-//       include: {
-//         EventParticipant: true
-//       }
-//     });
+  try {
+    const chatParticipants = await prisma.chatParticipant.findMany({
+      where: {
+        eventId,
+        OR: [
+          { participantId: participantId },
+        ]
+      },
+      include: {
+        EventParticipant: {
+          include: {
+            User: true
+          }
+        }
+      }
+    });
 
-//     return res.status(200).json({ message: "Successfully fetched DM list!", chatParticipants });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ message: 'An error occurred while fetching DM list!' })
-//   }
-// });
+    return res.status(200).json({ message: "Successfully fetched DM list!", chatParticipants });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'An error occurred while fetching DM list!' })
+  }
+});
 
 router.post('/messages', async (req: Request, res: Response) => {
   const { eventId, participantId, userId } = req.body

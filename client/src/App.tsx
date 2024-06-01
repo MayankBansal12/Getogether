@@ -16,6 +16,7 @@ import AllEvents from './pages/allevents'
 import Dash from './pages/Dash'
 import CreateEvent from './components/eventcomponents/create'
 import BookTable from './components/booktable'
+import SidebarNav from './components/sidenavs/primarynav'
 
 const router = createBrowserRouter([
   {

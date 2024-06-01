@@ -8,6 +8,7 @@ interface UserType {
   profilePic: string
   PicName: string
   role?: string
+  participantId?: number
 }
 
 interface BudgetType {
@@ -23,7 +24,7 @@ interface EventType {
   desc: string
   image: string
   date: Date
-  EventParticipant: []
+  EventParticipant: EventParticipantType[]
   Photo: []
   Vendor: []
   Budget?: BudgetType | null
@@ -32,12 +33,26 @@ interface EventType {
   Chat: []
 }
 
+interface EventParticipantType {
+  id: number
+  eventId: number
+  userId: number
+  createdAt: Date
+  role: string
+  status: number
+  Event: EventType
+  User: UserType
+  ChatParticipant: []
+  ChannelParticipant: []
+  PhotoParticipant: []
+}
+
 interface ChannelType {
   id: number
   eventId: number
   name: string
   venue: string
-  desc?: string
+  desc: string
   startTime: Date
   endTime: Date
   Event: EventType

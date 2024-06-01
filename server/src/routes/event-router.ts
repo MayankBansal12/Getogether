@@ -288,7 +288,11 @@ router
 
       return res
         .status(200)
-        .json({ message: 'Role for the user fetched!', role: participant.role })
+        .json({
+          message: 'Role for the user fetched!',
+          role: participant.role,
+          participant,
+        })
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Failed to get user role' })
@@ -332,8 +336,6 @@ router.post(
       const participant = await prisma.eventParticipant.findFirstOrThrow({
         where: { userId: Number(req.user.id), eventId: Number(eventId) },
       })
-
-      console.log('participantid: ', participant)
 
       if (!participant) {
         return res.status(500).json({ error: 'User unauthorized!' })
