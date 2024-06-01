@@ -22,7 +22,7 @@ import SingleSubEvent from '../eventcomponents/singlesubevent'
 import Budget from '../eventcomponents/budget'
 import PaymentHistory from '../eventcomponents/paymenthistory'
 import Default from './Default'
-import { formatDate } from "../../helpers/formatDate";
+import { formatDate, getDate } from "../../helpers/formatDate";
 import { useNavigate } from 'react-router-dom'
 import { useEventStore, useUserStore } from '../../global-store/store'
 import Chat from '../chat'
@@ -42,6 +42,7 @@ export default function SidebarNav(props: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [channel, setChannel] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(null);
   const [rendercomponent, setRenderComponent] = useState('')
   const user = useUserStore((state) => state.user)
   const [renderList, setRenderList] = useState('Home')
@@ -83,6 +84,7 @@ export default function SidebarNav(props: Props) {
     if (user.role === "host") {
       setRenderList("Dash");
     }
+    console.log("User details: ", user);
   }, [user])
 
   // Dashboard Items
@@ -113,31 +115,17 @@ export default function SidebarNav(props: Props) {
     },
   ]
   // List for DM delete this later
-  const dmList = [
-    {
-      name: 'Saakshi',
-      joinedDate: 'Joined on 25th May, 2024',
-      action: () => setRenderComponent('Chat'),
-    },
-    {
-      name: 'Arghya',
-      joinedDate: 'Joined on 26th May, 2024',
-      action: () => setRenderComponent('Chat'),
-    },
-  ]
-  // Show all the events
-  // const calendarList = [
+  // const dmList = [
   //   {
-  //     event: '@ Game Zone',
-  //     date: 'On 25th May, 2024',
-  //     action: () => setRenderComponent('Event Schedule'),
+  //     name: 'Saakshi',
+  //     joinedDate: 'Joined on 25th May, 2024',
+  //     action: () => setRenderComponent('Chat'),
   //   },
   //   {
-  //     event: '@ Bday Party',
-  //     date: 'On 25h May, 2024',
-  //     action: () => setRenderComponent('Event Schedule'),
+  //     name: 'Arghya',
+  //     joinedDate: 'Joined on 26th May, 2024',
+  //     action: () => setRenderComponent('Chat'),
   //   },
-  //   // Add more items as needed
   // ]
 
   const drawer = (
@@ -337,22 +325,27 @@ export default function SidebarNav(props: Props) {
         {/** Chat List */}
         {renderList === 'Dm' && (
           <List>
-            {dmList.map((item, index) => (
-              <React.Fragment key={index}>
-                <ListItem className="bg-white font-medium text-lg">
-                  <ListItemButton onClick={item.action}>
-                    <p>
-                      <span>{item.name}</span>
-                      <br />
-                      <span className="text-dull text-xs">
-                        {item.joinedDate}
-                      </span>
-                    </p>
-                  </ListItemButton>
-                </ListItem>
-                {index < dmList.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
+            {event.EventParticipant.length > 0 ?
+              event.EventParticipant.map((item, index) => (
+                <React.Fragment key={index}>
+                  <ListItem className="bg-white font-medium text-lg">
+                    <ListItemButton onClick={() => {
+                      setRenderComponent('Chat')
+                      setSelectedUser({ participantId: item?.id, user: item?.User })
+                    }}>
+                      <p>
+                        <span>{item?.User?.name || ""}</span>
+                        <br />
+                        <span className="text-dull text-xs">
+                          Joined {getDate(item?.createdDate)}
+                        </span>
+                      </p>
+                    </ListItemButton>
+                  </ListItem>
+                  <Divider />
+                </React.Fragment>
+              )) : <div>No Participants to show!</div>
+            }
           </List>
         )}
 
@@ -475,7 +468,7 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
-        {rendercomponent === 'Chat' && renderList === 'Dm' && <Chat />}
+        {rendercomponent === 'Chat' && renderList === 'Dm' && <Chat selectedUser={selectedUser} isGroup={false} />}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}

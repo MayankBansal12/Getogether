@@ -1,5 +1,5 @@
 // This component lists all the subevent
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Modal } from '@mui/material'
 import { Add, Preview } from "@mui/icons-material"
 import { useNavigate, useParams } from 'react-router-dom'
@@ -9,14 +9,17 @@ import { getDate } from '../../helpers/formatDate'
 import useApi from '../../hooks/use-api'
 import useSnackbar from '../../hooks/use-snackbar'
 import useAlert from '../../hooks/use-alert'
+import { useChannelStore } from '../../global-store/store'
 
-interface SubeventsProps {
-  channels: ChannelType[];
-}
+// interface SubeventsProps {
+//   channels: ChannelType[];
+// }
 
-const Subevents = ({ channels }: SubeventsProps) => {
+const Subevents = () => {
   const navigate = useNavigate()
+  const callApi = useApi()
   const { eventId } = useParams();
+  const { channel, setChannel } = useChannelStore(state => state)
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const setSnackbar = useSnackbar();
@@ -87,8 +90,7 @@ const Subevents = ({ channels }: SubeventsProps) => {
         method = "PUT"
       }
 
-      console.log("sub event: ", subEvent);
-      const res = await useApi(uri, method, { ...subEvent, eventId: Number(eventId), channelId: Number(subEvent?.id || 0) })
+      const res = await callApi(uri, method, { ...subEvent, eventId: Number(eventId), channelId: Number(subEvent?.id || 0) })
       console.log(res);
       if (res.status === 201) {
         setSubEvent({
@@ -103,6 +105,7 @@ const Subevents = ({ channels }: SubeventsProps) => {
           content: isEdit ? 'Sub Event Details edited!' : 'Sub Event created!',
           type: 'success',
         })
+        fetchChannelDetails();
       } else {
         setSnackbar({
           open: true,
@@ -132,13 +135,14 @@ const Subevents = ({ channels }: SubeventsProps) => {
       })
       return;
     }
-    const res = await useApi("/channel", "DELETE", { eventId: Number(eventId), channelId: subEvent?.id })
+    const res = await callApi("/channel", "DELETE", { eventId: Number(eventId), channelId: subEvent?.id })
     if (res.status === 204) {
       setSnackbar({
         open: true,
         content: 'Sub Event deleted!',
         type: 'success',
       })
+      fetchChannelDetails();
     } else {
       setSnackbar({
         open: true,
@@ -149,10 +153,25 @@ const Subevents = ({ channels }: SubeventsProps) => {
     closeAlert();
   }
 
+  const fetchChannelDetails = async () => {
+    try {
+      const res = await callApi("/event/list", "POST", { eventId: Number(eventId), includeGroup: true })
+      if (res.status === 200) {
+        setChannel(res?.data?.events?.Channel)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchChannelDetails();
+  }, [])
+
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
       <Box className="flex justify-between items-center bg-background-extralight my-4 px-4 md:px-6 py-4">
-        <span className="font-bold text-xl">Total Sub Events: {channels.length}</span>
+        <span className="font-bold text-xl">Total Sub Events: {channel?.length}</span>
         <button
           type="button"
           className="bg-primary-light hover:bg-transparent border transition-all hover:text-black hover:border-black ml-auto px-2 py-1 rounded-md w-40 text-white flex items-center gap-1"
@@ -266,20 +285,20 @@ const Subevents = ({ channels }: SubeventsProps) => {
         </Box>
       </Modal>
 
-      {channels.length < 1 ? <div className="text-center">No sub events listed!</div> :
-        channels.map(channel => (
+      {channel && channel.length <= 0 ? <div className="text-center">No sub events listed!</div> :
+        channel?.map(item => (
           <Box
-            key={channel.id}
+            key={item.id}
             display={'flex'}
             gap={4}
             className="flex md:flex-row flex-col justify-between items-center border-2 border-transparent hover:border-primary-light bg-background-extralight hover:bg-white rounded-md transition-all my-2 px-4 md:px-6 py-2"
           >
             <div className="text-center md:text-left">
               <p className="font-semibold text-xl">
-                {"@ " + channel.name.toLowerCase()}
+                {"@ " + item.name.toLowerCase()}
               </p>
               <p className="font-medium text-md text-primary-dull">
-                {getDate(channel.startTime)} - {getDate(channel.endTime)}
+                {getDate(item.startTime)} - {getDate(item.endTime)}
               </p>
             </div>
             <div className="text-center flex flex-col items-center gap-1">
@@ -298,12 +317,12 @@ const Subevents = ({ channels }: SubeventsProps) => {
                     d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                   />
                 </svg>
-                <span>{channel.ChannelParticipant?.length || 0} People</span>
+                <span>{item.ChannelParticipant?.length || 0} People</span>
               </div>
               <div className="flex gap-1">
-                <button className="hover:text-gray-500 transition-all cursor-pointer" onClick={() => { setSubEvent(channel); handleEditOpen() }}>Edit</button>
+                <button className="hover:text-gray-500 transition-all cursor-pointer" onClick={() => { setSubEvent(item); handleEditOpen() }}>Edit</button>
                 <span>|</span>
-                <button className="hover:text-gray-500 transition-all cursor-pointer" onClick={() => openDelete(channel)}>Delete</button>
+                <button className="hover:text-gray-500 transition-all cursor-pointer" onClick={() => openDelete(item)}>Delete</button>
               </div>
             </div>
           </Box>

@@ -8,6 +8,7 @@ interface UserType {
   profilePic: string
   PicName: string
   role?: string
+  participantId?: number
 }
 
 interface BudgetType {
