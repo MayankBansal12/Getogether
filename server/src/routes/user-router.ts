@@ -10,6 +10,7 @@ import push from '../helper/push-notify'
 
 const router = Router()
 const SECRET_KEY = process.env.SECRET_KEY
+const flaskBackend = 'http://localhost:6969'
 
 // /user/login -> User login
 router.post('/login', async (req: Request, res: Response) => {
@@ -79,8 +80,21 @@ router.post('/signup', async (req: Request, res: Response) => {
 
     const token = jwt.sign({ userId: newUser.id }, SECRET_KEY)
 
+    const data = fetch(flaskBackend + '/generate_embeddings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image,
+        name: imageName,
+        id: newUser.id,
+      }),
+    })
+
     res.status(201).json({ message: 'User signed up successfully!', token })
   } catch (error) {
+    console.log('\n==signup==\n', error)
     if (error.code === 'P2002') {
       return res.status(400).json({ error: 'Email already in use' })
     }

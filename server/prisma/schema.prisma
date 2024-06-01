@@ -50,20 +50,20 @@ model Budget {
 }
 
 model Photographer {
-  id     Int     @id @default(autoincrement())
-  userId Int     @unique
-  Photo  Photo[]
-  User   User    @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  // Photo  Photo[]
+  User   User @relation(fields: [userId], references: [id])
 }
 
 model Photo {
   id               Int                @id @default(autoincrement())
-  photographerId   Int
+  // photographerId   Int
   eventId          Int
   private          Boolean
   url              String
   embeddings       Float[]            @default([])
-  photographer     Photographer       @relation(fields: [photographerId], references: [id])
+  // photographer     Photographer?      @relation(fields: [photographerId], references: [id])
   Event            Event              @relation(fields: [eventId], references: [id])
   PhotoParticipant PhotoParticipant[]
 }

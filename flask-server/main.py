@@ -49,7 +49,35 @@ class EventParticipant(db.Model):
     user = db.relationship("User", back_populates="event_participants")
 
 
+class Photo(db.Model):
+    __tablename__ = "Photo"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    eventId = db.Column(db.Integer, db.ForeignKey("Event.id"), nullable=False)
+    private = db.Column(db.Boolean, default=False)
+    url = db.Column(db.String, nullable=False)
+    embeddings = db.Column(db.ARRAY(db.Float), default=[])
+    event = db.relationship("Event", back_populates="photos")
+    participants = db.relationship("PhotoParticipant", back_populates="photo")
+
+
+class PhotoParticipant(db.Model):
+    __tablename__ = "PhotoParticipant"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    photoId = db.Column(db.Integer, db.ForeignKey("Photo.id"), nullable=False)
+    participantId = db.Column(
+        db.Integer, db.ForeignKey("EventParticipant.id"), nullable=False
+    )
+    photo = db.relationship("Photo", back_populates="participants")
+    event_participant = db.relationship(
+        "EventParticipant", back_populates="photo_participants"
+    )
+
+
 User.event_participants = db.relationship("EventParticipant", back_populates="user")
+Event.photos = db.relationship("Photo", back_populates="event")
+EventParticipant.photo_participants = db.relationship(
+    "PhotoParticipant", back_populates="event_participant"
+)
 
 
 @app.route("/", methods=["GET"])
@@ -76,22 +104,24 @@ def generate_embeddings():
         img = face_recognition.load_image_file(newName)
         encodings = np.array(face_recognition.face_encodings(img))
 
-        if not encodings:
+        if len(encodings) == 0:
             return jsonify({"error": "No faces found"}), 400
 
         user_id = id
         user = User.query.get(user_id)
         if user:
+            print("here:\n", user.name, "\n")
             user.FaceEmbeddings = encodings[0].tolist()
             db.session.commit()
 
-        return jsonify(encodings.tolist())
+        return jsonify({"message": "done"})
     except Exception as e:
         print("\n\n==generate-embs==\n", e, "\n\n")
         return jsonify({"message": "server error"}), 400
     finally:
         if os.path.exists(newName):
             os.remove(newName)
+        print("done embedding")
 
 
 @app.route("/find-faces", methods=["POST"])
@@ -100,7 +130,8 @@ def findFaces():
     event_id = data.get("event_id")
     b64Img = data.get("image")
     name = data.get("name")
-    if not b64Img or not event_id:
+    photo_id = data.get("photo_id")
+    if not b64Img or not event_id or not photo_id:
         return jsonify({"error": "No image or event ID provided"}), 400
 
     current_time = datetime.now()
@@ -122,11 +153,15 @@ def findFaces():
         event = Event.query.filter_by(id=event_id).first()
         if not event:
             return jsonify({"error": "Event not found"}), 404
+        # Get the photo
+        photo = Photo.query.filter_by(id=photo_id).first()
+        if not photo:
+            return jsonify({"error": "Photo not found"}), 404
 
         print("here2")
         participants = event.participants
         print("\n\n==participants==\n", participants, "\n\n")
-        matching_participants = []
+        # matching_participants = []
         print("here3")
 
         # Compare embeddings
@@ -139,22 +174,30 @@ def findFaces():
                     encodings, user_embeddings
                 )
                 if any(match_results):
-                    matching_participants.append(
-                        {
-                            "id": user.id,
-                            "name": user.name,
-                            # "email": user.email,
-                            # "phone": user.phone,
-                            # "about": user.about,
-                            # "profilePic": user.profilePic,
-                            # "PicName": user.PicName,
-                        }
+                    photo_participant = PhotoParticipant(
+                        photoId=photo.id, participantId=participant.id
                     )
-
-        return jsonify(matching_participants)
+                    db.session.add(photo_participant)
+                    # matching_participants.append(
+                    #     {
+                    #         "id": user.id,
+                    #         "name": user.name,
+                    #         # "email": user.email,
+                    #         # "phone": user.phone,
+                    #         # "about": user.about,
+                    #         # "profilePic": user.profilePic,
+                    #         # "PicName": user.PicName,
+                    #     }
+                    # )
+        db.session.commit()
+        return jsonify({"message": "done"})
     except Exception as e:
         print("\n\n==generate-embs==\n", e, "\n\n")
         return jsonify({"message": "server error"}), 500
+    finally:
+        if os.path.exists(newName):
+            os.remove(newName)
+        print("done embedding")
 
 
 if __name__ == "__main__":

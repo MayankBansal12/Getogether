@@ -3,10 +3,12 @@
 import { Router, Request, Response } from 'express'
 import prisma from '../db/db'
 import authMiddleware from '../middlewares/user-middleware'
-import { UserReqType } from '../types/req'
+import { AuthReqType, UserReqType } from '../types/req'
 import UploadImg from '../helper/upload-img'
 
 const router = Router()
+
+const flaskBackend = 'http://localhost:6969'
 
 interface CreateAllReq extends UserReqType {
   body: {
@@ -94,8 +96,8 @@ router.post(
     }
 
     try {
-      let imageURL = "";
-      if (image) imageURL = await UploadImg(image);
+      let imageURL = ''
+      if (image) imageURL = await UploadImg(image)
 
       const newEvent = await prisma.event.create({
         data: {
@@ -121,7 +123,7 @@ router.post(
           role: 'host',
           status: 1,
         },
-      });
+      })
 
       const newSubEvents = await Promise.all(
         subEvents.map((subEvent) =>
@@ -159,10 +161,10 @@ router.post('/list', async (req: Request, res: Response) => {
             ChannelParticipant: true,
             GroupRelation: includeGroup
               ? {
-                include: {
-                  Group: true,
-                },
-              }
+                  include: {
+                    Group: true,
+                  },
+                }
               : false,
           },
         },
@@ -218,7 +220,7 @@ router.post('/invite', async (req: Request, res: Response) => {
   }
 })
 
-// /event/respond -> User Accepting/Declining the invitation 
+// /event/respond -> User Accepting/Declining the invitation
 // status -> accept 1 ,reject -1
 router.post('/respond', async (req: Request, res: Response) => {
   const { userId, eventId, status } = req.body
@@ -241,7 +243,9 @@ router.post('/respond', async (req: Request, res: Response) => {
         .json({ error: 'Invitation not found or already processed' })
     }
 
-    return res.status(200).json({ message: 'Successfully responded to Invitation!' })
+    return res
+      .status(200)
+      .json({ message: 'Successfully responded to Invitation!' })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to respond to invitation for event' })
@@ -269,19 +273,22 @@ router.post('/remove', async (req: Request, res: Response) => {
 
 // /event/user/role -> Assigning/changing a user role
 // role -> "host", "vendor", "guest"
-router.route('/user/role')
+router
+  .route('/user/role')
   .get(async (req: Request, res: Response) => {
     try {
-      const { userId, eventId } = req.query;
+      const { userId, eventId } = req.query
 
       const participant = await prisma.eventParticipant.findFirstOrThrow({
         where: {
           userId: Number(userId),
-          eventId: Number(eventId)
-        }
+          eventId: Number(eventId),
+        },
       })
 
-      return res.status(200).json({ message: 'Role for the user fetched!', role: participant.role })
+      return res
+        .status(200)
+        .json({ message: 'Role for the user fetched!', role: participant.role })
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Failed to get user role' })
@@ -311,52 +318,55 @@ router.route('/user/role')
   })
 
 // /event/channel/create -> Creating a new sub evet inside a event
-router.post('/channel/create', authMiddleware, async (req: UserReqType, res: Response) => {
-  const { eventId, name, desc, venue, startTime, endTime } = req.body
+router.post(
+  '/channel/create',
+  authMiddleware,
+  async (req: UserReqType, res: Response) => {
+    const { eventId, name, desc, venue, startTime, endTime } = req.body
 
-  if (!name || !desc || !venue) {
-    return res.status(500).json({ error: 'All fields are not provided!' })
-  }
-
-  try {
-    const participant = await prisma.eventParticipant.findFirstOrThrow({
-      where: { userId: Number(req.user.id), eventId: Number(eventId) }
-    })
-
-    console.log("participantid: ", participant);
-
-    if (!participant) {
-      return res.status(500).json({ error: 'User unauthorized!' })
+    if (!name || !desc || !venue) {
+      return res.status(500).json({ error: 'All fields are not provided!' })
     }
 
-    const newChannel = await prisma.channel.create({
-      data: {
-        eventId,
-        name,
-        venue,
-        desc,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-      },
-    })
+    try {
+      const participant = await prisma.eventParticipant.findFirstOrThrow({
+        where: { userId: Number(req.user.id), eventId: Number(eventId) },
+      })
 
+      console.log('participantid: ', participant)
 
-    const hostParticipant = await prisma.channelParticipant.create({
-      data: {
-        channelId: Number(newChannel.id),
-        participantId: Number(participant.id),
-      },
-    });
+      if (!participant) {
+        return res.status(500).json({ error: 'User unauthorized!' })
+      }
 
-    return res.status(201).json({
-      message: 'Successfully created the channel!',
-      channel: newChannel,
-    })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to create channel' })
-  }
-})
+      const newChannel = await prisma.channel.create({
+        data: {
+          eventId,
+          name,
+          venue,
+          desc,
+          startTime: new Date(startTime),
+          endTime: new Date(endTime),
+        },
+      })
+
+      const hostParticipant = await prisma.channelParticipant.create({
+        data: {
+          channelId: Number(newChannel.id),
+          participantId: Number(participant.id),
+        },
+      })
+
+      return res.status(201).json({
+        message: 'Successfully created the channel!',
+        channel: newChannel,
+      })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Failed to create channel' })
+    }
+  },
+)
 
 // /event/participants -> Fetching all events participants
 router.get('/participants', async (req: Request, res: Response) => {
@@ -371,7 +381,11 @@ router.get('/participants', async (req: Request, res: Response) => {
     })
     const users = []
     participants.map((participant) => {
-      users.push({ ...participant.User, role: participant.role, inviteStatus: participant.status })
+      users.push({
+        ...participant.User,
+        role: participant.role,
+        inviteStatus: participant.status,
+      })
     })
 
     return res
@@ -396,8 +410,8 @@ router
           Channel: true,
           EventParticipant: {
             include: {
-              User: true
-            }
+              User: true,
+            },
           },
         },
       })
@@ -446,5 +460,90 @@ router
       res.status(500).json({ error: 'Failed to delete event' })
     }
   })
+
+// /event/photos/:eventId -> For fetching all photos of an event
+router.get('/photos/:eventId', async (req: Request, res: Response) => {
+  const { eventId } = req.params
+
+  if (!eventId)
+    return res.status(400).json({ message: 'Event ID not provided' })
+
+  try {
+    const photos = await prisma.photo.findMany({
+      where: { eventId: Number(eventId) },
+      include: {
+        PhotoParticipant: {
+          include: {
+            EventParticipant: true,
+          },
+        },
+      },
+    })
+
+    if (!photos) {
+      return res
+        .status(200)
+        .json({ message: 'No photos found for the event', data: [] })
+    }
+
+    res.status(200).json({ message: 'All event photos fetched!', data: photos })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to fetch event photos' })
+  }
+})
+
+interface AddPhotoReq extends UserReqType {
+  body: {
+    image: string
+    eventId: string
+  }
+}
+
+router.post(
+  '/add-photos',
+  authMiddleware,
+  async (req: AddPhotoReq, res: Response) => {
+    const { image, eventId } = req.body
+
+    if (!image || !eventId)
+      return res.status(400).json({ message: 'Image or Event ID not provided' })
+
+    const img = await UploadImg(image)
+
+    try {
+      const photo = await prisma.photo.create({
+        data: {
+          eventId: Number(eventId),
+          url: img,
+          private: false,
+          // Event: {
+          //   connect: {
+          //     id: Number(eventId),
+          //   },
+          // },
+        },
+      })
+
+      const resp = fetch(flaskBackend + '/find-faces', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId,
+          image,
+          name: 'event',
+          photo_id: photo.id,
+        }),
+      })
+
+      res.status(201).json({ message: 'Photo added successfully!' })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Failed to add photo' })
+    }
+  },
+)
 
 export default router
