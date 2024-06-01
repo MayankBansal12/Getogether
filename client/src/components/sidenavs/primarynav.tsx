@@ -14,7 +14,6 @@ import {
   AccordionSummary,
   Avatar,
   ListItemButton,
-  ListItemText,
   Tooltip,
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
@@ -23,7 +22,7 @@ import SingleSubEvent from '../eventcomponents/singlesubevent'
 import Budget from '../eventcomponents/budget'
 import PaymentHistory from '../eventcomponents/paymenthistory'
 import Default from './Default'
-import { formatDate } from '../../helpers/formatDate'
+import { formatDate, getDate } from '../../helpers/formatDate'
 import { useNavigate } from 'react-router-dom'
 import { useEventStore, useUserStore } from '../../global-store/store'
 import Chat from '../chat'
@@ -42,9 +41,11 @@ export default function SidebarNav(props: Props) {
   const { window } = props
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const [channel, setChannel] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
-  const [renderList, setRenderList] = useState('Dash')
   const user = useUserStore((state) => state.user)
+  const [renderList, setRenderList] = useState('Home')
   const event = useEventStore((state) => state.event)
 
   const handleDash = () => {
@@ -80,21 +81,26 @@ export default function SidebarNav(props: Props) {
   }
 
   useEffect(() => {
+    if (user.role === 'host') {
+      setRenderList('Dash')
+    }
     console.log('User details: ', user)
-    console.log('Eent details: on primary ', event)
-  }, [])
+  }, [user])
 
   // Dashboard Items
   const dashlistitems = [
     { name: 'Participants', action: () => setRenderComponent('Participants') },
-    { name: 'Events', action: () => setRenderComponent('Sub Events') },
+    { name: 'Events List', action: () => setRenderComponent('Sub Events') },
     {
       name: 'Sub Events',
       accordion: true,
       details: [
         {
           name: 'Celebrating',
-          action: () => setRenderComponent('Information'),
+          action: () => {
+            setRenderComponent('Information')
+            setChannel('Celebrating')
+          },
         },
       ],
     },
@@ -109,35 +115,21 @@ export default function SidebarNav(props: Props) {
     },
   ]
   // List for DM delete this later
-  const dmList = [
-    {
-      name: 'Saakshi',
-      joinedDate: 'Joined on 25th May, 2024',
-      action: () => setRenderComponent('Chat'),
-    },
-    {
-      name: 'Arghya',
-      joinedDate: 'Joined on 26th May, 2024',
-      action: () => setRenderComponent('Chat'),
-    },
-  ]
-  // Show all the events
-  // const calendarList = [
+  // const dmList = [
   //   {
-  //     event: '@ Game Zone',
-  //     date: 'On 25th May, 2024',
-  //     action: () => setRenderComponent('Event Schedule'),
+  //     name: 'Saakshi',
+  //     joinedDate: 'Joined on 25th May, 2024',
+  //     action: () => setRenderComponent('Chat'),
   //   },
   //   {
-  //     event: '@ Bday Party',
-  //     date: 'On 25h May, 2024',
-  //     action: () => setRenderComponent('Event Schedule'),
+  //     name: 'Arghya',
+  //     joinedDate: 'Joined on 26th May, 2024',
+  //     action: () => setRenderComponent('Chat'),
   //   },
-  //   // Add more items as needed
   // ]
 
   const drawer = (
-    <div className="py-4 font-josefin">
+    <div className="flex flex-col h-full font-josefin">
       <div
         className="top-0 left-0 z-10 fixed flex justify-start items-center gap-3 bg-white px-4 py-8 w-full h-[70px] font-josefin"
         style={{ width: `${drawerWidth}px` }}
@@ -154,33 +146,35 @@ export default function SidebarNav(props: Props) {
         <div className="left-2 z-10 fixed flex flex-col justify-between items-center my-2 overscroll-none">
           <List>
             {/* Dashboard */}
-            <Tooltip
-              title="Dashboard"
-              disableInteractive
-              placement="bottom-end"
-            >
-              <ListItem
-                className="bg-white cursor-pointer"
-                onClick={handleDash}
+            {user && user.role === 'host' && (
+              <Tooltip
+                title="Dashboard"
+                disableInteractive
+                placement="bottom-end"
               >
-                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6 text-black transition-colors duration-200"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
-                    />
-                  </svg>
-                </Avatar>
-              </ListItem>
-            </Tooltip>
+                <ListItem
+                  className="bg-white cursor-pointer"
+                  onClick={handleDash}
+                >
+                  <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6 text-black transition-colors duration-200"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
+                      />
+                    </svg>
+                  </Avatar>
+                </ListItem>
+              </Tooltip>
+            )}
 
             {/* Home */}
             <Tooltip title="Home" disableInteractive placement="bottom-end">
@@ -287,20 +281,24 @@ export default function SidebarNav(props: Props) {
           />
         </div>
         <Divider />
+        {/** Home */}
         <div className="ml-[50px] pl-4 w-full h-full font-josefin">
-          {/* // Home */}
           {renderList === 'Home' && (
-            <List>
-              <ListItem className="bg-white font-medium text-lg">
-                <ListItemButton>@ Subevents </ListItemButton>
-              </ListItem>
-              <ListItem>
-                <ListItemButton># Celebrate</ListItemButton>
+            <List className="w-full">
+              <ListItem className="flex-col bg-white font-medium text-lg">
+                @Sub Events
+                <ListItemButton
+                  className="ml-3 font-josefin font-md text-black"
+                  onClick={() => setRenderComponent('Groups')}
+                >
+                  # Celebrating
+                </ListItemButton>
               </ListItem>
               <Divider className="m-0" />
             </List>
           )}
-          {/* // Dashboard */}
+
+          {/* Dashboard */}
           {renderList === 'Dash' && (
             <List>
               {dashlistitems.map((item, index) => (
@@ -350,28 +348,42 @@ export default function SidebarNav(props: Props) {
               ))}
             </List>
           )}
-          {/* // Chat List */}
+
+          {/** Chat List */}
           {renderList === 'Dm' && (
             <List>
-              {dmList.map((item, index) => (
-                <React.Fragment key={index}>
-                  <ListItem className="bg-white font-medium text-lg">
-                    <ListItemButton onClick={item.action}>
-                      <p>
-                        <span>{item.name}</span>
-                        <br />
-                        <span className="text-dull text-xs">
-                          {item.joinedDate}
-                        </span>
-                      </p>
-                    </ListItemButton>
-                  </ListItem>
-                  {index < dmList.length - 1 && <Divider />}
-                </React.Fragment>
-              ))}
+              {event.EventParticipant.length > 0 ? (
+                event.EventParticipant.map((item, index) => (
+                  <React.Fragment key={index}>
+                    <ListItem className="bg-white font-medium text-lg">
+                      <ListItemButton
+                        onClick={() => {
+                          setRenderComponent('Chat')
+                          setSelectedUser({
+                            participantId: item?.id,
+                            user: item?.User,
+                          })
+                        }}
+                      >
+                        <p>
+                          <span>{item?.User?.name || ''}</span>
+                          <br />
+                          <span className="text-dull text-xs">
+                            Joined {getDate(item?.createdDate)}
+                          </span>
+                        </p>
+                      </ListItemButton>
+                    </ListItem>
+                    <Divider />
+                  </React.Fragment>
+                ))
+              ) : (
+                <div>No Participants to show!</div>
+              )}
             </List>
           )}
-          {/* // calender */}
+
+          {/* calender */}
           {renderList === 'Calender' && (
             <List>
               {event?.Channel?.map((item, index) => (
@@ -490,12 +502,18 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === '' && renderList === 'Dash' && <Default />}
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
         {rendercomponent === 'booktable' && <BookTable />}
-        {rendercomponent === 'Participants' && <Participants />}
-        {rendercomponent === 'Sub Events' && <Subevents />}
-        {rendercomponent === 'Information' && <SingleSubEvent />}
+        {rendercomponent === 'Participants' && (
+          <Participants participants={event.EventParticipant} />
+        )}
+        {rendercomponent === 'Sub Events' && (
+          <Subevents channels={event.Channel} />
+        )}
+        {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
-        {rendercomponent === 'Chat' && renderList === 'Dm' && <Chat />}
+        {rendercomponent === 'Chat' && renderList === 'Dm' && (
+          <Chat selectedUser={selectedUser} isGroup={false} />
+        )}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}

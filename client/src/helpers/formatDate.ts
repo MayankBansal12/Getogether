@@ -46,3 +46,41 @@ export const formatDate = (startTime: Date, endTime: Date) => {
     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
     return start.toLocaleDateString('en-GB', options);
 }
+
+export const numericDate = (timestamp: string) => {
+    let date = new Date(timestamp)
+
+    let months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+    ]
+
+    let day = date.getUTCDate()
+    let monthName = months[date.getUTCMonth()]
+    let year = date.getUTCFullYear()
+
+    return `${day} ${monthName} ${year}`
+}
+
+export const formatTime = (date: string) => {
+    const now = new Date(date)
+    const hours = now.getHours().toString().padStart(2, '0')
+    const minutes = now.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
+}
+
+export const getDate = (date: Date) => {
+    date = new Date(date);
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+    return date.toLocaleDateString('en-GB', options);
+}
