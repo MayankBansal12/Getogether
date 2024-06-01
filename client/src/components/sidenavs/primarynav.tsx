@@ -14,6 +14,7 @@ import {
   AccordionSummary,
   Avatar,
   ListItemButton,
+  ListItemText,
   Tooltip,
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
@@ -142,7 +143,7 @@ export default function SidebarNav(props: Props) {
         <span className="font-bold text-2xl">Saakshi's Bday</span>
       </div>
       <Divider />
-      <div className="flex mt-[50px] h-full">
+      <div className="flex mt-[60px] h-full">
         <div className="left-2 z-10 fixed flex flex-col justify-between items-center my-2 overscroll-none">
           <List>
             {/* Dashboard */}
@@ -262,12 +263,12 @@ export default function SidebarNav(props: Props) {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-6 h-6 text-black transition-colors duration-200"
+                    className="text-black transition-colors duration-200 size-6"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z M8 13C7.44 13 7 12.55 7 12C7 11.45 7.45 11 8 11C8.55 11 9 11.45 9 12C9 12.55 8.56 13 8 13Z M16 13C15.44 13 15 12.55 15 12C15 11.45 15.45 11 16 11C16.55 11 17 11.45 17 12C17 12.55 16.56 13 16 13Z M8 13C7.44 13 7 12.55 7 12C7 11.45 7.45 11 8 11C8.55 11 9 11.45 9 12C9 12.55 8.56 13 8 13Z"
+                      d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                     />
                   </svg>
                 </Avatar>
@@ -287,17 +288,25 @@ export default function SidebarNav(props: Props) {
         <div className="ml-[50px] pl-4 w-full h-full font-josefin">
           {renderList === 'Home' && (
             <List>
-              <ListItem
-                className="bg-white font-medium text-lg"
-                onClick={() => setRenderComponent('Groups')}
-              >
-                @ Sub Events
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemText
+                  onClick={() => setRenderComponent('Groups')}
+                  disableTypography={true}
+                >
+                  @ Celebrate {/* name of the sub event */}
+                </ListItemText>
               </ListItem>
-              <ListItem
-                className="bg-white font-medium text-lg"
-                onClick={() => setRenderComponent('Groups')}
-              >
-                # Celebrating
+              <ListItem>
+                <ListItemButton># Announcements</ListItemButton>
+              </ListItem>
+              <ListItem>
+                <ListItemButton># General</ListItemButton>
+              </ListItem>
+              <ListItem>
+                <ListItemButton># Vendors</ListItemButton>
+              </ListItem>
+              <ListItem>
+                <ListItemButton># Photos</ListItemButton>
               </ListItem>
               <Divider className="m-0" />
             </List>
