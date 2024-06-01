@@ -8,150 +8,14 @@ import ImageHelper from '../services/image'
 import { useUserStore } from '../global-store/store'
 import { useParams } from 'react-router-dom'
 import useApi from '../hooks/use-api'
+import { formatTime, numericDate } from '../helpers/formatDate'
+import { stringAvatar } from '../helpers/avatar'
 
 const BACKEND_URL = 'http://localhost:5000'
 
-const chat = [
-  {
-    name: 'John',
-    message:
-      "Great, let's connect later today. I have a few things I'd like to discuss with you.",
-    timestamp: '2024-05-25T12:00:00Z',
-  },
-  {
-    name: 'Mayank',
-    message: "Sure, let's do it!",
-    timestamp: '2024-05-25T12:02:00Z',
-  },
-  {
-    name: 'Mayank',
-    message: 'Hey!',
-    timestamp: '2024-05-26T12:02:00Z',
-  },
-  {
-    name: 'Mayank',
-    message: 'WHere are you??',
-    timestamp: '2024-05-26T12:02:00Z',
-  },
-  {
-    name: 'John',
-    message: 'Heya!',
-    timestamp: '2024-05-27T12:02:00Z',
-  },
-  {
-    name: 'John',
-    message: 'Hey! Want to get in touch with you, are you available?',
-    timestamp: '2024-05-29T02:00:00Z',
-  },
-  {
-    name: 'Mayank',
-    message:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    timestamp: '2024-05-29T15:06:09Z',
-  },
-  {
-    name: 'John',
-    message: '',
-    photoLink:
-      'https://res.cloudinary.com/dwuyp1nss/image/upload/v1716661873/ntw8fwnqc1mnvu9wf3vq.jpg',
-    timestamp: '2024-05-30T19:48:39Z',
-  },
-  {
-    name: 'Mayank',
-    message: '',
-    photoLink:
-      'https://res.cloudinary.com/dwuyp1nss/image/upload/v1703774198/Website%20Demo/Home_Page_omsuhd.png',
-    timestamp: '2024-05-30T20:14:19Z',
-  },
-  {
-    name: 'Mayank',
-    message: 'See, this works?',
-    photoLink: '',
-    timestamp: '2024-05-30T20:15:10Z',
-  },
-  {
-    name: 'John',
-    message: '',
-    photoLink:
-      'https://res.cloudinary.com/dwuyp1nss/image/upload/v1716661873/ntw8fwnqc1mnvu9wf3vq.jpg',
-    timestamp: '2024-05-30T20:48:19Z',
-  },
-  {
-    name: 'John',
-    message: '',
-    photoLink:
-      'https://res.cloudinary.com/dwuyp1nss/image/upload/v1716661873/ntw8fwnqc1mnvu9wf3vq.jpg',
-    timestamp: '2024-05-30T20:48:29Z',
-  },
-  {
-    name: 'John',
-    message: 'Sorry sent it twice!',
-    photoLink: '',
-    timestamp: '2024-05-30T20:49:01Z',
-  },
-]
-
-function stringToColor(string: string) {
-  let hash = 0
-  let i
-
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash)
-  }
-
-  let color = '#'
-
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff
-    color += `00${value.toString(16)}`.slice(-2)
-  }
-
-  return color
-}
-
-function stringAvatar(name: string) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-    },
-    children: `${name.substring(0, 1)}`,
-  }
-}
-
-const formatDate = (timestamp: string) => {
-  let date = new Date(timestamp)
-
-  let months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ]
-
-  let day = date.getUTCDate()
-  let monthName = months[date.getUTCMonth()]
-  let year = date.getUTCFullYear()
-
-  return `${day} ${monthName} ${year}`
-}
-
-function formatTime(date: string) {
-  const now = new Date(date)
-  const hours = now.getHours().toString().padStart(2, '0')
-  const minutes = now.getMinutes().toString().padStart(2, '0')
-  return `${hours}:${minutes}`
-}
-
 export default function Chat({ selectedUser, isGroup, groupId = null }) {
   const [socket, setSocket] = useState(null)
+  const callApi = useApi()
   const { eventId } = useParams();
   const { user } = useUserStore(state => state);
   const [participant, setParticipant] = useState(null)
@@ -240,7 +104,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
       return;
     }
     try {
-      const res = await useApi("/user/messages", "POST", { eventId: Number(eventId), userId, participantId });
+      const res = await callApi("/user/messages", "POST", { eventId: Number(eventId), userId, participantId });
       if (res.status === 200) {
         console.log(res.data);
         setMessages(res.data.messages)
@@ -310,6 +174,22 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
     }
   }
 
+  const showAvatar = (senderId: number) => {
+    if (senderId === user.id) {
+      console.log(user);
+      if (!user.profilePic || user.profilePic === '')
+        return <Avatar {...stringAvatar(user.name)} />
+      else
+        return <Avatar src={user.profilePic} />;
+    } else {
+      console.log(participant);
+      if (!participant.profilePic || participant.profilePic === '')
+        return <Avatar {...stringAvatar(participant.name)} />
+      else
+        return <Avatar src={participant.profilePic} />;
+    }
+  }
+
   const renderMessages = () => {
     let lastDate = null
     let lastSender = null
@@ -327,7 +207,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
             <div className="flex items-center gap-2 mt-4">
               <div className="flex-grow border-gray-200 border-t"></div>
               <p className="text-[14px] text-center text-gray-500">
-                {formatDate(item.time)}
+                {numericDate(item.time)}
               </p>
               <div className="flex-grow border-gray-200 border-t"></div>
             </div>
@@ -335,7 +215,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
 
           {(showSender || showDate) && (
             <div className="flex items-center gap-2 mt-4">
-              <Avatar {...stringAvatar(item.senderId === user.id ? user.name : participant.name)} />
+              {showAvatar(item.senderId)}
               <p className="font-medium text-[18px]">{item.senderId === user.id ? user.name : participant.name} </p>
             </div>
           )}

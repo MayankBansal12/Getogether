@@ -17,6 +17,7 @@ import { useChannelStore } from '../../global-store/store'
 
 const Subevents = () => {
   const navigate = useNavigate()
+  const callApi = useApi()
   const { eventId } = useParams();
   const { channel, setChannel } = useChannelStore(state => state)
   const [open, setOpen] = useState(false);
@@ -89,7 +90,7 @@ const Subevents = () => {
         method = "PUT"
       }
 
-      const res = await useApi(uri, method, { ...subEvent, eventId: Number(eventId), channelId: Number(subEvent?.id || 0) })
+      const res = await callApi(uri, method, { ...subEvent, eventId: Number(eventId), channelId: Number(subEvent?.id || 0) })
       console.log(res);
       if (res.status === 201) {
         setSubEvent({
@@ -134,7 +135,7 @@ const Subevents = () => {
       })
       return;
     }
-    const res = await useApi("/channel", "DELETE", { eventId: Number(eventId), channelId: subEvent?.id })
+    const res = await callApi("/channel", "DELETE", { eventId: Number(eventId), channelId: subEvent?.id })
     if (res.status === 204) {
       setSnackbar({
         open: true,
@@ -154,7 +155,7 @@ const Subevents = () => {
 
   const fetchChannelDetails = async () => {
     try {
-      const res = await useApi("/event/list", "POST", { eventId: Number(eventId), includeGroup: true })
+      const res = await callApi("/event/list", "POST", { eventId: Number(eventId), includeGroup: true })
       if (res.status === 200) {
         setChannel(res?.data?.events?.Channel)
       }
