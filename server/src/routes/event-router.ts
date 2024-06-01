@@ -281,7 +281,7 @@ router.route('/user/role')
         }
       })
 
-      return res.status(200).json({ message: 'Role for the user fetched!', role: participant.role })
+      return res.status(200).json({ message: 'Role for the user fetched!', role: participant.role, participant })
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Failed to get user role' })
