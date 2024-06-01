@@ -30,7 +30,7 @@ export default function FormModal({
   return (
     <React.Fragment>
       <Dialog open={open}>
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle className="font-josefin">{title}</DialogTitle>
         <DialogContent>
           {text && <DialogContentText mb={'4'}>{text}</DialogContentText>}
           {children}
