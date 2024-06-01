@@ -178,8 +178,8 @@ router.post('/list', async (req: Request, res: Response) => {
   }
 })
 
-// /event/join -> Inviting a new user to event
-router.post('/join', async (req: Request, res: Response) => {
+// /event/invite -> Inviting a new user to event
+router.post('/invite', async (req: Request, res: Response) => {
   const { userId, eventId, role } = req.body
   const status = 0
 
@@ -194,17 +194,10 @@ router.post('/join', async (req: Request, res: Response) => {
       },
     })
 
-    // const existingParticipant = await prisma.eventParticipant.findUnique({
-    //   where: {
-    //     userId,
-    //     eventId,
-    //   },
-    // })
-
     if (existingParticipant) {
       return res
         .status(400)
-        .json({ message: 'User already added to the event' })
+        .json({ message: 'User already invited to the event' })
     }
 
     const participant = await prisma.eventParticipant.create({
@@ -218,16 +211,17 @@ router.post('/join', async (req: Request, res: Response) => {
 
     return res
       .status(201)
-      .json({ message: 'User added in the event!', participant })
+      .json({ message: 'User invited for the event!', participant })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to add user to event' })
   }
 })
 
-// /event/accept -> User Accepting/Declining the invitation
-router.post('/accept', async (req: Request, res: Response) => {
-  const { userId, eventId } = req.body
+// /event/respond -> User Accepting/Declining the invitation 
+// status -> accept 1 ,reject -1
+router.post('/respond', async (req: Request, res: Response) => {
+  const { userId, eventId, status } = req.body
 
   try {
     const participant = await prisma.eventParticipant.updateMany({
@@ -237,7 +231,7 @@ router.post('/accept', async (req: Request, res: Response) => {
         status: 0,
       },
       data: {
-        status: 1,
+        status: status,
       },
     })
 
@@ -247,39 +241,10 @@ router.post('/accept', async (req: Request, res: Response) => {
         .json({ error: 'Invitation not found or already processed' })
     }
 
-    return res.status(200).json({ message: 'Invitation accepted!' })
+    return res.status(200).json({ message: 'Successfully responded to Invitation!' })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Failed to accept invitation to event' })
-  }
-})
-
-// /event/decline -> User Declined the invitation
-router.post('/decline', async (req: Request, res: Response) => {
-  const { userId, eventId } = req.body
-
-  try {
-    const participant = await prisma.eventParticipant.updateMany({
-      where: {
-        userId,
-        eventId,
-        status: 0,
-      },
-      data: {
-        status: -1,
-      },
-    })
-
-    if (participant.count === 0) {
-      return res
-        .status(404)
-        .json({ error: 'Invitation not found or already processed' })
-    }
-
-    return res.status(200).json({ message: 'Invitation declined!' })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to decline invitation to event' })
+    res.status(500).json({ error: 'Failed to respond to invitation for event' })
   }
 })
 
@@ -304,43 +269,84 @@ router.post('/remove', async (req: Request, res: Response) => {
 
 // /event/user/role -> Assigning/changing a user role
 // role -> "host", "vendor", "guest"
-router.put('/user/role', async (req: Request, res: Response) => {
-  const { userId, eventId, role } = req.body
+router.route('/user/role')
+  .get(async (req: Request, res: Response) => {
+    try {
+      const { userId, eventId } = req.query;
 
-  try {
-    const updatedParticipant = await prisma.eventParticipant.updateMany({
-      where: {
-        userId,
-        eventId,
-      },
-      data: {
-        role,
-      },
-    })
+      const participant = await prisma.eventParticipant.findFirstOrThrow({
+        where: {
+          userId: Number(userId),
+          eventId: Number(eventId)
+        }
+      })
 
-    return res
-      .status(201)
-      .json({ message: 'Role changed for the user!', updatedParticipant })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to update user role' })
-  }
-})
+      return res.status(200).json({ message: 'Role for the user fetched!', role: participant.role })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Failed to get user role' })
+    }
+  })
+  .put(async (req: Request, res: Response) => {
+    const { userId, eventId, role } = req.body
+
+    try {
+      const updatedParticipant = await prisma.eventParticipant.updateMany({
+        where: {
+          userId,
+          eventId,
+        },
+        data: {
+          role,
+        },
+      })
+
+      return res
+        .status(201)
+        .json({ message: 'Role changed for the user!', updatedParticipant })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Failed to update user role' })
+    }
+  })
 
 // /event/channel/create -> Creating a new sub evet inside a event
-router.post('/channel/create', async (req: Request, res: Response) => {
-  const { eventId, name, venue, startTime, endTime } = req.body
+router.post('/channel/create', authMiddleware, async (req: UserReqType, res: Response) => {
+  const { eventId, name, desc, venue, startTime, endTime } = req.body
+
+  if (!name || !desc || !venue) {
+    return res.status(500).json({ error: 'All fields are not provided!' })
+  }
 
   try {
+    const participant = await prisma.eventParticipant.findFirstOrThrow({
+      where: { userId: Number(req.user.id), eventId: Number(eventId) }
+    })
+
+    console.log("participantid: ", participant);
+
+    if (!participant) {
+      return res.status(500).json({ error: 'User unauthorized!' })
+    }
+
     const newChannel = await prisma.channel.create({
       data: {
         eventId,
         name,
         venue,
+        desc,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
       },
     })
+
+
+    const hostParticipant = await prisma.channelParticipant.create({
+      data: {
+        channelId: Number(newChannel.id),
+        participantId: Number(participant.id),
+      },
+    });
 
     return res.status(201).json({
       message: 'Successfully created the channel!',
@@ -388,7 +394,11 @@ router
         where: { id: Number(eventId) },
         include: {
           Channel: true,
-          EventParticipant: true,
+          EventParticipant: {
+            include: {
+              User: true
+            }
+          },
         },
       })
 

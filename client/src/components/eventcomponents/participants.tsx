@@ -1,11 +1,13 @@
 // This component is for the participants page. (On the host side)
 import React, { useState } from 'react'
-import { Box, Link } from '@mui/material'
+import { Box, Link, Avatar, Chip } from '@mui/material'
+import { ChatBubbleOutline } from '@mui/icons-material';
 import monkey from '../../assets/monkey.png'
+import { getDate } from '../../helpers/formatDate'
+import { redirect } from 'react-router-dom';
 
-const Participants = () => {
+const Participants = ({ participants }) => {
   //Dummy values. Delete this later
-  const participants = 70
   const image = monkey
   const [open, setOpen] = useState(false)
   const [rotate, setRotate] = useState(false)
@@ -15,33 +17,28 @@ const Participants = () => {
     setRotate(!rotate)
   }
 
-  const renderRole = (role) => {
+  const renderRole = (role: string) => {
     switch (role) {
       case 'host':
         return (
-          <span className="border-1 px-2 font-bold text-lg text-primary-light">
-            Host
-          </span>
+          <Chip variant="outlined" color="info" label="host" size="small" />
         )
       case 'vendor':
         return (
-          <span className="border-1 px-2 font-bold text-[#18A33F] text-lg">
-            Vendor
-          </span>
+          <Chip variant="outlined" color="error" label="vendor" size="small" />
         )
       default:
         return (
-          <span className="border-1 px-2 font-bold text-[#D44343] text-lg">
-            Guest
-          </span>
+          <Chip variant="outlined" color="success" label="guest" size="small" />
         )
     }
   }
+
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
-      <Box className="flex justify-between items-center bg-background-extralight my-4 md:px-8 py-4">
-        <span className="font-bold text-xl">
-          Total Participants: {participants}
+      <Box className="flex justify-between items-center bg-background-extralight my-4 md:px-4 py-2 rounded-md">
+        <span className="font-semibold text-xl">
+          Total Event Participants: {participants.length}
         </span>
         <button onClick={handleClick}>
           <svg
@@ -50,9 +47,8 @@ const Participants = () => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className={`hover:bg-white px-2 py-2 rounded-full w-10 h-10 transition-transform duration-300 ${
-              rotate ? 'rotate-45' : ''
-            }`}
+            className={`hover:bg-white px-2 py-2 rounded-full w-10 h-10 transition-transform duration-300 ${rotate ? 'rotate-45' : ''
+              }`}
           >
             <path
               strokeLinecap="round"
@@ -71,85 +67,33 @@ const Participants = () => {
           </Link>
         </div>
       )}
-      {/* Fetch and change the data over here */}
-      <Box
-        display={'flex'}
-        gap={4}
-        className="flex md:flex-row flex-col justify-start items-center bg-background-extralight my-4 md:px-8 py-4 text-center md:text-left"
-      >
-        <p className="image">
-          <img
-            src={image}
-            width={70}
-            height={70}
-            className="border-2 border-primary-light rounded-full"
-          />
-        </p>
-        <p className="">
-          <span className="font-semibold text-xl">
-            Mayank Surname {/** {name} */}
-          </span>
-          {renderRole('host')}
-          {/** {renderRole({role})} */}
-          <br />
-          <span className="font-medium text-md text-primary-dull">
-            Joined on 24 May, 2024{/** {date} */}
-          </span>
-        </p>
-      </Box>
-      {/*********************************************************** */}
-      {/** Box 2  Delete all of this */}
-      <Box
-        display={'flex'}
-        gap={4}
-        className="flex justify-start items-center bg-background-extralight my-4 md:px-8 py-4"
-      >
-        <p className="image">
-          <img
-            src={image}
-            width={70}
-            height={70}
-            className="border-2 border-primary-light rounded-full"
-          />
-        </p>
-        <p className="">
-          <span className="font-semibold text-xl">
-            Arghya Studio {/** {name} */}
-          </span>
-          {renderRole('vendor')}
-          {/** {role} */}
-          <br />
-          <span className="font-medium text-md text-primary-dull">
-            Joined on 24 May, 2024{/** {date} */}
-          </span>
-        </p>
-      </Box>
-      {/** Box 3 */}
-      <Box
-        display={'flex'}
-        gap={4}
-        className="flex justify-start items-center bg-background-extralight my-4 md:px-8 py-4"
-      >
-        <p className="image">
-          <img
-            src={image}
-            width={70}
-            height={70}
-            className="border-2 border-primary-light rounded-full"
-          />
-        </p>
-        <p className="">
-          <span className="font-semibold text-xl">
-            Saakshi Raut{/** {name} */}
-          </span>
-          {renderRole('guest')}
-          {/** {role} */}
-          <br />
-          <span className="font-medium text-md text-primary-dull">
-            Joined on 24 May, 2024{/** {date} */}
-          </span>
-        </p>
-      </Box>
+      {participants.map((participant) => (
+        <Box
+          display={'flex'}
+          gap={2}
+          key={participant.id}
+          className="flex md:flex-row flex-col gap-1 justify-between items-center bg-background-extralight my-2 md:px-4 py-3 text-center md:text-left rounded-md"
+        >
+          <div className="flex gap-3 items-center">
+            <Avatar
+              src={participant?.User?.profilePic}
+              sx={{ width: "60px", height: "60px" }}
+            />
+            <div className="flex flex-col gap-1">
+              <p className="flex gap-2">
+                <span className="font-semibold text-xl">
+                  {participant?.User?.name}
+                </span>
+                <span>{renderRole(participant?.role)}</span>
+              </p>
+              <span className="font-medium text-md text-primary-dull">
+                {getDate(participant?.createdDate)}
+              </span>
+            </div>
+          </div>
+          {participant.status === 1 ? <ChatBubbleOutline className="text-gray-700 cursor-pointer" onClick={() => redirect("/")} /> : <p>{participant.status === 0 ? "Invite Pending" : "Invite Rejected"}</p>}
+        </Box>
+      ))}
     </div>
   )
 }

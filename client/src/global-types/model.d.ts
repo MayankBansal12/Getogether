@@ -7,6 +7,7 @@ interface UserType {
   about: string
   profilePic: string
   PicName: string
+  role?: string
 }
 
 interface BudgetType {
@@ -37,6 +38,7 @@ interface ChannelType {
   eventId: number
   name: string
   venue: string
+  desc?: string
   startTime: Date
   endTime: Date
   Event: EventType
@@ -45,4 +47,4 @@ interface ChannelType {
   ChannelParticipant: []
 }
 
-export { UserType, EventType }
+export { UserType, EventType, ChannelType, BudgetType }
