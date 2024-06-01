@@ -33,6 +33,7 @@ import BookTable from '../booktable'
 import Table from '../../assets/table.svg'
 import useApi from '../../hooks/use-api'
 import { useChannelStore } from '../../global-store/store'
+import Appearance from '../appearance'
 
 const drawerWidth = 350
 
@@ -109,6 +110,10 @@ export default function SidebarNav(props: Props) {
   const handleChannelClick = (channelId) => {
     // Update state to store the selected channel ID
     setSelectedChannelId(channelId)
+  }
+
+  const handleSettings = () => {
+    setRenderList('Settings')
   }
 
   const handlePaymentHistory = () => {
@@ -295,8 +300,11 @@ export default function SidebarNav(props: Props) {
             </Tooltip>
 
             {/* More */}
-            <Tooltip title="More">
-              <ListItem className="bg-white cursor-pointer">
+            <Tooltip title="Settings">
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleSettings}
+              >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -462,6 +470,32 @@ export default function SidebarNav(props: Props) {
               ))}
             </List>
           )}
+          {/* Settings */}
+          {renderList === 'Settings' && (
+            <List>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('Site Appearance')}
+                >
+                  Appearance
+                </ListItemButton>
+              </ListItem>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('User Settings')}
+                >
+                  User Settings
+                </ListItemButton>
+              </ListItem>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('Event Settings')}
+                >
+                  Event Settings
+                </ListItemButton>
+              </ListItem>
+            </List>
+          )}
         </div>
       </div>
     </div>
@@ -575,6 +609,9 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Book My Table' && <BookTable />}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
+        )}
+        {rendercomponent === 'Site Appearance' && renderList === 'Settings' && (
+          <Appearance />
         )}
       </Box>
     </Box>

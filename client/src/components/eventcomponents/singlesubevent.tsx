@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react'
 import { Box, Divider } from '@mui/material'
 import Button from '../button'
 import { getDate } from '../../helpers/formatDate'
-import useApi from '../../hooks/use-api' // Import your API hook
+import useApi from '../../hooks/use-api'
 
 const SingleSubEvent = ({ channelId }) => {
   const [channel, setChannel] = useState(null)
-  const callApi = useApi() // Custom hook for API calls, make sure to define this hook
+  const callApi = useApi()
 
   useEffect(() => {
     const fetchChannelDetails = async () => {
       try {
-        const res = await callApi(`/event/channel/${channelId}`, 'GET') // Adjust the API endpoint based on your backend
+        const res = await callApi(`/event/channel/${channelId}`, 'GET')
         if (res.status === 200) {
           setChannel(res.data.channel)
         } else {
