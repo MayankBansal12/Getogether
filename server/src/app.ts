@@ -15,6 +15,7 @@ import eventRouter from './routes/event-router'
 import groupRouter from './routes/group-router'
 import channelRouter from './routes/channel-router'
 import userRouter from './routes/user-router'
+import tableRouter from "./routes/table-router"
 import authRouter from './routes/auth-router'
 import imageRouter from './routes/photo-test-route'
 
@@ -22,6 +23,7 @@ app.use('/user', userRouter)
 app.use('/event', eventRouter)
 app.use('/group', groupRouter)
 app.use('/channel', channelRouter)
+app.use("/table", tableRouter)
 app.use('/auth', authRouter)
 app.use('/image', imageRouter)
 
