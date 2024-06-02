@@ -66,7 +66,7 @@ export default function GroupChat({ groupId }) {
             setMessage('');
             setMessages([]);
         };
-    }, [socket]);
+    }, [socket, groupId]);
 
     // Fetch new messages
     const fetchMessages = async () => {
@@ -90,7 +90,7 @@ export default function GroupChat({ groupId }) {
     // Fetch new messages
     useEffect(() => {
         fetchMessages();
-    }, [])
+    }, [groupId])
 
     // Scroll to bottom whenever messages changes!
     useEffect(() => {
