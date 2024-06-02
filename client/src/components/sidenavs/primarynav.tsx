@@ -530,10 +530,10 @@ export default function SidebarNav(props: Props) {
                         }}
                       >
                         <p>
-                          <span>{item?.User?.name || ''}</span>
+                          <span>{item?.User?.name === user.name ? item?.User?.name + " (you)" : item?.User?.name}</span>
                           <br />
                           <span className="text-dull text-xs">
-                            Joined {getDate(item?.createdAt)}
+                            Joined {getDate(item?.createdDate)}
                           </span>
                         </p>
                       </ListItemButton>

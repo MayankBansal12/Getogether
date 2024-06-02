@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom'
 import useApi from '../hooks/use-api'
 import { formatTime, numericDate } from '../helpers/formatDate'
 import { stringAvatar } from '../helpers/avatar'
+import { GroupMessageType } from '../global-types/model'
 
 const BACKEND_URL = 'http://localhost:5000'
 
@@ -18,7 +19,7 @@ export default function GroupChat({ groupId }) {
     const callApi = useApi()
     const { eventId } = useParams();
     const { user } = useUserStore(state => state);
-    const [messages, setMessages] = useState<any[]>([])
+    const [messages, setMessages] = useState<GroupMessageType[]>([])
     const [message, setMessage] = useState('')
     const [showScroll, setShowScroll] = useState(false)
     const chatContainerRef = useRef(null)
@@ -65,7 +66,7 @@ export default function GroupChat({ groupId }) {
             setMessage('');
             setMessages([]);
         };
-    }, [socket]);
+    }, [socket, groupId]);
 
     // Fetch new messages
     const fetchMessages = async () => {
@@ -89,7 +90,7 @@ export default function GroupChat({ groupId }) {
     // Fetch new messages
     useEffect(() => {
         fetchMessages();
-    }, [])
+    }, [groupId])
 
     // Scroll to bottom whenever messages changes!
     useEffect(() => {
@@ -104,6 +105,8 @@ export default function GroupChat({ groupId }) {
         }
         socket.emit('send-message', {
             userId: user.id,
+            userName: user.name,
+            userAvatar: user.profilePic,
             groupId: groupId,
             message,
             photoLink: photoLink,
@@ -134,22 +137,11 @@ export default function GroupChat({ groupId }) {
         }
     }
 
-    const showAvatar = (senderId: number) => {
-        // if (senderId === user.id) {
-            console.log(user);
-        //     // if (!user.profilePic || user.profilePic === '')
-        //     //     return <Avatar {...stringAvatar(user.name)} />
-        //     // else
-        return <Avatar src={user.profilePic} />;
-        // }
-        // return;
-        // else {
-        //     console.log(participant);
-        //     if (!participant.profilePic || participant.profilePic === '')
-        //         return <Avatar {...stringAvatar(participant.name)} />
-        //     else
-        //         return <Avatar src={participant.profilePic} />;
-        // }
+    const showAvatar = (avatar: string, name: string) => {
+        if (avatar !== '')
+            return <Avatar src={avatar} />;
+        else
+            return <Avatar {...stringAvatar(name)} />
     }
 
     const renderMessages = () => {
@@ -169,7 +161,7 @@ export default function GroupChat({ groupId }) {
                         <div className="flex items-center gap-2 mt-4">
                             <div className="flex-grow border-gray-200 border-t"></div>
                             <p className="text-[14px] text-center text-gray-500">
-                                {numericDate(item.time)}
+                                {numericDate(item?.time)}
                             </p>
                             <div className="flex-grow border-gray-200 border-t"></div>
                         </div>
@@ -177,21 +169,21 @@ export default function GroupChat({ groupId }) {
 
                     {(showSender || showDate) && (
                         <div className="flex items-center gap-2 mt-4">
-                            {showAvatar(item.senderId)}
-                            <p className="font-medium text-[18px]">{item.senderId === user.id ? user.name : "User"} </p>
+                            {showAvatar(item.senderAvatar, item.senderName)}
+                            <p className="font-medium text-[18px]">{item.senderName} </p>
                         </div>
                     )}
 
                     <div className="flex items-end gap-2">
-                        {!item.photos || item.photos === '' ? (
-                            <p className="ml-12 text-gray-600">{item.message}</p>
+                        {!item?.photos || item?.photos === '' ? (
+                            <p className="ml-12 text-gray-600">{item?.message}</p>
                         ) : (
                             <img
                                 className="mb-2 ml-12 rounded-md w-[500px] cursor-pointer"
-                                src={item.photos}
+                                src={item?.photos}
                                 alt="img"
                                 onClick={() => {
-                                    setShowPhoto(item.photos)
+                                    setShowPhoto(item?.photos)
                                     handleOpen()
                                 }}
                             />

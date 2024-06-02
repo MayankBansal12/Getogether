@@ -131,69 +131,71 @@ const BookTable = () => {
   }, [])
 
   const generateGrid = (rowSize = 0, colSize = 0, totalNo = 0) => {
-    const elements = [];
+    const rows = [];
     let count = 0;
 
     if (totalNo === 0) {
-      return;
+      return rows;
     }
 
     for (let i = 1; i <= rowSize; i++) {
+      const rowElements = [];
       for (let j = 1; j <= colSize; j++) {
         if (count >= totalNo) break;
 
-        if (!isTableBooked(i, j)) {
-          elements.push(
-            <button
-              key={`${i}_${j}`}
-              className="border-2 hover:border-2 hover:bg-[#DED9FF] transition-all mx-2 md:mx-4 my-2 md:my-4 px-2"
-              onClick={() => {
-                handleOpen()
-                setBookTable({ row: i, col: j })
-              }}
-            >
-              <div className="flex justify-center items-center">
-                {/* First Table */}
-                <img
-                  src={Table}
-                  alt="Table"
-                  className={`mx-2 ${isMobile ? 'size-6' : 'size-12'}`}
-                />
-                {/* Second Table Flipped Horizontally */}
-                <img
-                  src={Table}
-                  alt="Flipped Table"
-                  className={`mx-2 transform scale-x-[-1] ${isMobile ? 'size-6' : 'size-12'}`}
-                />
-              </div>
-            </button>
-          );
-        } else {
-          elements.push(
-            <button
-              disabled
-              key={`${i}_${j}`}
-              className="flex justify-center items-center border-2 border-gray-300 hover:border-gray-300 bg-gray-200 mx-2 md:mx-4 my-2 md:my-4 px-2 text-gray-500 cursor-not-allowed"
-            >
+        const button = !isTableBooked(i, j) ? (
+          <button
+            key={`${i}_${j}`}
+            className="border-2 hover:border-2 hover:bg-[#DED9FF] transition-all mx-2 md:mx-4 my-2 md:my-4 px-2"
+            onClick={() => {
+              handleOpen();
+              setBookTable({ row: i, col: j });
+            }}
+          >
+            <div className="flex justify-center items-center">
+              {/* First Table */}
               <img
                 src={Table}
                 alt="Table"
-                className={`mx-2 ${isMobile ? 'w-6 h-6' : 'size-12'}`}
+                className={`mx-2 ${isMobile ? 'size-6' : 'size-12'}`}
               />
+              {/* Second Table Flipped Horizontally */}
               <img
                 src={Table}
                 alt="Flipped Table"
-                className={`mx-2 transform scale-x-[-1] ${isMobile ? 'w-6 h-6' : 'size-12'
+                className={`mx-2 transform scale-x-[-1] ${isMobile ? 'size-6' : 'size-12'
                   }`}
               />
-            </button>
-          );
-        }
+            </div>
+          </button>
+        ) : (
+          <button
+            disabled
+            key={`${i}_${j}`}
+            className="flex justify-center items-center border-2 border-gray-300 hover:border-gray-300 bg-gray-200 mx-2 md:mx-4 my-2 md:my-4 px-2 text-gray-500 cursor-not-allowed"
+          >
+            <img
+              src={Table}
+              alt="Table"
+              className={`mx-2 ${isMobile ? 'w-6 h-6' : 'size-12'}`}
+            />
+            <img
+              src={Table}
+              alt="Flipped Table"
+              className={`mx-2 transform scale-x-[-1] ${isMobile ? 'w-6 h-6' : 'size-12'
+                }`}
+            />
+          </button>
+        );
+
+        rowElements.push(button);
         count++;
       }
+      rows.push(<div key={`row_${i}`} className="flex flex-wrap">{rowElements}</div>);
       if (count >= totalNo) break;
     }
-    return elements;
+
+    return rows;
   };
 
   return (
@@ -237,15 +239,10 @@ const BookTable = () => {
           </div>
         </Modal>
       </div>
-      <div className="flex md:flex-row flex-col space-x-4">
+      <div className="flex md:flex-row flex-col justify-center space-x-4">
         {event?.EventTable?.table_size <= 0 ?
           <p className="text-center font-medium text-lg">No tables to show!</p> :
-          <div
-            className={`grid justify-center items-center text-center ${isMobile
-              ? 'grid-cols-3 gap-2'
-              : 'md:grid-cols-5 grid-cols-1 sm:grid-rows-1 md:grid-rows-5'
-              }`}
-          >
+          <div className={`grid justify-center items-center text-center`}>
             {generateGrid(event?.EventTable?.total_row, event?.EventTable?.total_col, event?.EventTable?.table_size)}
           </div>
         }

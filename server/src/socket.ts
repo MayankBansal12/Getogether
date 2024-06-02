@@ -51,12 +51,14 @@ export default function (io: Server) {
         });
 
         // Send messages in a group
-        socket.on("send-message", async ({ userId, groupId, message, photoLink }: SendMessagePayload) => {
+        socket.on("send-message", async ({ userId, groupId, message, photoLink, userName, userAvatar }: SendMessagePayload) => {
             const newMessage = await prisma.groupMessage.create({
                 data: {
                     senderId: userId,
                     groupId,
                     message,
+                    senderName: userName,
+                    senderAvatar: userAvatar,
                     photos: photoLink
                 }
             })

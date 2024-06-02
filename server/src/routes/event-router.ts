@@ -125,21 +125,60 @@ router.post(
         },
       })
 
+      const defaultGroups = [
+        { name: 'Announcements', desc: 'Channel announcements' },
+        { name: 'Vendor', desc: 'Vendor discussions' },
+        { name: 'General', desc: 'General chat' },
+        { name: 'Photos', desc: 'Share your photos' },
+      ]
+
       const newSubEvents = await Promise.all(
-        subEvents.map((subEvent) =>
-          prisma.channel.create({
+        subEvents.map(async (subEvent) => {
+          const newChannel = await prisma.channel.create({
             data: {
               eventId: newEvent.id,
               name: subEvent.name,
               venue: subEvent.venue,
               startTime: new Date(subEvent.startTime),
               endTime: new Date(subEvent.endTime),
+              ChannelParticipant: {
+                create: {
+                  participantId: hostParticipant.id,
+                },
+              },
             },
-          }),
-        ),
+          })
+
+          // Create default groups for the new channel
+          const groupPromises = defaultGroups.map(group =>
+            prisma.group.create({
+              data: {
+                name: group.name,
+                desc: group.desc,
+                eventId: newEvent.id,
+              },
+            })
+          )
+
+          const createdGroups = await Promise.all(groupPromises)
+
+          // Create GroupRelations
+          const groupRelationPromises = createdGroups.map(group =>
+            prisma.groupRelation.create({
+              data: {
+                groupId: group.id,
+                channelId: newChannel.id,
+              },
+            })
+          )
+
+          await Promise.all(groupRelationPromises)
+
+          return newChannel
+        })
       )
 
-      return res.status(201).json({ message: 'Events created successfully' })
+      return res.status(201).json({ message: 'Events created successfully', newEvent, newSubEvents })
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Failed to create event' })
@@ -358,6 +397,38 @@ router.post(
           participantId: Number(participant.id),
         },
       })
+
+      // Create default groups
+      const defaultGroups = [
+        { name: 'Announcements', desc: 'Channel announcements' },
+        { name: 'Vendor', desc: 'Vendor discussions' },
+        { name: 'General', desc: 'General chat' },
+        { name: 'Photos', desc: 'Share your photos' },
+      ]
+
+      const groupPromises = defaultGroups.map(group =>
+        prisma.group.create({
+          data: {
+            name: group.name,
+            desc: group.desc,
+            eventId: Number(eventId),
+          },
+        })
+      )
+
+      const createdGroups = await Promise.all(groupPromises)
+
+      // Create GroupRelations
+      const groupRelationPromises = createdGroups.map(group =>
+        prisma.groupRelation.create({
+          data: {
+            groupId: group.id,
+            channelId: newChannel.id,
+          },
+        })
+      )
+
+      await Promise.all(groupRelationPromises)
 
       return res.status(201).json({
         message: 'Successfully created the channel!',
