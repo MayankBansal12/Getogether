@@ -15,6 +15,9 @@ import {
   Avatar,
   ListItemButton,
   ListItemText,
+  Menu,
+  MenuItem,
+  Popover,
   Tooltip,
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
@@ -30,7 +33,13 @@ import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
 import Groups from '../groupchats'
 import BookTable from '../booktable'
+import Table from '../../assets/table.svg'
+import useApi from '../../hooks/use-api'
+import Appearance from '../appearance'
+import UserSettings from '../user-settings'
+import EventSettings from '../event-settings'
 import EventPhotos from '../event-photos'
+
 
 const drawerWidth = 350
 
@@ -41,14 +50,57 @@ type Props = {
 export default function SidebarNav(props: Props) {
   const navigate = useNavigate()
   const { window } = props
+  const callApi = useApi()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
-  const [channel, setChannel] = useState(null)
+  const [channel, setChannel] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
-  const user = useUserStore((state) => state.user)
+  var user = useUserStore((state) => state.user)
   const [renderList, setRenderList] = useState('Home')
   const event = useEventStore((state) => state.event)
+  const [channels, setChannels] = useState([])
+  const [selectedChannelId, setSelectedChannelId] = useState()
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
+  const open = Boolean(anchorEl)
+  const id = open ? 'simple-popover' : undefined
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    handleClose()
+    // Ye vala section dekhlo
+    user = null
+    navigate('/')
+  }
+
+  const handleBackToEvents = () => {
+    handleClose()
+    navigate('/allevents')
+  }
+
+  const fetchChannelDetails = async () => {
+    try {
+      const res = await callApi('/event/list', 'POST', {
+        eventId: Number(event.id),
+        includeGroup: true,
+      })
+      if (res.status === 200) {
+        setChannels(res?.data?.events?.Channel)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    fetchChannelDetails()
+  }, [])
 
   const handleDash = () => {
     setRenderComponent('')
@@ -66,7 +118,10 @@ export default function SidebarNav(props: Props) {
     setRenderComponent('Event Schedule')
     setRenderList('Calender')
   }
-
+  const handleBookTable = () => {
+    setRenderComponent('Book My Table')
+    setRenderList('Book')
+  }
   const handleDrawerClose = () => {
     setIsClosing(true)
     setMobileOpen(false)
@@ -80,6 +135,19 @@ export default function SidebarNav(props: Props) {
     if (!isClosing) {
       setMobileOpen(!mobileOpen)
     }
+  }
+
+  const handleChannelClick = (channelId) => {
+    // Update state to store the selected channel ID
+    setSelectedChannelId(channelId)
+  }
+
+  const handleSettings = () => {
+    setRenderList('Settings')
+  }
+
+  const handlePaymentHistory = () => {
+    setRenderComponent('Payment History')
   }
 
   useEffect(() => {
@@ -111,10 +179,6 @@ export default function SidebarNav(props: Props) {
       name: 'Payment History',
       action: () => setRenderComponent('Payment History'),
     },
-    {
-      name: 'Book My Table',
-      action: () => setRenderComponent('booktable'),
-    },
   ]
   // List for DM delete this later
   // const dmList = [
@@ -140,8 +204,10 @@ export default function SidebarNav(props: Props) {
           src={event?.image}
           className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
           alt="event profile"
+
         />{' '}
         <span className="font-bold text-2xl">{event?.name || 'Event'}</span>
+
       </div>
       <Divider />
       <div className="flex mt-[60px] h-full">
@@ -253,6 +319,17 @@ export default function SidebarNav(props: Props) {
                 </Avatar>
               </ListItem>
             </Tooltip>
+            {/* Book My table */}
+            <Tooltip title="Book Table">
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleBookTable}
+              >
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <img src={Table} alt="Table" className="w-6 h-6" />
+                </Avatar>
+              </ListItem>
+            </Tooltip>
 
             {/* Photos */}
             <Tooltip
@@ -286,8 +363,11 @@ export default function SidebarNav(props: Props) {
             </Tooltip>
 
             {/* More */}
-            <Tooltip title="More">
-              <ListItem className="bg-white cursor-pointer">
+            <Tooltip title="Settings">
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={handleSettings}
+              >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -306,19 +386,46 @@ export default function SidebarNav(props: Props) {
                 </Avatar>
               </ListItem>
             </Tooltip>
+            {/* Profile */}
+            <Tooltip title={'Logout'}>
+              <ListItem
+                className="bottom-0 flex"
+                aria-describedby={id}
+                variant="contained"
+              >
+                <Avatar
+                  src={user.profilePic}
+                  className="cursor-pointer size-6"
+                  onClick={handleClick}
+                />
+
+                <Popover
+                  id={id}
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                >
+                  <div style={{ padding: '2px' }}>
+                    <MenuItem onClick={handleBackToEvents}>
+                      <span className="font-josefin">Back to All Events</span>
+                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>
+                      <span className="font-josefin">Logout</span>
+                    </MenuItem>
+                  </div>
+                </Popover>
+              </ListItem>
+            </Tooltip>
           </List>
-          <div className="bottom-0 flex">
-            <Avatar
-              src={user.profilePic}
-              sx={{ width: 50, height: 50 }}
-              className="cursor-pointer"
-            />
-          </div>
         </div>
         <Divider />
         {/** Home */}
         <div className="ml-[50px] pl-4 w-full h-full font-josefin">
-          {renderList === 'Home' && (
+          {user && user.role === 'host' && renderList === 'Home' && (
             <List>
               <ListItem className="bg-white font-medium text-lg">
                 <ListItemText
@@ -343,14 +450,17 @@ export default function SidebarNav(props: Props) {
               <Divider className="m-0" />
             </List>
           )}
-
           {/* Dashboard */}
           {renderList === 'Dash' && (
             <List>
               {dashlistitems.map((item, index) => (
                 <ListItem key={index} className="bg-white font-medium text-lg">
                   {item.accordion ? (
-                    <Accordion className="!border-0 !shadow-none">
+                    //               {channel && channel.length <= 0 ? (
+                    //   <div className="text-center">No sub events listed!</div>
+                    // ) : (
+                    //   channel?.map((item) => (
+                    <Accordion className="!border-0 !shadow-none w-full">
                       <AccordionSummary
                         expandIcon={
                           <svg
@@ -374,13 +484,13 @@ export default function SidebarNav(props: Props) {
                         <p className="w-32">@ {item.name}</p>
                       </AccordionSummary>
                       <AccordionDetails>
-                        {item.details.map((detail, idx) => (
+                        {channels.map((channel, index) => (
                           <ListItemButton
-                            key={idx}
-                            className="ml-3 font-josefin font-md text-black"
-                            onClick={detail.action}
+                            key={index}
+                            className="ml-3 w-54 font-josefin font-md text-black"
+                            onClick={() => handleChannelClick(channel.id)}
                           >
-                            # {detail.name}
+                            @ {channel.name}
                           </ListItemButton>
                         ))}
                       </AccordionDetails>
@@ -394,7 +504,6 @@ export default function SidebarNav(props: Props) {
               ))}
             </List>
           )}
-
           {/** Chat List */}
           {renderList === 'Dm' && (
             <List>
@@ -428,7 +537,6 @@ export default function SidebarNav(props: Props) {
               )}
             </List>
           )}
-
           {/* calender */}
           {renderList === 'Calender' && (
             <List>
@@ -450,6 +558,32 @@ export default function SidebarNav(props: Props) {
                   {index < event?.Channel?.length - 1 && <Divider />}
                 </React.Fragment>
               ))}
+            </List>
+          )}
+          {/* Settings */}
+          {renderList === 'Settings' && (
+            <List>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('Site Appearance')}
+                >
+                  Appearance
+                </ListItemButton>
+              </ListItem>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('User Settings')}
+                >
+                  User Settings
+                </ListItemButton>
+              </ListItem>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('Event Settings')}
+                >
+                  Event Settings
+                </ListItemButton>
+              </ListItem>
             </List>
           )}
         </div>
@@ -547,7 +681,7 @@ export default function SidebarNav(props: Props) {
         <Toolbar />
         {rendercomponent === '' && renderList === 'Dash' && <Default />}
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
-        {rendercomponent === 'booktable' && <BookTable />}
+
         {rendercomponent === 'Participants' && (
           <Participants participants={event.EventParticipant} />
         )}
@@ -556,16 +690,32 @@ export default function SidebarNav(props: Props) {
           // @ts-ignore
           <Subevents channels={event.Channel} />
         )}
-        {rendercomponent === 'Information' && <SingleSubEvent channel={null} />}
+        {rendercomponent === 'Information' && (
+          <SingleSubEvent channelId={selectedChannelId} />
+        )}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
         {rendercomponent === 'Chat' && renderList === 'Dm' && (
           <Chat selectedUser={selectedUser} isGroup={false} />
         )}
+        {rendercomponent === 'Book My Table' && <BookTable />}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}
+
+        {rendercomponent === '' && renderList === 'Settings' && <Appearance />}
+        {rendercomponent === 'Site Appearance' && renderList === 'Settings' && (
+          <Appearance />
+        )}
+        {rendercomponent === 'User Settings' && renderList === 'Settings' && (
+          <UserSettings />
+        )}
+        {rendercomponent === 'Event Settings' && renderList === 'Settings' && (
+          <EventSettings />
+        )}
+
         {rendercomponent === 'Photos' && <EventPhotos />}
+
       </Box>
     </Box>
   )
