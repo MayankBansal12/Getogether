@@ -1,16 +1,16 @@
+
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import Stepper from '@mui/material/Stepper'
 import Step from '@mui/material/Step'
 import StepButton from '@mui/material/StepButton'
 import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
 import Datepicker from 'react-tailwindcss-datepicker'
 import useAlert from '../../hooks/use-alert'
 import useSnackbar from '../../hooks/use-snackbar'
 import { useNavigate } from 'react-router-dom'
 
-const BACKEND = 'http://localhost:5000'
+const BACKEND = import.meta.env.VITE_SERVER
 
 interface Props {
   subEvents: { name: string; venue: string; startTime: Date; endTime: Date }[]
@@ -211,6 +211,7 @@ export default function StepsPanes({
                     <input
                       type="text"
                       name="venue"
+                      placeholder='venue'
                       value={subEvents[activeStep].venue}
                       onChange={(e) => changeField(e.target.value, 'venue')}
                       className="border-primary-light bg-background-light text-[18px] my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"

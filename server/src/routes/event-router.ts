@@ -8,7 +8,7 @@ import UploadImg from '../helper/upload-img'
 
 const router = Router()
 
-const flaskBackend = 'http://localhost:6969'
+const flaskBackend = process.env.FLASK_BACKEND || 'http://localhost:6969'
 
 interface CreateAllReq extends UserReqType {
   body: {

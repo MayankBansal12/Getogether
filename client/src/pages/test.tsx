@@ -12,6 +12,7 @@ interface ImageEvent {
 
 const Test = (props: Props) => {
   const [ImgUrl, setImgUrl] = useState('')
+  const BACKEND_URL = import.meta.env.VITE_SERVER
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement> & ImageEvent,
@@ -20,7 +21,7 @@ const Test = (props: Props) => {
     try {
       // Ayse convert karna hoga
       const img = await ImageHelper.ConvertBase64(e.target.image.files[0])
-      const res = await fetch('http://localhost:5000/image/upload-image', {
+      const res = await fetch(`${BACKEND_URL}/image/upload-image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

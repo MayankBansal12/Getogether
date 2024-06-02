@@ -7,7 +7,7 @@ import ImageHelper from '../services/image'
 import ImageUploader from './image-uploader'
 import Participants from './eventcomponents/participants'
 
-const backend = 'http://localhost:5000'
+const backend = import.meta.env.VITE_SERVER;
 interface AllEventPhotos {
   url: string
   id: number

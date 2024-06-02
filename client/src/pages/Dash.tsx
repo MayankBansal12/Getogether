@@ -22,7 +22,7 @@ const Dash = () => {
 
   useEffect(() => {
     fetchUserRole(Number(eventId));
-  }, [])
+  }, [eventId])
 
   return <SideNav />
 }

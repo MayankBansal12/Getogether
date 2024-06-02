@@ -11,7 +11,7 @@ import useApi from '../hooks/use-api'
 import { formatTime, numericDate } from '../helpers/formatDate'
 import { stringAvatar } from '../helpers/avatar'
 
-const BACKEND_URL = 'http://localhost:5000'
+const BACKEND_URL = import.meta.env.VITE_SERVER;
 
 export default function Chat({ selectedUser, isGroup, groupId = null }) {
   const [socket, setSocket] = useState(null)
@@ -200,13 +200,15 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
       lastDate = messageDate
       lastSender = item.senderId
 
+      console.log("last Date ", lastDate, " messagDate: ", messageDate)
+
       return (
         <div key={item.id}>
           {showDate && (
             <div className="flex items-center gap-2 mt-4">
               <div className="flex-grow border-gray-200 border-t"></div>
               <p className="text-[14px] text-center text-gray-500">
-                {numericDate(item.time)}
+                {messageDate}
               </p>
               <div className="flex-grow border-gray-200 border-t"></div>
             </div>

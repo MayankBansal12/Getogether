@@ -165,6 +165,11 @@ export default function SidebarNav(props: Props) {
     setRenderComponent('Information')
   }
 
+  const handleCalenderClick = (channel) => {
+    setSelectedChannel(channel)
+    setRenderComponent('Event Schedule')
+  }
+
   const handleSettings = () => {
     setRenderList('Settings')
   }
@@ -551,7 +556,7 @@ export default function SidebarNav(props: Props) {
             <List>
               {event?.Channel?.map((item, index) => (
                 <React.Fragment key={index}>
-                  <ListItem className="bg-white font-medium text-lg">
+                  <ListItem className="bg-white font-medium text-lg" onClick={() => handleCalenderClick(item)}>
                     <ListItemButton
                       onClick={() => setRenderComponent('Event Schedule')}
                     >
@@ -702,7 +707,7 @@ export default function SidebarNav(props: Props) {
         <Toolbar />
         {rendercomponent === '' && renderList === 'Dash' && <Default />}
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
-
+        {rendercomponent === 'GroupChat' && renderList === 'Home' && <GroupChat groupId={selectedGroupId} />}
         {rendercomponent === 'Participants' && (
           <Participants participants={event.EventParticipant} />
         )}
@@ -726,9 +731,8 @@ export default function SidebarNav(props: Props) {
           <BookTableForm />
         )}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
-          <CalenderEvent />
+          <CalenderEvent channel={selectedChannel} />
         )}
-
         {rendercomponent === '' && renderList === 'Settings' && <Appearance />}
         {rendercomponent === 'Site Appearance' && renderList === 'Settings' && (
           <Appearance />

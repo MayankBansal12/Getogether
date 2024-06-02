@@ -10,7 +10,7 @@ import push from '../helper/push-notify'
 
 const router = Router()
 const SECRET_KEY = process.env.SECRET_KEY
-const flaskBackend = 'http://localhost:6969'
+const flaskBackend = process.env.FLASK_BACKEND || 'http://localhost:6969'
 
 // /user/login -> User login
 router.post('/login', async (req: Request, res: Response) => {

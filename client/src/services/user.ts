@@ -2,7 +2,7 @@ import { useUserStore } from '../global-store/store'
 import { LoginEvent, SignupEvent } from '../pages/auth/auth'
 import ImageHelper from './image'
 
-const BACKEND = 'http://localhost:5000'
+const BACKEND = import.meta.env.VITE_SERVER
 
 interface AuthSuccess {
   success: boolean
@@ -30,7 +30,7 @@ class User {
     if (user) return true
 
     try {
-      const resp = await fetch('http://localhost:5000/auth/me', {
+      const resp = await fetch(`${BACKEND}/auth/me`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ class User {
       })
       // console.log('Push subscription:\n', JSON.stringify(pushSubscription))
 
-      const response = await fetch('http://localhost:5000/user/subscribe', {
+      const response = await fetch(`${BACKEND}/user/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

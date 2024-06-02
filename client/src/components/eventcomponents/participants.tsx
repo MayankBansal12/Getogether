@@ -4,13 +4,14 @@ import { Box, Link, Avatar, Chip } from '@mui/material'
 import { ChatBubbleOutline } from '@mui/icons-material';
 import monkey from '../../assets/monkey.png'
 import { getDate } from '../../helpers/formatDate'
-import { redirect } from 'react-router-dom';
+import { redirect, useParams } from 'react-router-dom';
 
 const Participants = ({ participants }) => {
-  //Dummy values. Delete this later
   const image = monkey
   const [open, setOpen] = useState(false)
   const [rotate, setRotate] = useState(false)
+  const { eventId } = useParams()
+  const frontend = import.meta.env.VITE_CLIENT;
 
   const handleClick = () => {
     setOpen(!open)
@@ -60,10 +61,10 @@ const Participants = ({ participants }) => {
       </Box>
       {open && (
         <div className="border-primary-light bg-white px-4 py-10 border min-w-40 font-josefin text-center">
-          <p className="py-4 text-3xl">Call your friends!! 📩</p>
+          <p className="py-4 text-3xl">Call your friends and family!! 📩</p>
           <p className="py-2 text-xl">You can share this invite link.</p>
           <Link className="py-2 text-xl wrap">
-            https://www.planit.com/event/04
+            {frontend + "/join/event/" + eventId}
           </Link>
         </div>
       )}

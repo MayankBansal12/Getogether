@@ -5,79 +5,62 @@ import EventBox from '../components/eventcomponents/eventbox'
 import Button from '../components/button'
 import { useNavigate } from 'react-router-dom'
 import { Box, Divider } from '@mui/material'
+import { getDate } from '../helpers/formatDate'
 
 // This is where the user will be redirected after login
-const CalenderEvent = () => {
+const CalenderEvent = ({ channel }) => {
   const navigate = useNavigate()
   return (
-    <>
-      <main className="mx-auto px-4 md:px-6 py-4 w-full max-w-4xl font-josefin">
-        <div className="space-y-8">
-          <div className="text-center">
-            <h1 className="font-bold text-3xl md:text-4xl tracking-tight">
-              Game Zone
-            </h1>
-            <p className="mt-2 text-primary-dull">
-              June 15, 2023 | 7:00 PM - 11:00 PM
-            </p>
-            <p className="mt-2 text-primary-dull">
-              Acme Event Center, 123 Main St, Anytown USA
-            </p>
-          </div>
-          <div className="space-y-6">
-            <h2 className="font-bold text-2xl">Event Details</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium text-lg">What to Bring ❓</h3>
-                <p className="mt-2 text-black">
-                  Please bring a valid ID for entry and any items specified on
-                  the event agenda.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-medium text-lg">Dress Code 👕</h3>
-                <p className="mt-2 text-black">
-                  Formal attire is required. No jeans or t-shirts allowed.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-medium text-lg">Agenda 📌</h3>
-                <ul className="space-y-2 mt-2 pl-6 text-black list-disc">
-                  <li>7:00 PM - 8:00 PM: Cocktail Reception</li>
-                  <li>8:00 PM - 9:00 PM: Dinner and Speeches</li>
-                  <li>9:00 PM - 11:00 PM: Dancing and Networking</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-6">
-            <h2 className="font-bold text-2xl">About the Host</h2>
-            <div className="flex items-center gap-4">
-              <img
-                alt="Acme Inc. Logo"
-                className="rounded-full"
-                height={48}
-                src="/placeholder.svg"
-                style={{
-                  aspectRatio: '48/48',
-                  objectFit: 'cover',
-                }}
-                width={48}
+    <div className="flex-col px-4 md:px-10 w-full font-josefin container">
+      <Box
+        display={'flex'}
+        gap={2}
+        className="flex flex-col bg-background-extralight my-4 px-4 md:px-8 py-8 rounded-md"
+      >
+        <div className="flex md:flex-row flex-col justify-between items-center w-full">
+
+          <p className="font-bold text-center text-xl">{channel?.name}</p>
+
+          <div className="flex px-2 py-1 border border-black rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="mx-2 w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
               />
-              <div>
-                <h3 className="font-medium text-lg">Mayank</h3>
-                <p className="mt-1 text-black">
-                  Acme Inc. is a leading provider of innovative solutions for
-                  businesses of all sizes. We are dedicated to helping our
-                  clients achieve their goals and succeed in today's competitive
-                  marketplace.
-                </p>
-              </div>
-            </div>
+            </svg>
           </div>
         </div>
-      </main>
-    </>
+
+        <p className="font-xl text-black text-md">{channel?.desc}</p>
+
+      </Box>
+
+      <Box
+        display={'flex'}
+        gap={2}
+        className="md:flex-row flex-col justify-between my-4 w-full"
+      >
+        <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 rounded-md text-center">
+          <p className="py-2 font-bold text-xl underline">Venue</p>
+          <p className="font-medium text-lg">{channel?.venue}</p>
+        </div>
+        <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 rounded-md text-center">
+          <p className="py-2 font-bold text-xl underline">Time</p>
+          <p className="font-medium text-lg">{`${getDate(
+            channel?.startTime,
+          )} - ${getDate(channel?.endTime)}`}</p>
+
+        </div>
+      </Box>
+    </div>
   )
 }
 
