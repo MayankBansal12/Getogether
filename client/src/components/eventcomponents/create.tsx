@@ -64,11 +64,8 @@ const CreateEvent = () => {
       // const budget = Number(e.target.budget.value)
       const desc = e.target.desc.value
       if (!name || !desc || name.length < 1 || desc.length < 1) {
-        setSnackbar({
-          open: true,
-          content: 'Please fill all the details',
-          type: 'info',
-        })
+        
+        
         return
       }
       let img = ''

@@ -161,10 +161,10 @@ router.post('/list', async (req: Request, res: Response) => {
             ChannelParticipant: true,
             GroupRelation: includeGroup
               ? {
-                  include: {
-                    Group: true,
-                  },
-                }
+                include: {
+                  Group: true,
+                },
+              }
               : false,
           },
         },
@@ -415,6 +415,12 @@ router
               User: true,
             },
           },
+          Budget: true,
+          EventTable: {
+            include: {
+              SingleTable: true
+            }
+          }
         },
       })
 

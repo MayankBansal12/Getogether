@@ -58,11 +58,16 @@ router.post('/event', async (req, res) => {
 
 // /table/user -> Route to show all tables booked by a specific user
 router.post('/user', async (req, res) => {
-    const { userId } = req.body;
+    const { userId, eventId } = req.body;
 
     try {
         const tables = await prisma.singleTable.findMany({
-            where: { userId },
+            where: {
+                userId,
+                EventTable: {
+                    eventId
+                }
+            },
             include: {
                 EventTable: {
                     include: {
