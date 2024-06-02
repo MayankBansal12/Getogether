@@ -12,7 +12,19 @@ router.post("/message/list", async (req: Request, res: Response) => {
         const message = await prisma.group.findUnique({
             where: { id: groupId, eventId },
             include: {
-                GroupMessage: true,
+                GroupMessage: {
+                    include: {
+                        SenderChannelParticipant: {
+                            include: {
+                                EventParticipant: {
+                                    include: {
+                                        User: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
             },
         });
         if (!message) {
