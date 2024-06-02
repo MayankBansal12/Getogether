@@ -31,7 +31,7 @@ import { useNavigate } from 'react-router-dom'
 import { useEventStore, useUserStore } from '../../global-store/store'
 import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
-import Groups from '../groupchats'
+import Groups from '../groupchatDefault'
 import BookTable from '../booktable'
 import Table from '../../assets/table.svg'
 import useApi from '../../hooks/use-api'
@@ -39,6 +39,8 @@ import Appearance from '../appearance'
 import UserSettings from '../user-settings'
 import EventSettings from '../event-settings'
 import EventPhotos from '../event-photos'
+import ChatDefault from '../chatDefault'
+import BookTableForm from '../booktable_form'
 
 const drawerWidth = 350
 
@@ -117,7 +119,6 @@ export default function SidebarNav(props: Props) {
     setRenderList('Calender')
   }
   const handleBookTable = () => {
-    setRenderComponent('Book My Table')
     setRenderList('Book')
   }
   const handleDrawerClose = () => {
@@ -577,6 +578,18 @@ export default function SidebarNav(props: Props) {
               </ListItem>
             </List>
           )}
+          {/* BookTable */}
+          {renderList === 'Book' && (
+            <List>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('Table Arrangements')}
+                >
+                  Table Arrangements
+                </ListItemButton>
+              </ListItem>
+            </List>
+          )}
         </div>
       </div>
     </div>
@@ -689,7 +702,8 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Chat' && renderList === 'Dm' && (
           <Chat selectedUser={selectedUser} isGroup={false} />
         )}
-        {rendercomponent === 'Book My Table' && <BookTable />}
+        {renderList === 'Book' && rendercomponent === '' && <BookTable />}
+        {rendercomponent === 'Table Arrangements' && <BookTableForm />}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}
