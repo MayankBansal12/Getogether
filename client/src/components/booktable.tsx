@@ -145,7 +145,7 @@ const BookTable = () => {
         if (!isTableBooked(i, j)) {
           elements.push(
             <button
-              key={`${i}-${j}`}
+              key={`${i}_${j}`}
               className="border-2 hover:border-2 hover:bg-[#DED9FF] transition-all mx-2 md:mx-4 my-2 md:my-4 px-2"
               onClick={() => {
                 handleOpen()
@@ -172,6 +172,7 @@ const BookTable = () => {
           elements.push(
             <button
               disabled
+              key={`${i}_${j}`}
               className="flex justify-center items-center border-2 border-gray-300 hover:border-gray-300 bg-gray-200 mx-2 md:mx-4 my-2 md:my-4 px-2 text-gray-500 cursor-not-allowed"
             >
               <img
