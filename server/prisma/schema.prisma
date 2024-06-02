@@ -90,7 +90,8 @@ model Event {
   Channel          Channel[]
   ChatParticipant  ChatParticipant[]
   Host             User               @relation(fields: [hostId], references: [id])
-  EventTable       EventTable[]
+  bookTable        Boolean            @default(false)
+  EventTable       EventTable?
 }
 
 model Channel {
@@ -213,7 +214,7 @@ model ChatParticipant {
 
 model EventTable {
   id          Int           @id @default(autoincrement())
-  eventId     Int
+  eventId     Int           @unique
   table_size  Int
   total_row   Int
   total_col   Int

@@ -18,16 +18,28 @@ interface BudgetType {
   spent: number
 }
 
+interface EventTableType {
+  id: number,
+  tableId: number,
+  eventId: number,
+  total_row: number,
+  total_col: number,
+  table_size: number,
+  SingleTable: []
+}
+
 interface EventType {
   id: number
   name: string
   desc: string
   image: string
   date: Date
+  bookTable: boolean
   EventParticipant: EventParticipantType[]
   Photo: []
   Vendor: []
   Budget?: BudgetType | null
+  EventTable?: EventTableType | null
   Channel: ChannelType[]
   ChatParticipant: []
   Chat: []

@@ -107,4 +107,6 @@ const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
   )
 }
 
+}
+
 export default SingleSubEvent
