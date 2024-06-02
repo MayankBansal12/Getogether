@@ -120,6 +120,8 @@ interface IGroupMessage {
   senderId: number
   message: string
   photos: string
+  senderName: string
+  senderAvatar: string
   Group: IGroup
   SenderChannelParticipant: IChannelParticipant
 }
@@ -201,6 +203,8 @@ interface SendMessagePayload {
   groupId: number
   message: string
   photoLink: string
+  userName: string
+  userAvatar: string
 }
 interface PersonalMessagePayLoad {
   eventId: number

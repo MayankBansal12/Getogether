@@ -113,7 +113,7 @@ io.on('connection', (socket) => {
   // Send messages in a group
   socket.on(
     'send-message',
-    async ({ userId, groupId, message, photoLink }: SendMessagePayload) => {
+    async ({ userId, userName, userAvatar, groupId, message, photoLink }: SendMessagePayload) => {
       let imageUrl = ''
       if (photoLink !== '') imageUrl = await UploadImg(photoLink)
 
@@ -122,6 +122,8 @@ io.on('connection', (socket) => {
           senderId: userId,
           groupId,
           message,
+          senderName: userName,
+          senderAvatar: userAvatar,
           photos: imageUrl,
         },
       })
