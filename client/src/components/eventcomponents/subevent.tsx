@@ -193,11 +193,7 @@ const Subevents = () => {
       console.log(error)
     }
   }
-
-  useEffect(() => {
-    fetchChannelDetails()
-  }, [])
-
+  
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
       <Box className="flex justify-between items-center bg-background-extralight my-4 px-4 md:px-6 py-4">

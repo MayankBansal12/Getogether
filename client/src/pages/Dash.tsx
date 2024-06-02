@@ -9,7 +9,6 @@ import { EventType, UserType } from '../global-types/model'
 
 const Dash = () => {
   const { eventId } = useParams()
-  const { event, setEvent } = useEventStore((state) => state)
   const { user, setUser } = useUserStore((state) => state)
   const callApi = useApi()
 
@@ -21,18 +20,8 @@ const Dash = () => {
     setUser({ ...user, role, "participantId": participant.id })
   }
 
-  const getEventDetails = async () => {
-    const res = await callApi('/event/' + eventId, 'GET')
-    if (res) {
-      const eventDetails: EventType = res.data.event
-      console.log('Event details: ', eventDetails)
-      setEvent(eventDetails)
-      fetchUserRole(eventDetails.id)
-    }
-  }
-
   useEffect(() => {
-    getEventDetails()
+    fetchUserRole(Number(eventId));
   }, [])
 
   return <SideNav />

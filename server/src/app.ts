@@ -115,7 +115,7 @@ io.on('connection', (socket) => {
     'send-message',
     async ({ userId, groupId, message, photoLink }: SendMessagePayload) => {
       let imageUrl = ''
-      if (photoLink) imageUrl = await UploadImg(photoLink)
+      if (photoLink !== '') imageUrl = await UploadImg(photoLink)
 
       const newMessage = await prisma.groupMessage.create({
         data: {
