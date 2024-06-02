@@ -259,6 +259,45 @@ router.post('/invite', async (req: Request, res: Response) => {
   }
 })
 
+router.post('/join', async (req: Request, res: Response) => {
+  const { userId, eventId, role } = req.body
+  const status = 1
+
+  try {
+    // Check if the participant already exists
+    const existingParticipant = await prisma.eventParticipant.findUnique({
+      where: {
+        UserEventUnique: {
+          userId,
+          eventId,
+        },
+      },
+    })
+
+    if (existingParticipant) {
+      return res
+        .status(400)
+        .json({ message: 'User already invited to the event' })
+    }
+
+    const participant = await prisma.eventParticipant.create({
+      data: {
+        userId,
+        eventId,
+        role,
+        status,
+      },
+    })
+
+    return res
+      .status(201)
+      .json({ message: 'User added to the event!', participant })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to add user to event' })
+  }
+})
+
 // /event/respond -> User Accepting/Declining the invitation
 // status -> accept 1 ,reject -1
 router.post('/respond', async (req: Request, res: Response) => {
@@ -467,6 +506,30 @@ router.get('/participants', async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to fetch event participants' })
+  }
+})
+
+// /event/details -> For fetching basic event details
+router.post("/details", async (req: Request, res: Response) => {
+  const { eventId } = req.body;
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: Number(eventId) },
+      include: {
+        Host: {
+          select: { name: true, id: true }
+        }
+      }
+    })
+
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found!' })
+    }
+
+    return res.status(200).json({ message: 'Event Details fetched!', event })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to fetch event details' })
   }
 })
 

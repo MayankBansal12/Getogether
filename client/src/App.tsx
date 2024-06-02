@@ -17,6 +17,7 @@ import Dash from './pages/Dash'
 import CreateEvent from './components/eventcomponents/create'
 import BookTable from './components/booktable'
 import SidebarNav from './components/sidenavs/primarynav'
+import JoinInvite from './pages/JoinInvite'
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,14 @@ const router = createBrowserRouter([
     element: (
       <Protected>
         <Dash />
+      </Protected>
+    ),
+  },
+  {
+    path: '/join/event/:eventId',
+    element: (
+      <Protected>
+        <JoinInvite />
       </Protected>
     ),
   },
