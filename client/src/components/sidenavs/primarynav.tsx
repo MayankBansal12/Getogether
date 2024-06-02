@@ -32,8 +32,9 @@ import Groups from '../groupchats'
 import BookTable from '../booktable'
 import Table from '../../assets/table.svg'
 import useApi from '../../hooks/use-api'
-import { useChannelStore } from '../../global-store/store'
 import Appearance from '../appearance'
+import UserSettings from '../user-settings'
+import EventSettings from '../event-settings'
 
 const drawerWidth = 350
 
@@ -610,8 +611,15 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}
+        {rendercomponent === '' && renderList === 'Settings' && <Appearance />}
         {rendercomponent === 'Site Appearance' && renderList === 'Settings' && (
           <Appearance />
+        )}
+        {rendercomponent === 'User Settings' && renderList === 'Settings' && (
+          <UserSettings />
+        )}
+        {rendercomponent === 'Event Settings' && renderList === 'Settings' && (
+          <EventSettings />
         )}
       </Box>
     </Box>
