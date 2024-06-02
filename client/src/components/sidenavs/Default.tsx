@@ -1,10 +1,16 @@
 //  this is the Default page for the host
 
-import { useEventStore } from "../../global-store/store"
+import { useParams } from "react-router-dom";
+import { useChannelStore, useEventStore } from "../../global-store/store"
+import useApi from "../../hooks/use-api"
+import { EventType } from "../../global-types/model";
+import { useEffect } from "react";
 
 const Default = () => {
-
-  const event = useEventStore(state => state.event)
+  const { event, setEvent } = useEventStore(state => state)
+  const { setChannel } = useChannelStore(state => state)
+  const callApi = useApi();
+  const { eventId } = useParams();
 
   return (
     <div className="flex flex-col justify-center items-center py-4 w-full h-[60vh] font-josefin">

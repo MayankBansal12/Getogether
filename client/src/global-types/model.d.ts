@@ -69,8 +69,43 @@ interface ChannelType {
   endTime: Date
   Event: EventType
   ChannelService: []
-  GroupRelation: []
+  GroupRelation: GroupRelationType[]
   ChannelParticipant: []
 }
 
-export { UserType, EventType, ChannelType, BudgetType }
+interface GroupRelationType {
+  id: number
+  groupId: number
+  channelId: number
+  Group: GroupType
+}
+
+
+interface GroupType {
+  id: number
+  name: string
+  desc: string
+  eventId: number
+  GroupRelation: GroupRelationType[]
+  GroupMessage: GroupMessageType[]
+}
+
+interface GroupMessageType {
+  id: number
+  groupId: number
+  senderId: number
+  message: string
+  photos: string
+  Group: IGroup
+  SenderChannelParticipant: ChannelParticipantType
+}
+
+interface ChannelParticipantType {
+  id: number
+  participantId: number
+  channelId: number
+  Channel: ChannelType
+  EventParticipant: EventParticipantType
+}
+
+export { UserType, EventType, ChannelType, BudgetType, GroupRelationType, GroupType, GroupMessageType, ChannelParticipantType }

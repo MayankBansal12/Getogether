@@ -3,35 +3,14 @@ import { Box, Divider } from '@mui/material'
 import Button from '../button'
 import { getDate } from '../../helpers/formatDate'
 import useApi from '../../hooks/use-api'
+import { useChannelStore } from '../../global-store/store'
+import { ChannelType } from '../../global-types/model'
 
-const SingleSubEvent = ({ channelId }) => {
-  const [channel, setChannel] = useState(null)
-  const callApi = useApi()
+const SingleSubEvent = ({ channel }) => {
 
   useEffect(() => {
-    const fetchChannelDetails = async () => {
-      try {
-        const res = await callApi(`/event/channel/${channelId}`, 'GET')
-        if (res.status === 200) {
-          setChannel(res.data.channel)
-        } else {
-          // Handle error if needed
-        }
-      } catch (error) {
-        console.log(error)
-        // Handle error if needed
-      }
-    }
-
-    fetchChannelDetails()
-  }, [channelId, callApi])
-
-  if (!channel) {
-    return <div>Loading...</div> // Add loading indicator while fetching data
-  }
-
-
-const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
+    console.log("Chanel", channel);
+  }, [channel])
 
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
@@ -59,7 +38,7 @@ const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
                 d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
               />
             </svg>
-            <span>{channel.ChannelParticipant?.length || 0} People</span>
+            <span>{channel?.ChannelParticipant?.length || 0} People</span>
           </div>
         </div>
 
@@ -74,12 +53,11 @@ const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
       >
         <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 rounded-md text-center">
           <p className="py-2 font-bold text-xl underline">Venue</p>
-          <p className="font-medium text-lg">{channel.venue}</p>
+          <p className="font-medium text-lg">{channel?.venue}</p>
         </div>
         <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 rounded-md text-center">
           <p className="py-2 font-bold text-xl underline">Time</p>
           <p className="font-medium text-lg">{`${getDate(
-
             channel?.startTime,
           )} - ${getDate(channel?.endTime)}`}</p>
 
@@ -94,7 +72,7 @@ const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
       >
         <div className="flex md:flex-row flex-col justify-between items-center">
           <span className="font-bold text-xl">Groups</span>
-          <Button onClick={() => {}} children={'+ Add Group'} />
+          <Button onClick={() => { }} children={'+ Add Group'} />
         </div>
         <Divider />
 
@@ -105,8 +83,6 @@ const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
       </Box>
     </div>
   )
-}
-
 }
 
 export default SingleSubEvent

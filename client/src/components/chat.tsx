@@ -53,7 +53,6 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
     if (socket) {
       let roomId = '';
       const handleMessage = (newMessage) => {
-        console.log("message recd: ", newMessage);
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       };
 
@@ -195,7 +194,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
     let lastSender = null
 
     return messages?.map((item) => {
-      const messageDate = new Date(item.timestamp).toDateString()
+      const messageDate = new Date(item.time).toDateString()
       const showDate = messageDate !== lastDate
       const showSender = item.senderId !== lastSender
       lastDate = messageDate
@@ -235,7 +234,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
               />
             )}
             <p className="text-[14px] text-gray-500">
-              {formatTime(item.time)}
+              {formatTime(item?.time)}
             </p>
           </div>
         </div>
