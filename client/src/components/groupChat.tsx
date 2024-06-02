@@ -45,7 +45,6 @@ export default function GroupChat({ groupId }) {
     useEffect(() => {
         console.log("socket: ", socket, "grpuid: ", groupId)
         if (socket) {
-            let roomId = '';
             const handleMessage = (newMessage) => {
                 setMessages((prevMessages) => [...prevMessages, newMessage]);
             };
@@ -136,13 +135,14 @@ export default function GroupChat({ groupId }) {
     }
 
     const showAvatar = (senderId: number) => {
-        if (senderId === user.id) {
+        // if (senderId === user.id) {
             console.log(user);
-            if (!user.profilePic || user.profilePic === '')
-                return <Avatar {...stringAvatar(user.name)} />
-            else
-                return <Avatar src={user.profilePic} />;
-        }
+        //     // if (!user.profilePic || user.profilePic === '')
+        //     //     return <Avatar {...stringAvatar(user.name)} />
+        //     // else
+        return <Avatar src={user.profilePic} />;
+        // }
+        // return;
         // else {
         //     console.log(participant);
         //     if (!participant.profilePic || participant.profilePic === '')
