@@ -41,7 +41,7 @@ const authMiddleware = async (
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    req.user = { ...user, password: '' }
+    req.user = { ...user, password: '', FaceEmbeddings: [] }
     next()
   } catch (error) {
     console.log('==authMiddleware==\n', error)

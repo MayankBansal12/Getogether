@@ -40,7 +40,7 @@ class User {
       const data = await resp.json()
       if (resp.ok) {
         setUser(data.user)
-        this.setNotification();
+        this.setNotification()
         return true
       } else {
         localStorage.removeItem('token')
@@ -62,16 +62,12 @@ class User {
       const about = e.target.about.value
       const password = e.target.password.value
       const confirmPassword = e.target.confirmPassword.value
-      const image = e.target.image ? await ImageHelper.ConvertBase64(e.target.image.files[0]) : ""
-      const imageName = e.target.image ? e.target.image.files[0]?.name : ""
+      const image = e.target.image
+        ? await ImageHelper.ConvertBase64(e.target.image.files[0])
+        : ''
+      const imageName = e.target.image ? e.target.image.files[0]?.name : ''
 
-      if (
-        !email ||
-        !name ||
-        !phone ||
-        !password ||
-        !confirmPassword
-      ) {
+      if (!email || !name || !phone || !password || !confirmPassword) {
         return {
           success: false,
           message: 'All the fields are required',
@@ -193,7 +189,7 @@ class User {
   public static async SetupServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
-        const sw = await navigator.serviceWorker.register('sw.js')
+        const sw = await navigator.serviceWorker.register('/sw.js')
         // console.log('Service worker registered:', sw)
       } catch (error) {
         console.error('Service worker registration failed:', error)

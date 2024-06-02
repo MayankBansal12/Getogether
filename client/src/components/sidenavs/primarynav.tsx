@@ -38,6 +38,8 @@ import useApi from '../../hooks/use-api'
 import Appearance from '../appearance'
 import UserSettings from '../user-settings'
 import EventSettings from '../event-settings'
+import EventPhotos from '../event-photos'
+
 
 const drawerWidth = 350
 
@@ -202,8 +204,10 @@ export default function SidebarNav(props: Props) {
           src={event?.image}
           className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
           alt="event profile"
-        />
-        <span className="font-bold text-2xl">{event?.name}</span>
+
+        />{' '}
+        <span className="font-bold text-2xl">{event?.name || 'Event'}</span>
+
       </div>
       <Divider />
       <div className="flex mt-[60px] h-full">
@@ -323,6 +327,37 @@ export default function SidebarNav(props: Props) {
               >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <img src={Table} alt="Table" className="w-6 h-6" />
+                </Avatar>
+              </ListItem>
+            </Tooltip>
+
+            {/* Photos */}
+            <Tooltip
+              title="Upload or View Photos"
+              disableInteractive
+              placement="bottom-end"
+            >
+              <ListItem
+                className="bg-white cursor-pointer"
+                onClick={() => setRenderComponent('Photos')}
+              >
+                <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <g transform="translate(2 3)">
+                      <path d="M20 16a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2v11z" />
+                      <circle cx="10" cy="10" r="4" />
+                    </g>
+                  </svg>
                 </Avatar>
               </ListItem>
             </Tooltip>
@@ -489,7 +524,7 @@ export default function SidebarNav(props: Props) {
                           <span>{item?.User?.name || ''}</span>
                           <br />
                           <span className="text-dull text-xs">
-                            Joined {getDate(item?.createdDate)}
+                            Joined {getDate(item?.createdAt)}
                           </span>
                         </p>
                       </ListItemButton>
@@ -651,6 +686,8 @@ export default function SidebarNav(props: Props) {
           <Participants participants={event.EventParticipant} />
         )}
         {rendercomponent === 'Sub Events' && (
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           <Subevents channels={event.Channel} />
         )}
         {rendercomponent === 'Information' && (
@@ -665,6 +702,7 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}
+
         {rendercomponent === '' && renderList === 'Settings' && <Appearance />}
         {rendercomponent === 'Site Appearance' && renderList === 'Settings' && (
           <Appearance />
@@ -675,6 +713,9 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Event Settings' && renderList === 'Settings' && (
           <EventSettings />
         )}
+
+        {rendercomponent === 'Photos' && <EventPhotos />}
+
       </Box>
     </Box>
   )

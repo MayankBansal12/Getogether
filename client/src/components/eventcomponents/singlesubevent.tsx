@@ -30,6 +30,9 @@ const SingleSubEvent = ({ channelId }) => {
     return <div>Loading...</div> // Add loading indicator while fetching data
   }
 
+
+const SingleSubEvent = ({ channel }: { channel: ChannelType | null }) => {
+
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
       <Box
@@ -38,7 +41,9 @@ const SingleSubEvent = ({ channelId }) => {
         className="flex flex-col bg-background-extralight my-4 px-4 md:px-8 py-8 rounded-md"
       >
         <div className="flex md:flex-row flex-col justify-between items-center w-full">
-          <p className="font-bold text-center text-xl">{channel.name}</p>
+
+          <p className="font-bold text-center text-xl">{channel?.name}</p>
+
           <div className="flex px-2 py-1 border border-black rounded-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +62,9 @@ const SingleSubEvent = ({ channelId }) => {
             <span>{channel.ChannelParticipant?.length || 0} People</span>
           </div>
         </div>
-        <p className="font-xl text-black text-md">{channel.desc}</p>
+
+        <p className="font-xl text-black text-md">{channel?.desc}</p>
+
       </Box>
 
       <Box
@@ -72,8 +79,10 @@ const SingleSubEvent = ({ channelId }) => {
         <div className="flex-1 bg-background-extralight px-4 md:px-12 py-4 md:py-8 rounded-md text-center">
           <p className="py-2 font-bold text-xl underline">Time</p>
           <p className="font-medium text-lg">{`${getDate(
-            channel.startTime,
-          )} - ${getDate(channel.endTime)}`}</p>
+
+            channel?.startTime,
+          )} - ${getDate(channel?.endTime)}`}</p>
+
         </div>
       </Box>
 
