@@ -15,6 +15,9 @@ import {
   Avatar,
   ListItemButton,
   ListItemText,
+  Menu,
+  MenuItem,
+  Popover,
   Tooltip,
 } from '@mui/material'
 import Participants from '../eventcomponents/participants'
@@ -51,11 +54,35 @@ export default function SidebarNav(props: Props) {
   const [channel, setChannel] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
-  const user = useUserStore((state) => state.user)
+  var user = useUserStore((state) => state.user)
   const [renderList, setRenderList] = useState('Home')
   const event = useEventStore((state) => state.event)
   const [channels, setChannels] = useState([])
   const [selectedChannelId, setSelectedChannelId] = useState()
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
+  const open = Boolean(anchorEl)
+  const id = open ? 'simple-popover' : undefined
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    handleClose()
+    // Ye vala section dekhlo
+    user = null
+    navigate('/')
+  }
+
+  const handleBackToEvents = () => {
+    handleClose()
+    navigate('/allevents')
+  }
+
   const fetchChannelDetails = async () => {
     try {
       const res = await callApi('/event/list', 'POST', {
@@ -324,14 +351,41 @@ export default function SidebarNav(props: Props) {
                 </Avatar>
               </ListItem>
             </Tooltip>
+            {/* Profile */}
+            <Tooltip title={'Logout'}>
+              <ListItem
+                className="bottom-0 flex"
+                aria-describedby={id}
+                variant="contained"
+              >
+                <Avatar
+                  src={user.profilePic}
+                  className="cursor-pointer size-6"
+                  onClick={handleClick}
+                />
+
+                <Popover
+                  id={id}
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                >
+                  <div style={{ padding: '2px' }}>
+                    <MenuItem onClick={handleBackToEvents}>
+                      <span className="font-josefin">Back to All Events</span>
+                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>
+                      <span className="font-josefin">Logout</span>
+                    </MenuItem>
+                  </div>
+                </Popover>
+              </ListItem>
+            </Tooltip>
           </List>
-          <div className="bottom-0 flex">
-            <Avatar
-              src={user.profilePic}
-              sx={{ width: 50, height: 50 }}
-              className="cursor-pointer"
-            />
-          </div>
         </div>
         <Divider />
         {/** Home */}
