@@ -75,8 +75,7 @@ export default function SidebarNav(props: Props) {
 
   const handleLogout = () => {
     handleClose()
-    // Ye vala section dekhlo
-    user = null
+    localStorage.removeItem("token");
     navigate('/')
   }
 
@@ -211,7 +210,7 @@ export default function SidebarNav(props: Props) {
       </div>
       <Divider />
       <div className="flex mt-[60px] h-full">
-        <div className="left-2 z-10 fixed flex flex-col justify-between items-center my-2 overscroll-none">
+        <div className="left-2 z-10 fixed flex flex-col h-[89%] justify-between items-center my-2 overscroll-none">
           <List>
             {/* Dashboard */}
             {user && user.role === 'host' && (
@@ -386,41 +385,36 @@ export default function SidebarNav(props: Props) {
                 </Avatar>
               </ListItem>
             </Tooltip>
-            {/* Profile */}
-            <Tooltip title={'Logout'}>
-              <ListItem
-                className="bottom-0 flex"
-                aria-describedby={id}
-                variant="contained"
-              >
-                <Avatar
-                  src={user.profilePic}
-                  className="cursor-pointer size-6"
-                  onClick={handleClick}
-                />
-
-                <Popover
-                  id={id}
-                  open={open}
-                  anchorEl={anchorEl}
-                  onClose={handleClose}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                  }}
-                >
-                  <div style={{ padding: '2px' }}>
-                    <MenuItem onClick={handleBackToEvents}>
-                      <span className="font-josefin">Back to All Events</span>
-                    </MenuItem>
-                    <MenuItem onClick={handleLogout}>
-                      <span className="font-josefin">Logout</span>
-                    </MenuItem>
-                  </div>
-                </Popover>
-              </ListItem>
-            </Tooltip>
           </List>
+          {/* Profile */}
+          <div>
+            <p onClick={handleClick}>
+              <Avatar
+                src={user?.profilePic}
+                className="cursor-pointer size-6"
+              />
+            </p>
+
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+            >
+              <div style={{ padding: '2px' }}>
+                <MenuItem onClick={handleBackToEvents}>
+                  <span className="font-josefin">Back to All Events</span>
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <span className="font-josefin">Logout</span>
+                </MenuItem>
+              </div>
+            </Popover>
+          </div>
         </div>
         <Divider />
         {/** Home */}
