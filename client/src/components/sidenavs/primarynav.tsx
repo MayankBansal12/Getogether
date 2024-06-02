@@ -27,8 +27,12 @@ import Budget from '../eventcomponents/budget'
 import PaymentHistory from '../eventcomponents/paymenthistory'
 import Default from './Default'
 import { formatDate, getDate } from '../../helpers/formatDate'
-import { useNavigate } from 'react-router-dom'
-import { useEventStore, useUserStore } from '../../global-store/store'
+import { useNavigate, useParams } from 'react-router-dom'
+import {
+  useChannelStore,
+  useEventStore,
+  useUserStore,
+} from '../../global-store/store'
 import Chat from '../chat'
 import CalenderEvent from '../calenderevent'
 import Groups from '../groupchatDefault'
@@ -41,6 +45,8 @@ import EventSettings from '../event-settings'
 import EventPhotos from '../event-photos'
 import ChatDefault from '../chatDefault'
 import BookTableForm from '../booktable_form'
+import { ChannelType, EventType } from '../../global-types/model'
+import GroupChat from '../groupChat'
 
 const drawerWidth = 350
 
@@ -52,16 +58,21 @@ export default function SidebarNav(props: Props) {
   const navigate = useNavigate()
   const { window } = props
   const callApi = useApi()
+  const { eventId } = useParams()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
-  const [channel, setChannel] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
-  var user = useUserStore((state) => state.user)
-  const [renderList, setRenderList] = useState('Home')
-  const event = useEventStore((state) => state.event)
-  const [channels, setChannels] = useState([])
-  const [selectedChannelId, setSelectedChannelId] = useState()
+  const user = useUserStore((state) => state.user)
+  const { event, setEvent } = useEventStore((state) => state)
+  const { channel, setChannel } = useChannelStore((state) => state)
+  const [renderList, setRenderList] = useState(
+    user.role === 'host' ? 'Dash' : 'Home',
+  )
+  const [selectedChannel, setSelectedChannel] = useState<ChannelType | null>(
+    null,
+  )
+  const [selectedGroupId, setSelectedGroupId] = useState<number>(0)
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
   const open = Boolean(anchorEl)
   const id = open ? 'simple-popover' : undefined
@@ -88,19 +99,31 @@ export default function SidebarNav(props: Props) {
   const fetchChannelDetails = async () => {
     try {
       const res = await callApi('/event/list', 'POST', {
-        eventId: Number(event.id),
+        eventId: Number(eventId),
         includeGroup: true,
       })
       if (res.status === 200) {
-        setChannels(res?.data?.events?.Channel)
+        setChannel(res?.data?.events?.Channel)
       }
     } catch (error) {
       console.log(error)
     }
   }
+
+  const getEventDetails = async () => {
+    const res = await callApi('/event/' + eventId, 'GET')
+    if (res) {
+      const eventDetails: EventType = res.data.event
+      console.log('Event details: ', eventDetails)
+      setEvent(eventDetails)
+      fetchChannelDetails()
+    }
+  }
+
   useEffect(() => {
+    getEventDetails()
     fetchChannelDetails()
-  }, [])
+  }, [eventId])
 
   const handleDash = () => {
     setRenderComponent('')
@@ -120,6 +143,7 @@ export default function SidebarNav(props: Props) {
   }
   const handleBookTable = () => {
     setRenderList('Book')
+    setRenderComponent('Book Table')
   }
   const handleDrawerClose = () => {
     setIsClosing(true)
@@ -136,9 +160,9 @@ export default function SidebarNav(props: Props) {
     }
   }
 
-  const handleChannelClick = (channelId) => {
-    // Update state to store the selected channel ID
-    setSelectedChannelId(channelId)
+  const handleChannelClick = (channel) => {
+    setSelectedChannel(channel)
+    setRenderComponent('Information')
   }
 
   const handleSettings = () => {
@@ -154,7 +178,8 @@ export default function SidebarNav(props: Props) {
       setRenderList('Dash')
     }
     console.log('User details: ', user)
-  }, [user])
+    console.log('channel: ', channel)
+  }, [])
 
   // Dashboard Items
   const dashlistitems = [
@@ -168,7 +193,7 @@ export default function SidebarNav(props: Props) {
           name: 'Celebrating',
           action: () => {
             setRenderComponent('Information')
-            setChannel('Celebrating')
+            // setChannel('Celebrating')
           },
         },
       ],
@@ -179,19 +204,6 @@ export default function SidebarNav(props: Props) {
       action: () => setRenderComponent('Payment History'),
     },
   ]
-  // List for DM delete this later
-  // const dmList = [
-  //   {
-  //     name: 'Saakshi',
-  //     joinedDate: 'Joined on 25th May, 2024',
-  //     action: () => setRenderComponent('Chat'),
-  //   },
-  //   {
-  //     name: 'Arghya',
-  //     joinedDate: 'Joined on 26th May, 2024',
-  //     action: () => setRenderComponent('Chat'),
-  //   },
-  // ]
 
   const drawer = (
     <div className="flex flex-col h-full font-josefin">
@@ -203,7 +215,7 @@ export default function SidebarNav(props: Props) {
           src={event?.image}
           className="border-2 border-primary-light rounded-xl w-[35px] md:w-[55px] h-[35px] md:h-[55px]"
           alt="event profile"
-        />{' '}
+        />
         <span className="font-bold text-2xl">{event?.name || 'Event'}</span>
       </div>
       <Divider />
@@ -316,6 +328,7 @@ export default function SidebarNav(props: Props) {
                 </Avatar>
               </ListItem>
             </Tooltip>
+
             {/* Book My table */}
             <Tooltip title="Book Table">
               <ListItem
@@ -384,14 +397,15 @@ export default function SidebarNav(props: Props) {
               </ListItem>
             </Tooltip>
           </List>
+
           {/* Profile */}
           <div>
-            <p onClick={handleClick}>
+            <button onClick={handleClick}>
               <Avatar
                 src={user?.profilePic}
                 className="cursor-pointer size-6"
               />
-            </p>
+            </button>
 
             <Popover
               id={id}
@@ -401,6 +415,10 @@ export default function SidebarNav(props: Props) {
               anchorOrigin={{
                 vertical: 'top',
                 horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
             >
               <div style={{ padding: '2px' }}>
@@ -415,43 +433,42 @@ export default function SidebarNav(props: Props) {
           </div>
         </div>
         <Divider />
+
         {/** Home */}
         <div className="ml-[50px] pl-4 w-full h-full font-josefin">
-          {user && user.role === 'host' && renderList === 'Home' && (
-            <List>
-              <ListItem className="bg-white font-medium text-lg">
-                <ListItemText
-                  onClick={() => setRenderComponent('Groups')}
-                  disableTypography={true}
-                >
-                  @ Celebrate {/* name of the sub event */}
-                </ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemButton># Announcements</ListItemButton>
-              </ListItem>
-              <ListItem>
-                <ListItemButton># General</ListItemButton>
-              </ListItem>
-              <ListItem>
-                <ListItemButton># Vendors</ListItemButton>
-              </ListItem>
-              <ListItem>
-                <ListItemButton># Photos</ListItemButton>
-              </ListItem>
-              <Divider className="m-0" />
-            </List>
-          )}
+          {renderList === 'Home' &&
+            channel?.map((item) => (
+              <List key={item.id}>
+                <ListItem className="bg-white font-medium text-lg">
+                  <ListItemText
+                    onClick={() => setRenderComponent('Groups')}
+                    disableTypography={true}
+                  >
+                    @ {item?.name?.toLowerCase()}
+                  </ListItemText>
+                </ListItem>
+                {item?.GroupRelation?.map((group) => (
+                  <ListItem
+                    key={group.id}
+                    onClick={() => {
+                      setRenderComponent('GroupChat')
+                      setSelectedGroupId(group.id)
+                    }}
+                  >
+                    <ListItemButton>
+                      #{group?.Group?.name.toLowerCase()}
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+                <Divider className="m-0" />
+              </List>
+            ))}
           {/* Dashboard */}
-          {renderList === 'Dash' && (
+          {user && user.role === 'host' && renderList === 'Dash' && (
             <List>
-              {dashlistitems.map((item, index) => (
+              {dashlistitems?.map((item, index) => (
                 <ListItem key={index} className="bg-white font-medium text-lg">
                   {item.accordion ? (
-                    //               {channel && channel.length <= 0 ? (
-                    //   <div className="text-center">No sub events listed!</div>
-                    // ) : (
-                    //   channel?.map((item) => (
                     <Accordion className="!border-0 !shadow-none w-full">
                       <AccordionSummary
                         expandIcon={
@@ -476,13 +493,13 @@ export default function SidebarNav(props: Props) {
                         <p className="w-32">@ {item.name}</p>
                       </AccordionSummary>
                       <AccordionDetails>
-                        {channels.map((channel, index) => (
+                        {channel?.map((item, index) => (
                           <ListItemButton
                             key={index}
                             className="ml-3 w-54 font-josefin font-md text-black"
-                            onClick={() => handleChannelClick(channel.id)}
+                            onClick={() => handleChannelClick(item)}
                           >
-                            @ {channel.name}
+                            @ {item.name}
                           </ListItemButton>
                         ))}
                       </AccordionDetails>
@@ -499,8 +516,8 @@ export default function SidebarNav(props: Props) {
           {/** Chat List */}
           {renderList === 'Dm' && (
             <List>
-              {event.EventParticipant.length > 0 ? (
-                event.EventParticipant.map((item, index) => (
+              {event?.EventParticipant?.length > 0 ? (
+                event?.EventParticipant?.map((item, index) => (
                   <React.Fragment key={index}>
                     <ListItem className="bg-white font-medium text-lg">
                       <ListItemButton
@@ -695,15 +712,19 @@ export default function SidebarNav(props: Props) {
           <Subevents channels={event.Channel} />
         )}
         {rendercomponent === 'Information' && (
-          <SingleSubEvent channelId={selectedChannelId} />
+          <SingleSubEvent channel={selectedChannel} />
         )}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
         {rendercomponent === 'Chat' && renderList === 'Dm' && (
           <Chat selectedUser={selectedUser} isGroup={false} />
         )}
-        {renderList === 'Book' && rendercomponent === '' && <BookTable />}
-        {rendercomponent === 'Table Arrangements' && <BookTableForm />}
+        {rendercomponent === 'Book Table' && renderList === 'Book' && (
+          <BookTable />
+        )}
+        {rendercomponent === 'Table Arrangements' && renderList === 'Book' && (
+          <BookTableForm />
+        )}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent />
         )}
