@@ -49,7 +49,7 @@ interface EventParticipantType {
   id: number
   eventId: number
   userId: number
-  createdAt: Date
+  createdDate: Date
   role: string
   status: number
   Event: EventType
@@ -94,7 +94,10 @@ interface GroupMessageType {
   id: number
   groupId: number
   senderId: number
+  senderName: string
+  senderAvatar: string
   message: string
+  time: Date
   photos: string
   Group: IGroup
   SenderChannelParticipant: ChannelParticipantType

@@ -1,4 +1,4 @@
-export const formatDate = (startTime: Date, endTime: Date) => {
+export const formatDate = (startTime: Date | string, endTime: Date | string) => {
     const currentDate = new Date();
     const start = new Date(startTime);
     const end = new Date(endTime);
@@ -47,7 +47,7 @@ export const formatDate = (startTime: Date, endTime: Date) => {
     return start.toLocaleDateString('en-GB', options);
 }
 
-export const numericDate = (timestamp: string) => {
+export const numericDate = (timestamp: string | Date) => {
     let date = new Date(timestamp)
 
     let months = [
@@ -72,14 +72,14 @@ export const numericDate = (timestamp: string) => {
     return `${day} ${monthName} ${year}`
 }
 
-export const formatTime = (date: string) => {
+export const formatTime = (date: string | Date) => {
     const now = new Date(date)
     const hours = now.getHours().toString().padStart(2, '0')
     const minutes = now.getMinutes().toString().padStart(2, '0')
     return `${hours}:${minutes}`
 }
 
-export const getDate = (date: Date) => {
+export const getDate = (date: string | Date) => {
     date = new Date(date);
     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
     return date.toLocaleDateString('en-GB', options);

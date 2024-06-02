@@ -130,6 +130,7 @@ model Group {
   name          String
   desc          String
   eventId       Int
+  createdDate   DateTime        @default(now())
   GroupRelation GroupRelation[]
   GroupMessage  GroupMessage[]
 }
@@ -140,6 +141,9 @@ model GroupMessage {
   senderId                 Int
   message                  String
   photos                   String
+  senderName               String
+  senderAvatar             String
+  time                     DateTime           @default(now())
   Group                    Group              @relation(fields: [groupId], references: [id])
   SenderChannelParticipant ChannelParticipant @relation(fields: [senderId], references: [id])
 }
