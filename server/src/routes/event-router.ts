@@ -161,10 +161,10 @@ router.post('/list', async (req: Request, res: Response) => {
             ChannelParticipant: true,
             GroupRelation: includeGroup
               ? {
-                include: {
-                  Group: true,
-                },
-              }
+                  include: {
+                    Group: true,
+                  },
+                }
               : false,
           },
         },
@@ -286,13 +286,11 @@ router
         },
       })
 
-      return res
-        .status(200)
-        .json({
-          message: 'Role for the user fetched!',
-          role: participant.role,
-          participant,
-        })
+      return res.status(200).json({
+        message: 'Role for the user fetched!',
+        role: participant.role,
+        participant,
+      })
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Failed to get user role' })
@@ -333,13 +331,40 @@ router.post(
     }
 
     try {
-      const participant = await prisma.eventParticipant.findFirstOrThrow({
-        where: { userId: Number(req.user.id), eventId: Number(eventId) },
-      })
+      // const participant = await prisma.eventParticipant.findFirstOrThrow({
+      //   where: { userId: Number(req.user.id), eventId: Number(eventId) },
+      // })
 
-      if (!participant) {
+      // if (!participant) {
+      //   return res.status(500).json({ error: 'User unauthorized!' })
+      // }
+
+      // const newChannel = await prisma.channel.create({
+      //   data: {
+      //     eventId,
+      //     name,
+      //     venue,
+      //     desc,
+      //     startTime: new Date(startTime),
+      //     endTime: new Date(endTime),
+      //   },
+      // })
+
+      // const hostParticipant = await prisma.channelParticipant.create({
+      //   data: {
+      //     channelId: Number(newChannel.id),
+      //     participantId: Number(participant.id),
+      //   },
+      // })
+
+      const eventPart = await prisma.eventParticipant.findFirst({
+        where: {
+          userId: req.user.id,
+          eventId: Number(eventId),
+        },
+      })
+      if (!eventPart)
         return res.status(500).json({ error: 'User unauthorized!' })
-      }
 
       const newChannel = await prisma.channel.create({
         data: {
@@ -349,13 +374,15 @@ router.post(
           desc,
           startTime: new Date(startTime),
           endTime: new Date(endTime),
-        },
-      })
-
-      const hostParticipant = await prisma.channelParticipant.create({
-        data: {
-          channelId: Number(newChannel.id),
-          participantId: Number(participant.id),
+          ChannelParticipant: {
+            create: {
+              EventParticipant: {
+                connect: {
+                  id: eventPart.id,
+                },
+              },
+            },
+          },
         },
       })
 
@@ -418,9 +445,9 @@ router
           Budget: true,
           EventTable: {
             include: {
-              SingleTable: true
-            }
-          }
+              SingleTable: true,
+            },
+          },
         },
       })
 
