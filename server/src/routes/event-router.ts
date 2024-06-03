@@ -488,7 +488,7 @@ router.post(
 )
 
 // /event/participants -> Fetching all events participants
-router.get('/participants', async (req: Request, res: Response) => {
+router.route('/participants').get(async (req: Request, res: Response) => {
   const { eventId } = req.query
 
   try {
@@ -514,6 +514,26 @@ router.get('/participants', async (req: Request, res: Response) => {
     console.error(error)
     res.status(500).json({ error: 'Failed to fetch event participants' })
   }
+}).post(async (req: Request, res: Response) => {
+  const { eventId, role } = req.body;
+
+  try {
+    const participants = await prisma.eventParticipant.findMany({
+      where: {
+        eventId: parseInt(eventId),
+        role: role,
+      },
+      include: {
+        User: true,
+      },
+    });
+
+    res.status(200).json({ messsage: 'Event Participants fetched!', participants })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching participants.' });
+  }
+
 })
 
 // /event/details -> For fetching basic event details
@@ -539,6 +559,55 @@ router.post("/details", async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch event details' })
   }
 })
+
+// /event/budget -> For reading, updating budget details in a event
+router.route("/budget")
+  .post(async (req: Request, res: Response) => {
+    const { eventId } = req.body;
+    try {
+      const budget = await prisma.budget.findUnique({
+        where: { eventId: parseInt(eventId) },
+      });
+      if (budget) {
+        res.status(200).json({ message: "Fetched the budget details!", budget });
+      } else {
+        res.status(404).json({ error: 'Budget not found!' });
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  })
+  .put(async (req: Request, res: Response) => {
+    const { totalAmount, eventId } = req.body;
+
+    try {
+      // Check if the budget for the event already exists
+      const existingBudget = await prisma.budget.findUnique({
+        where: { eventId: parseInt(eventId) },
+      });
+
+      if (existingBudget) {
+        // Update existing budget
+        const updatedBudget = await prisma.budget.update({
+          where: { eventId: parseInt(eventId) },
+          data: { totalAmount },
+        });
+        res.status(201).json({ message: "Updated the budget details!", budget: updatedBudget });
+      } else {
+        // Create new budget
+        const newBudget = await prisma.budget.create({
+          data: {
+            eventId: parseInt(eventId),
+            totalAmount,
+            spent: 0,
+          },
+        });
+        res.status(201).json({ message: "Updated the budget details!", budget: newBudget });
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  })
 
 // /event/:eventId -> For fetching, editing, deleting event details with that id
 router
@@ -603,7 +672,7 @@ router
         where: { id: Number(eventId) },
       })
 
-      res.status(204).send()
+      res.status(204).json({ message: "Deleted the payment record!" })
     } catch (error) {
       console.error(error)
       res.status(500).json({ error: 'Failed to delete event' })

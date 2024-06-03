@@ -18,6 +18,21 @@ interface BudgetType {
   spent: number
 }
 
+type NameType = {
+  name: string
+}
+interface PaymentType {
+  id: number,
+  amount: number,
+  date: Date,
+  payerId: number,
+  payeeId: number,
+  eventId: number,
+  status: number,
+  Payer: NameType,
+  Payee: NameType,
+}
+
 interface EventTableType {
   id: number,
   tableId: number,
@@ -111,4 +126,4 @@ interface ChannelParticipantType {
   EventParticipant: EventParticipantType
 }
 
-export { UserType, EventType, ChannelType, BudgetType, GroupRelationType, GroupType, GroupMessageType, ChannelParticipantType }
+export { UserType, EventType, ChannelType, BudgetType, PaymentType, GroupRelationType, GroupType, GroupMessageType, ChannelParticipantType }
