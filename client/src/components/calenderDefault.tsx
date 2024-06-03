@@ -25,6 +25,9 @@ const CalenderDefault = () => {
         <p className="py-4 font-medium text-center text-dull text-lg underline">
           This is the Event Schedule section for your event.
         </p>
+        <p className="font-medium text-dull text-xl">
+          Click on the Subevent inorder to read the details.
+        </p>
       </div>
     </React.Fragment>
   )
