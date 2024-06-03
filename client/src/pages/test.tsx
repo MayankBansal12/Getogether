@@ -12,7 +12,7 @@ interface ImageEvent {
 
 const Test = (props: Props) => {
   const [ImgUrl, setImgUrl] = useState('')
-  const BACKEND_URL = import.meta.env.VITE_SERVER
+  const BACKEND_URL = import.meta.env.VITE_SERVER || 'http://localhost:5000'
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement> & ImageEvent,

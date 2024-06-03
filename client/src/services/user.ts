@@ -2,7 +2,7 @@ import { useUserStore } from '../global-store/store'
 import { LoginEvent, SignupEvent } from '../pages/auth/auth'
 import ImageHelper from './image'
 
-const BACKEND = import.meta.env.VITE_SERVER
+const BACKEND = import.meta.env.VITE_SERVER || 'http://localhost:5000'
 
 interface AuthSuccess {
   success: boolean

@@ -2,7 +2,12 @@
 /* eslint-disable prefer-const */
 import React, { useRef, useEffect, useState } from 'react'
 import { Avatar, Button, Modal } from '@mui/material'
-import { Send, ArrowDownward, AttachFile, HighlightOff } from '@mui/icons-material'
+import {
+  Send,
+  ArrowDownward,
+  AttachFile,
+  HighlightOff,
+} from '@mui/icons-material'
 import { io } from 'socket.io-client'
 import ImageHelper from '../services/image'
 import { useUserStore } from '../global-store/store'
@@ -11,13 +16,13 @@ import useApi from '../hooks/use-api'
 import { formatTime, numericDate } from '../helpers/formatDate'
 import { stringAvatar } from '../helpers/avatar'
 
-const BACKEND_URL = import.meta.env.VITE_SERVER;
+const BACKEND_URL = import.meta.env.VITE_SERVER || 'http://localhost:5000'
 
 export default function Chat({ selectedUser, isGroup, groupId = null }) {
   const [socket, setSocket] = useState(null)
   const callApi = useApi()
-  const { eventId } = useParams();
-  const { user } = useUserStore(state => state);
+  const { eventId } = useParams()
+  const { user } = useUserStore((state) => state)
   const [participant, setParticipant] = useState(null)
   const [messages, setMessages] = useState<any[]>([])
   const [message, setMessage] = useState('')
@@ -44,78 +49,88 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
 
   // Join room in case of user, group connects
   useEffect(() => {
-    console.log("selected user: ", selectedUser);
+    console.log('selected user: ', selectedUser)
 
     if (selectedUser) {
-      setParticipant({ ...selectedUser.user, "participantId": selectedUser.participantId });
+      setParticipant({
+        ...selectedUser.user,
+        participantId: selectedUser.participantId,
+      })
     }
 
     if (socket) {
-      let roomId = '';
+      let roomId = ''
       const handleMessage = (newMessage) => {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      };
+        setMessages((prevMessages) => [...prevMessages, newMessage])
+      }
 
       if (isGroup) {
-        socket.emit('join-group', { userId: user.id, groupId: groupId });
-        socket.on('message', handleMessage);
+        socket.emit('join-group', { userId: user.id, groupId: groupId })
+        socket.on('message', handleMessage)
 
         return () => {
-          socket.off('message', handleMessage);
-          socket.emit('leave-group', { userId: user.id, groupId: groupId });
-        };
+          socket.off('message', handleMessage)
+          socket.emit('leave-group', { userId: user.id, groupId: groupId })
+        }
       } else {
         if (!selectedUser) {
-          console.log("can't connect!");
-          return;
+          console.log("can't connect!")
+          return
         }
 
-        let userId1 = Number(user.id);
-        let userId2 = Number(selectedUser.user.id);
+        let userId1 = Number(user.id)
+        let userId2 = Number(selectedUser.user.id)
 
-        roomId = userId1 < userId2 ? `${userId1}_${eventId}_${userId2}` : `${userId2}_${eventId}_${userId1}`;
+        roomId =
+          userId1 < userId2
+            ? `${userId1}_${eventId}_${userId2}`
+            : `${userId2}_${eventId}_${userId1}`
 
-        console.log('trying to connect with room id: ', roomId);
-        socket.emit("join-dm", { roomId: roomId });
-        socket.on('newDirectMessage', handleMessage);
+        console.log('trying to connect with room id: ', roomId)
+        socket.emit('join-dm', { roomId: roomId })
+        socket.on('newDirectMessage', handleMessage)
 
         return () => {
-          socket.off('newDirectMessage', handleMessage);
-          socket.emit('leave-dm', { roomId: roomId });
-        };
+          socket.off('newDirectMessage', handleMessage)
+          socket.emit('leave-dm', { roomId: roomId })
+        }
       }
     } else {
-      console.log('Error connecting socket!');
+      console.log('Error connecting socket!')
     }
 
     return () => {
-      setMessage('');
-      setMessages([]);
-    };
-  }, [socket, selectedUser]);
+      setMessage('')
+      setMessages([])
+    }
+  }, [socket, selectedUser])
 
   // Fetch new messages
   const fetchMessages = async () => {
-    const userId = user?.id;
-    const participantId = participant?.id;
+    const userId = user?.id
+    const participantId = participant?.id
     if (!userId || !participantId) {
-      console.log("Error fetching emssages");
-      return;
+      console.log('Error fetching emssages')
+      return
     }
     try {
-      const res = await callApi("/user/messages", "POST", { eventId: Number(eventId), userId, participantId });
+      const res = await callApi('/user/messages', 'POST', {
+        eventId: Number(eventId),
+        userId,
+        participantId,
+      })
       if (res.status === 200) {
-        console.log(res.data);
+        console.log(res.data)
         setMessages(res.data.messages)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
   // Fetch new messages whenever participant or user changes
   useEffect(() => {
-    fetchMessages();
+    fetchMessages()
   }, [user, participant])
 
   // Scroll to bottom whenever messages changes!
@@ -124,10 +139,20 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
   }, [messages])
 
   // Send message func
-  const sendMessage = (senderId: number, participantId: number, photoLink = '') => {
+  const sendMessage = (
+    senderId: number,
+    participantId: number,
+    photoLink = '',
+  ) => {
     if (!socket || !senderId || !participantId) {
-      console.log("Error sending message ", "senderId: ", senderId, " particid: ", participantId);
-      console.log(participant);
+      console.log(
+        'Error sending message ',
+        'senderId: ',
+        senderId,
+        ' particid: ',
+        participantId,
+      )
+      console.log(participant)
       return
     }
     if (isGroup) {
@@ -144,7 +169,10 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
         receiverId: participantId,
         message,
         photoLink: photoLink,
-        roomId: senderId < participantId ? `${senderId}_${eventId}_${participantId}` : `${participantId}_${eventId}_${senderId}`
+        roomId:
+          senderId < participantId
+            ? `${senderId}_${eventId}_${participantId}`
+            : `${participantId}_${eventId}_${senderId}`,
       })
     }
     setMessage('')
@@ -164,7 +192,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
   const handleScroll = () => {
     if (
       chatContainerRef.current?.scrollHeight -
-      Math.ceil(chatContainerRef.current?.scrollTop) <=
+        Math.ceil(chatContainerRef.current?.scrollTop) <=
       chatContainerRef.current?.clientHeight
     ) {
       setShowScroll(false)
@@ -175,17 +203,15 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
 
   const showAvatar = (senderId: number) => {
     if (senderId === user.id) {
-      console.log(user);
+      console.log(user)
       if (!user.profilePic || user.profilePic === '')
         return <Avatar {...stringAvatar(user.name)} />
-      else
-        return <Avatar src={user.profilePic} />;
+      else return <Avatar src={user.profilePic} />
     } else {
-      console.log(participant);
+      console.log(participant)
       if (!participant.profilePic || participant.profilePic === '')
         return <Avatar {...stringAvatar(participant.name)} />
-      else
-        return <Avatar src={participant.profilePic} />;
+      else return <Avatar src={participant.profilePic} />
     }
   }
 
@@ -200,7 +226,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
       lastDate = messageDate
       lastSender = item.senderId
 
-      console.log("last Date ", lastDate, " messagDate: ", messageDate)
+      console.log('last Date ', lastDate, ' messagDate: ', messageDate)
 
       return (
         <div key={item.id}>
@@ -217,7 +243,9 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
           {(showSender || showDate) && (
             <div className="flex items-center gap-2 mt-4">
               {showAvatar(item.senderId)}
-              <p className="font-medium text-[18px]">{item.senderId === user.id ? user.name : participant.name} </p>
+              <p className="font-medium text-[18px]">
+                {item.senderId === user.id ? user.name : participant.name}{' '}
+              </p>
             </div>
           )}
 
@@ -248,14 +276,14 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
     try {
       const base64Img = await ImageHelper.ConvertBase64(img)
       setImageUrl(base64Img as string)
-      handleOpenPreview();
+      handleOpenPreview()
     } catch (error) {
-      console.log("Error encoding image: ", error)
+      console.log('Error encoding image: ', error)
     }
   }
 
   return (
-    <div className="flex flex-col h-[85vh] relative">
+    <div className="relative flex flex-col h-[85vh]">
       <div
         className="flex-1 p-4 overflow-auto"
         ref={chatContainerRef}
@@ -269,8 +297,17 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
           className="flex justify-center items-center"
         >
           <div className="relative">
-            <img src={showPhoto} alt="img" className="max-w-[500px] max-h-[500px] lg:max-w-[1000px] lg:max-h-[1000px]" />
-            <button className="absolute right-1 top-1 text-gray-300" onClick={handleClose}><HighlightOff /></button>
+            <img
+              src={showPhoto}
+              alt="img"
+              className="max-w-[500px] lg:max-w-[1000px] max-h-[500px] lg:max-h-[1000px]"
+            />
+            <button
+              className="top-1 right-1 absolute text-gray-300"
+              onClick={handleClose}
+            >
+              <HighlightOff />
+            </button>
           </div>
         </Modal>
 
@@ -280,15 +317,25 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
           className="flex flex-col justify-center items-center"
         >
           <div className="relative">
-            <img src={imageUrl} alt="img" className="max-w-[500px] max-h-[500px] lg:max-w-[950px] lg:max-h-[950px]" />
-            <button className="absolute right-3 bottom-3 bg-primary-light text-white rounded-full p-2 flex items-center justify-center" onClick={() => sendMessage(user?.id, participant?.id, imageUrl)}><Send /></button>
+            <img
+              src={imageUrl}
+              alt="img"
+              className="max-w-[500px] lg:max-w-[950px] max-h-[500px] lg:max-h-[950px]"
+            />
+            <button
+              className="right-3 bottom-3 absolute flex justify-center items-center bg-primary-light p-2 rounded-full text-white"
+              onClick={() => sendMessage(user?.id, participant?.id, imageUrl)}
+            >
+              <Send />
+            </button>
           </div>
         </Modal>
       </div>
       {showScroll && (
         <button
-          className="absolute right-2 w-8 bottom-16 bg-gray-200 p-1 rounded-full"
-          onClick={scrollToBottom}>
+          className="right-2 bottom-16 absolute bg-gray-200 p-1 rounded-full w-8"
+          onClick={scrollToBottom}
+        >
           <ArrowDownward />
         </button>
       )}
