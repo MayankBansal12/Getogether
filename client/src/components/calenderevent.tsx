@@ -1,15 +1,8 @@
-import React from 'react'
-import monkey from '../assets/monkey.png'
-import bday from '../assets/bday.png'
-import EventBox from '../components/eventcomponents/eventbox'
-import Button from '../components/button'
 import { useNavigate } from 'react-router-dom'
-import { Box, Divider } from '@mui/material'
+import { Box } from '@mui/material'
 import { getDate } from '../helpers/formatDate'
 
-// This is where the user will be redirected after login
 const CalenderEvent = ({ channel }) => {
-  const navigate = useNavigate()
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
       <Box
@@ -40,7 +33,6 @@ const CalenderEvent = ({ channel }) => {
         </div>
 
         <p className="font-xl text-black text-md">{channel?.desc}</p>
-
       </Box>
 
       <Box
@@ -59,6 +51,11 @@ const CalenderEvent = ({ channel }) => {
           )} - ${getDate(channel?.endTime)}`}</p>
 
         </div>
+      </Box>
+
+      <Box
+        className="flex flex-col my-8 px-4 md:px-8 py-8 rounded-md items-center">
+        <p>Google Maps Coming Soon!</p>
       </Box>
     </div>
   )

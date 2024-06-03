@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import Toolbar from '@mui/material/Toolbar'
+import monkey from '../../assets/monkey.png'
 import {
   Accordion,
   AccordionDetails,
@@ -15,7 +16,6 @@ import {
   Avatar,
   ListItemButton,
   ListItemText,
-  Menu,
   MenuItem,
   Popover,
   Tooltip,
@@ -54,6 +54,12 @@ type Props = {
   window?: () => Window
 }
 
+// todo :- keep a check of selected icon and selected item and 
+// highlight them so user can be sure which item is selected currently 
+
+// todo :- Ensure default page for every icon, especially for home and chat and for calender as well
+// todo :- Accordian for home items as well (similar to sub events in dash)
+
 export default function SidebarNav(props: Props) {
   const navigate = useNavigate()
   const { window } = props
@@ -63,11 +69,11 @@ export default function SidebarNav(props: Props) {
   const [isClosing, setIsClosing] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
-  const user = useUserStore((state) => state.user)
+  const { user, setUser } = useUserStore((state) => state)
   const { event, setEvent } = useEventStore((state) => state)
   const { channel, setChannel } = useChannelStore((state) => state)
   const [renderList, setRenderList] = useState(
-    user.role === 'host' ? 'Dash' : 'Home',
+    user.role === 'host' ? 'dash' : 'Home',
   )
   const [selectedChannel, setSelectedChannel] = useState<ChannelType | null>(
     null,
@@ -120,9 +126,20 @@ export default function SidebarNav(props: Props) {
     }
   }
 
+  const fetchUserRole = async (eventId: Number) => {
+    const res = await callApi('/event/user/role?eventId=' + eventId + '&userId=' + user.id)
+    if (res && res.data) {
+      const role: string = res.data.role
+      const participant = res.data.participant;
+
+      setUser({ ...user, role, "participantId": participant.id })
+    }
+  }
+
   useEffect(() => {
     getEventDetails()
     fetchChannelDetails()
+    fetchUserRole(Number(eventId))
   }, [eventId])
 
   const handleDash = () => {
@@ -179,8 +196,8 @@ export default function SidebarNav(props: Props) {
   }
 
   useEffect(() => {
-    if (user.role === 'host') {
-      setRenderList('Dash')
+    if (user.role === "host") {
+      handleDash();
     }
     console.log('User details: ', user)
     console.log('channel: ', channel)
@@ -198,7 +215,6 @@ export default function SidebarNav(props: Props) {
           name: 'Celebrating',
           action: () => {
             setRenderComponent('Information')
-            // setChannel('Celebrating')
           },
         },
       ],
@@ -208,6 +224,10 @@ export default function SidebarNav(props: Props) {
       name: 'Payment History',
       action: () => setRenderComponent('Payment History'),
     },
+    {
+      name: 'Table Arranagements',
+      action: () => setRenderComponent('Table Arrangements')
+    }
   ]
 
   const drawer = (
@@ -354,7 +374,10 @@ export default function SidebarNav(props: Props) {
             >
               <ListItem
                 className="bg-white cursor-pointer"
-                onClick={() => setRenderComponent('Photos')}
+                onClick={() => {
+                  setRenderComponent('Photos')
+                  setRenderList('photo')
+                }}
               >
                 <Avatar className="hover:bg-background-light rounded-full transition-colors duration-200">
                   <svg
@@ -407,7 +430,7 @@ export default function SidebarNav(props: Props) {
           <div>
             <button onClick={handleClick}>
               <Avatar
-                src={user?.profilePic}
+                src={user.profilePic || monkey}
                 className="cursor-pointer size-6"
               />
             </button>
@@ -468,6 +491,7 @@ export default function SidebarNav(props: Props) {
                 <Divider className="m-0" />
               </List>
             ))}
+
           {/* Dashboard */}
           {user && user.role === 'host' && renderList === 'Dash' && (
             <List>
@@ -518,6 +542,7 @@ export default function SidebarNav(props: Props) {
               ))}
             </List>
           )}
+
           {/** Chat List */}
           {renderList === 'Dm' && (
             <List>
@@ -534,13 +559,19 @@ export default function SidebarNav(props: Props) {
                           })
                         }}
                       >
-                        <p>
-                          <span>{item?.User?.name === user.name ? item?.User?.name + " (you)" : item?.User?.name}</span>
-                          <br />
-                          <span className="text-dull text-xs">
-                            Joined {getDate(item?.createdDate)}
-                          </span>
-                        </p>
+                        <div className="flex gap-2 items-center">
+                          <Avatar
+                            src={item?.User?.profilePic}
+                            sx={{ width: "50px", height: "50px" }}
+                          />
+                          <p>
+                            <span>{item?.User?.name === user.name ? item?.User?.name + " (you)" : item?.User?.name}</span>
+                            <br />
+                            <span className="text-dull text-xs">
+                              Joined {getDate(item?.createdDate)}
+                            </span>
+                          </p>
+                        </div>
                       </ListItemButton>
                     </ListItem>
                     <Divider />
@@ -551,6 +582,7 @@ export default function SidebarNav(props: Props) {
               )}
             </List>
           )}
+
           {/* calender */}
           {renderList === 'Calender' && (
             <List>
@@ -560,13 +592,12 @@ export default function SidebarNav(props: Props) {
                     <ListItemButton
                       onClick={() => setRenderComponent('Event Schedule')}
                     >
-                      <p className="text-center">
+                      <div className="flex flex-col gap-2 w-full items-center">
                         <span className="text-dull text-sm">
                           {formatDate(item.startTime, item.endTime)}
                         </span>
-                        <br />
                         <span className="text-md">{item.name}</span>
-                      </p>
+                      </div>
                     </ListItemButton>
                   </ListItem>
                   {index < event?.Channel?.length - 1 && <Divider />}
@@ -574,6 +605,7 @@ export default function SidebarNav(props: Props) {
               ))}
             </List>
           )}
+
           {/* Settings */}
           {renderList === 'Settings' && (
             <List>
@@ -600,14 +632,28 @@ export default function SidebarNav(props: Props) {
               </ListItem>
             </List>
           )}
+
           {/* BookTable */}
           {renderList === 'Book' && (
             <List>
               <ListItem className="bg-white font-medium text-lg">
                 <ListItemButton
-                  onClick={() => setRenderComponent('Table Arrangements')}
+                  onClick={() => setRenderComponent('Book Table')}
                 >
-                  Table Arrangements
+                  Book My Table
+                </ListItemButton>
+              </ListItem>
+            </List>
+          )}
+
+          {/* Photos section */}
+          {renderList === 'photo' && (
+            <List>
+              <ListItem className="bg-white font-medium text-lg">
+                <ListItemButton
+                  onClick={() => setRenderComponent('Photos')}
+                >
+                  Upload/Access Photos
                 </ListItemButton>
               </ListItem>
             </List>
@@ -727,7 +773,7 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === 'Book Table' && renderList === 'Book' && (
           <BookTable />
         )}
-        {rendercomponent === 'Table Arrangements' && renderList === 'Book' && (
+        {rendercomponent === 'Table Arrangements' && renderList === 'Dash' && (
           <BookTableForm />
         )}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
