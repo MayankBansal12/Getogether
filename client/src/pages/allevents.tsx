@@ -6,7 +6,7 @@ import Button from '../components/button'
 import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../global-store/store'
 
-const BACKEND = import.meta.env.VITE_SERVER
+const BACKEND = import.meta.env.VITE_SERVER || 'http://localhost:5000'
 
 interface SingleEvent {
   id: number

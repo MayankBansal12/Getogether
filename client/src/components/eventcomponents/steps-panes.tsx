@@ -1,4 +1,3 @@
-
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import Stepper from '@mui/material/Stepper'
@@ -10,7 +9,7 @@ import useAlert from '../../hooks/use-alert'
 import useSnackbar from '../../hooks/use-snackbar'
 import { useNavigate } from 'react-router-dom'
 
-const BACKEND = import.meta.env.VITE_SERVER
+const BACKEND = import.meta.env.VITE_SERVER || 'http://localhost:5000'
 
 interface Props {
   subEvents: { name: string; venue: string; startTime: Date; endTime: Date }[]
@@ -116,8 +115,8 @@ export default function StepsPanes({
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
         ? // It's the last step, but not all steps have been completed,
-        // find the first step that has been completed
-        subEvents.findIndex((step, i) => !(i in completed))
+          // find the first step that has been completed
+          subEvents.findIndex((step, i) => !(i in completed))
         : activeStep + 1
     setActiveStep(newActiveStep)
 
@@ -164,7 +163,12 @@ export default function StepsPanes({
 
   return (
     <Box sx={{ width: '90%', height: '90%' }}>
-      <Stepper nonLinear activeStep={activeStep} alternativeLabel className="pt-2 pb-6">
+      <Stepper
+        nonLinear
+        activeStep={activeStep}
+        alternativeLabel
+        className="pt-2 pb-6"
+      >
         {subEvents.map((subEvent, index) => (
           <Step key={index} completed={completed[index]}>
             <StepButton color="inherit" onClick={handleStep(index)}>
@@ -175,18 +179,17 @@ export default function StepsPanes({
       </Stepper>
       <div className="h-[calc(100%-160px)]">
         {allStepsCompleted() ? (
-          <div className="flex flex-col h-full justify-center items-center">
+          <div className="flex flex-col justify-center items-center h-full">
             <h1>{eventData.name}</h1>
-            <h2>
-              Great job, Your event is being created...
-            </h2>
-            <h3>You will redirected to the event dashboard once completed...#hold up</h3>
+            <h2>Great job, Your event is being created...</h2>
+            <h3>
+              You will redirected to the event dashboard once completed...#hold
+              up
+            </h3>
           </div>
         ) : (
           <React.Fragment>
-            <h2 className="text-xl py-2">
-              {subEvents[activeStep].name}
-            </h2>
+            <h2 className="py-2 text-xl">{subEvents[activeStep].name}</h2>
             <Box
               sx={{
                 display: 'flex',
@@ -205,16 +208,16 @@ export default function StepsPanes({
                   px: 4,
                 }}
               >
-                <div className="flex flex-col w-full h-full justify-center gap-8">
+                <div className="flex flex-col justify-center gap-8 w-full h-full">
                   <div className="flex flex-col justify-center gap-2">
                     <label htmlFor="venue">Venue</label>
                     <input
                       type="text"
                       name="venue"
-                      placeholder='venue'
+                      placeholder="venue"
                       value={subEvents[activeStep].venue}
                       onChange={(e) => changeField(e.target.value, 'venue')}
-                      className="border-primary-light bg-background-light text-[18px] my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 focus:outline-none"
+                      className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 text-[18px] focus:outline-none"
                       required
                     />
                   </div>

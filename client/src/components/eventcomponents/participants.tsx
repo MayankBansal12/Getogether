@@ -1,17 +1,17 @@
 // This component is for the participants page. (On the host side)
 import React, { useState } from 'react'
 import { Box, Link, Avatar, Chip } from '@mui/material'
-import { ChatBubbleOutline } from '@mui/icons-material';
+import { ChatBubbleOutline } from '@mui/icons-material'
 import monkey from '../../assets/monkey.png'
 import { getDate } from '../../helpers/formatDate'
-import { redirect, useParams } from 'react-router-dom';
+import { redirect, useParams } from 'react-router-dom'
 
 const Participants = ({ participants }) => {
   const image = monkey
   const [open, setOpen] = useState(false)
   const [rotate, setRotate] = useState(false)
   const { eventId } = useParams()
-  const frontend = import.meta.env.VITE_CLIENT;
+  const frontend = import.meta.env.VITE_CLIENT
 
   const handleClick = () => {
     setOpen(!open)
@@ -48,8 +48,9 @@ const Participants = ({ participants }) => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className={`hover:bg-white px-2 py-2 rounded-full w-10 h-10 transition-transform duration-300 ${rotate ? 'rotate-45' : ''
-              }`}
+            className={`hover:bg-white px-2 py-2 rounded-full w-10 h-10 transition-transform duration-300 ${
+              rotate ? 'rotate-45' : ''
+            }`}
           >
             <path
               strokeLinecap="round"
@@ -64,7 +65,7 @@ const Participants = ({ participants }) => {
           <p className="py-4 text-3xl">Call your friends and family!! 📩</p>
           <p className="py-2 text-xl">You can share this invite link.</p>
           <Link className="py-2 text-xl wrap">
-            {frontend + "/join/event/" + eventId}
+            {frontend + '/join/event/' + eventId}
           </Link>
         </div>
       )}
@@ -73,12 +74,12 @@ const Participants = ({ participants }) => {
           display={'flex'}
           gap={2}
           key={participant.id}
-          className="flex md:flex-row flex-col gap-1 justify-between items-center bg-background-extralight my-2 md:px-4 py-3 text-center md:text-left rounded-md"
+          className="flex md:flex-row flex-col justify-between items-center gap-1 bg-background-extralight my-2 md:px-4 py-3 rounded-md text-center md:text-left"
         >
-          <div className="flex gap-3 items-center">
+          <div className="flex items-center gap-3">
             <Avatar
               src={participant?.User?.profilePic}
-              sx={{ width: "60px", height: "60px" }}
+              sx={{ width: '60px', height: '60px' }}
             />
             <div className="flex flex-col gap-1">
               <p className="flex gap-2">
@@ -92,7 +93,16 @@ const Participants = ({ participants }) => {
               </span>
             </div>
           </div>
-          {participant.status === 1 ? <ChatBubbleOutline className="text-gray-700 cursor-pointer" onClick={() => redirect("/")} /> : <p>{participant.status === 0 ? "Invite Pending" : "Invite Rejected"}</p>}
+          {participant.status === 1 ? (
+            <ChatBubbleOutline
+              className="text-gray-700 cursor-pointer"
+              onClick={() => redirect('/')}
+            />
+          ) : (
+            <p>
+              {participant.status === 0 ? 'Invite Pending' : 'Invite Rejected'}
+            </p>
+          )}
         </Box>
       ))}
     </div>
