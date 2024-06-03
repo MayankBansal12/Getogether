@@ -49,6 +49,7 @@ import { ChannelType, EventType } from '../../global-types/model'
 import GroupChat from '../groupChat'
 import useSnackbar from '../../hooks/use-snackbar'
 import useAlert from '../../hooks/use-alert'
+import CalenderDefault from '../calenderDefault'
 
 const drawerWidth = 350
 
@@ -186,12 +187,12 @@ export default function SidebarNav(props: Props) {
     handleListItemClick(null, null)
   }
   const handleDm = () => {
-    setRenderComponent('Chat')
+    setRenderComponent('Direct Message')
     setRenderList('Dm')
     handleListItemClick(null, null)
   }
   const handleCalender = () => {
-    setRenderComponent('Event Schedule')
+    setRenderComponent('')
     setRenderList('Calender')
     handleListItemClick(null, null)
   }
@@ -227,6 +228,8 @@ export default function SidebarNav(props: Props) {
 
   const handleSettings = () => {
     setRenderList('Settings')
+    setRenderComponent('')
+    setSelectedIndex(1)
   }
 
   const handlePaymentHistory = () => {
@@ -910,6 +913,9 @@ export default function SidebarNav(props: Props) {
         )}
         {rendercomponent === 'Budget' && <Budget />}
         {rendercomponent === 'Payment History' && <PaymentHistory />}
+        {rendercomponent === 'Direct Message' && renderList === 'Dm' && (
+          <ChatDefault />
+        )}
         {rendercomponent === 'Chat' && renderList === 'Dm' && (
           <Chat selectedUser={selectedUser} isGroup={false} />
         )}
@@ -918,6 +924,9 @@ export default function SidebarNav(props: Props) {
         )}
         {rendercomponent === 'Table Arrangements' && renderList === 'Dash' && (
           <BookTableForm />
+        )}
+        {rendercomponent === '' && renderList === 'Calender' && (
+          <CalenderDefault />
         )}
         {rendercomponent === 'Event Schedule' && renderList === 'Calender' && (
           <CalenderEvent channel={selectedChannel} />
