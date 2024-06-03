@@ -54,8 +54,6 @@ const io = new Server(server, {
 })
 
 io.on('connection', (socket) => {
-  console.log('User connected!')
-
   // For personal messages
   // For connecting the dm with a user
   socket.on('join-dm', ({ roomId }) => {
@@ -100,13 +98,11 @@ io.on('connection', (socket) => {
   // For group messages
   // Join group with a unique groupId
   socket.on('join-group', async ({ userId, groupId }: JoinChannelPayload) => {
-    console.log('User with userId ', userId, ' connected in group: ', groupId)
     socket.join(groupId.toString())
   })
 
   // Leave group room
   socket.on('leave-group', ({ userId, groupId }) => {
-    console.log('User with userId ', userId, ' left group: ', groupId)
     socket.leave(groupId.toString())
   })
 
