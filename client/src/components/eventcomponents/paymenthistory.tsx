@@ -1,6 +1,5 @@
 // this for the payment section on the host side
 import { TableHead, TableRow, TableCell, TableBody, Table, Modal, Box, Avatar } from '@mui/material'
-import { ListItemDecorator, Select, Option, Typography } from '@mui/joy';
 import Button from '../button'
 import { usePaymentStore, useUserStore } from '../../global-store/store'
 import { getDate } from '../../helpers/formatDate';

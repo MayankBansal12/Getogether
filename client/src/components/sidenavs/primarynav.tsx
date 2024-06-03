@@ -70,15 +70,13 @@ export default function SidebarNav(props: Props) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
-  const [rendercomponent, setRenderComponent] = useState('')
+  const [rendercomponent, setRenderComponent] = useState('Groups')
   const [setAlert, closeAlert] = useAlert()
   const { user, setUser } = useUserStore((state) => state)
   const { event, setEvent } = useEventStore((state) => state)
   const { channel, setChannel } = useChannelStore((state) => state)
   const setSnackbar = useSnackbar();
-  const [renderList, setRenderList] = useState(
-    user.role === 'host' ? 'dash' : 'Home',
-  )
+  const [renderList, setRenderList] = useState('Home')
   const [selectedChannel, setSelectedChannel] = useState<ChannelType | null>(
     null,
   )
@@ -150,6 +148,7 @@ export default function SidebarNav(props: Props) {
           getEventDetails()
           fetchChannelDetails()
           setUser({ ...user, role, participantId: participant.id });
+          if (role === "host") handleDash()
         }
       }
     } catch (error) {
@@ -212,14 +211,6 @@ export default function SidebarNav(props: Props) {
   const handlePaymentHistory = () => {
     setRenderComponent('Payment History')
   }
-
-  useEffect(() => {
-    if (user.role === "host") {
-      handleDash();
-    }
-    console.log('User details: ', user)
-    console.log('channel: ', channel)
-  }, [])
 
   // Dashboard Items
   const dashlistitems = [
@@ -651,13 +642,13 @@ export default function SidebarNav(props: Props) {
                   User Settings
                 </ListItemButton>
               </ListItem>
-              <ListItem className="bg-white font-medium text-lg">
+              {user.role === "host" && <ListItem className="bg-white font-medium text-lg">
                 <ListItemButton
                   onClick={() => setRenderComponent('Event Settings')}
                 >
                   Event Settings
                 </ListItemButton>
-              </ListItem>
+              </ListItem>}
             </List>
           )}
 
