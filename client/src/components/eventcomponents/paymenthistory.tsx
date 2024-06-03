@@ -233,8 +233,8 @@ export default function PaymentHistory() {
                   className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 w-4/5 text-[18px] focus:outline-none"
                   value={record.payeeId} onChange={(e) => setRecord((prev) => ({ ...prev, payeeId: Number(e.target.value) }))}>
                   <option value={0} disabled>Select an option</option>
-                  {vendors && vendors.map((data) => (
-                    <option value={data?.User?.id} key={data.id}>{data?.User?.name}</option>
+                  {vendors && vendors.map((data, i) => (
+                    <option value={data?.User?.id} key={i}>{data?.User?.name}</option>
                   ))}
                 </select>
               </div>
@@ -327,8 +327,8 @@ export default function PaymentHistory() {
           <TableBody>
             {payment?.length === 0 ? <div className="text-center">No Payments record to show!</div>
               :
-              payment?.map((item) => (
-                <TableRow key={item.id} className="dark:border-gray-800 border-b">
+              payment?.map((item, i) => (
+                <TableRow key={i} className="dark:border-gray-800 border-b">
                   <TableCell className="px-4 py-3 text-sm">
                     {getDate(item?.date)}
                   </TableCell>
