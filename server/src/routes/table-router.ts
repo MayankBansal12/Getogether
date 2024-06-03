@@ -6,24 +6,32 @@ const router = Router();
 // /table/setup -> Route to create or update the EventTable for an event
 router.post('/setup', async (req: Request, res: Response) => {
     const { eventId, totalRow, totalCol, tableSize } = req.body;
+    const bookTable = req.body.bookTable === 'true';
 
     try {
         const eventTable = await prisma.eventTable.upsert({
             where: { eventId },
             update: {
-                total_row: totalRow,
-                total_col: totalCol,
-                table_size: tableSize,
+                total_row: parseInt(totalRow),
+                total_col: parseInt(totalCol),
+                table_size: parseInt(tableSize),
             },
             create: {
                 eventId,
-                total_row: totalRow,
-                total_col: totalCol,
-                table_size: tableSize,
+                total_row: parseInt(totalRow),
+                total_col: parseInt(totalCol),
+                table_size: parseInt(tableSize),
             },
+        });
+        await prisma.event.update({
+            where: { id: eventId },
+            data: {
+                bookTable: bookTable
+            }
         });
         res.status(201).json({ message: "Table setup completed!", table: eventTable });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "Error setting up the table!", error: error.message });
     }
 });

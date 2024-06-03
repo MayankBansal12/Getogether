@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { UserType, EventType, ChannelType } from '../global-types/model'
+import { UserType, EventType, ChannelType, PaymentType } from '../global-types/model'
 
 type UserStoreType = {
   user: UserType | null
@@ -14,6 +14,11 @@ type EventStoreType = {
 type ChannelStoreType = {
   channel: ChannelType[] | null
   setChannel: (channel: ChannelType[]) => void
+}
+
+type PaymentStoreType = {
+  payment: PaymentType[] | null
+  setPayment: (payment: PaymentType[]) => void
 }
 
 interface AlertStoreDataType {
@@ -57,6 +62,11 @@ const useChannelStore = create<ChannelStoreType>()((set) => ({
   setChannel: (state: ChannelType[]) => set({ channel: state }),
 }))
 
+const usePaymentStore = create<PaymentStoreType>()((set) => ({
+  payment: null,
+  setPayment: (state: PaymentType[]) => set({ payment: state }),
+}))
+
 // Alert Store
 const useAlertStore = create<AlertStoreType>((set) => ({
   open: false,
@@ -65,8 +75,8 @@ const useAlertStore = create<AlertStoreType>((set) => ({
   noSecondaryButton: false,
   primaryButton: 'Confirm',
   secondaryButton: 'Cancel',
-  primaryAction: () => {},
-  secondaryAction: () => {},
+  primaryAction: () => { },
+  secondaryAction: () => { },
   // A function that sets all the values except open
   setAlertStore: (alert: AlertStoreType) => set(alert),
   setOpen: (open: boolean) => set({ open }),
@@ -85,6 +95,7 @@ export {
   useUserStore,
   useEventStore,
   useChannelStore,
+  usePaymentStore,
   useAlertStore,
   useSnackbarStore,
 }

@@ -185,7 +185,7 @@ model Vendor {
 model Payment {
   id      Int  @id @default(autoincrement())
   amount  Int
-  date    Int
+  date    DateTime        @default(now())
   payerId Int
   payeeId Int
   eventId Int

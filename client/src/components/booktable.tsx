@@ -225,8 +225,8 @@ const BookTable = () => {
             </div>
               :
               <div className="grid justify-center items-center text-center grid-cols-3 gap-4 overflow-y-scroll">
-                {userTable.map(table => (
-                  <div className="flex flex-col gap-1" key={table.id}>
+                {userTable.map((table, i) => (
+                  <div className="flex flex-col gap-1" key={i}>
                     <span>Row No: {table?.row}</span>
                     <span>Col No: {table?.col}</span>
                     <button onClick={(e) => handleCancelTable(e, table?.row, table?.col)} className="bg-primary-light px-2 py-1 rounded-md text-white cursor-pointer">
@@ -239,15 +239,18 @@ const BookTable = () => {
           </div>
         </Modal>
       </div>
-      <div className="flex md:flex-row flex-col justify-center space-x-4">
-        {event?.EventTable?.table_size <= 0 ?
-          <p className="text-center font-medium text-lg">No tables to show!</p> :
-          <div className={`grid justify-center items-center text-center`}>
-            {generateGrid(event?.EventTable?.total_row, event?.EventTable?.total_col, event?.EventTable?.table_size)}
-          </div>
-        }
-      </div>
-
+      {event.bookTable ?
+        <div className="flex md:flex-row flex-col justify-center space-x-4">
+          {event?.EventTable?.table_size <= 0 ?
+            <p className="text-center font-medium text-lg">No tables to show!</p> :
+            <div className={`grid justify-center items-center text-center`}>
+              {generateGrid(event?.EventTable?.total_row, event?.EventTable?.total_col, event?.EventTable?.table_size)}
+            </div>
+          }
+        </div>
+        :
+        <div className="flex justify-center items-center h-1/2 font-medium text-xl">Host has disabled book table feature!</div>
+      }
       <Modal
         open={open}
         onClose={handleClose}

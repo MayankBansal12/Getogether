@@ -18,6 +18,7 @@ import userRouter from './routes/user-router'
 import tableRouter from "./routes/table-router"
 import authRouter from './routes/auth-router'
 import imageRouter from './routes/photo-test-route'
+import paymentRouter from './routes/payment-router'
 
 app.use('/user', userRouter)
 app.use('/event', eventRouter)
@@ -26,6 +27,7 @@ app.use('/channel', channelRouter)
 app.use("/table", tableRouter)
 app.use('/auth', authRouter)
 app.use('/image', imageRouter)
+app.use('/payment', paymentRouter)
 
 // Routes
 app.get('/', (req, res) => {
