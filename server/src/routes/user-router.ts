@@ -12,6 +12,28 @@ const router = Router()
 const SECRET_KEY = process.env.SECRET_KEY
 const flaskBackend = process.env.FLASK_BACKEND || 'http://localhost:6969'
 
+// Fetch call to the Flask backend to generate embeddings
+async function generateEmbeddings(image, imageName, newUser) {
+  try {
+    const response = await fetch(flaskBackend + '/generate_embeddings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image,
+        name: imageName,
+        id: newUser.id,
+      }),
+    })
+    if (!response.ok) {
+      console.error('Failed to generate embeddings:', response.statusText)
+    }
+  } catch (error) {
+    console.error('Error generating embeddings:', error)
+  }
+}
+
 // /user/login -> User login
 router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body
@@ -79,20 +101,10 @@ router.post('/signup', async (req: Request, res: Response) => {
     })
 
     const token = jwt.sign({ userId: newUser.id }, SECRET_KEY)
-
-    const data = fetch(flaskBackend + '/generate_embeddings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        image,
-        name: imageName,
-        id: newUser.id,
-      }),
-    })
-
     res.status(201).json({ message: 'User signed up successfully!', token })
+
+    generateEmbeddings(image, imageName, newUser)
+
   } catch (error) {
     console.log('\n==signup==\n', error)
     if (error.code === 'P2002') {

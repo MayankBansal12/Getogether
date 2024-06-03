@@ -47,6 +47,8 @@ import ChatDefault from '../chatDefault'
 import BookTableForm from '../booktable_form'
 import { ChannelType, EventType } from '../../global-types/model'
 import GroupChat from '../groupChat'
+import useSnackbar from '../../hooks/use-snackbar'
+import useAlert from '../../hooks/use-alert'
 
 const drawerWidth = 350
 
@@ -69,9 +71,11 @@ export default function SidebarNav(props: Props) {
   const [isClosing, setIsClosing] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const [rendercomponent, setRenderComponent] = useState('')
+  const [setAlert, closeAlert] = useAlert()
   const { user, setUser } = useUserStore((state) => state)
   const { event, setEvent } = useEventStore((state) => state)
   const { channel, setChannel } = useChannelStore((state) => state)
+  const setSnackbar = useSnackbar();
   const [renderList, setRenderList] = useState(
     user.role === 'host' ? 'dash' : 'Home',
   )
@@ -93,6 +97,7 @@ export default function SidebarNav(props: Props) {
 
   const handleLogout = () => {
     handleClose()
+    closeAlert()
     localStorage.removeItem('token')
     navigate('/')
   }
@@ -127,18 +132,31 @@ export default function SidebarNav(props: Props) {
   }
 
   const fetchUserRole = async (eventId: Number) => {
-    const res = await callApi('/event/user/role?eventId=' + eventId + '&userId=' + user.id)
-    if (res && res.data) {
-      const role: string = res.data.role
-      const participant = res.data.participant;
+    try {
+      const res = await callApi('/event/user/role?eventId=' + eventId + '&userId=' + user.id);
+      if (res && res.data) {
+        const { isParticipant, role, participant } = res.data;
 
-      setUser({ ...user, role, "participantId": participant.id })
+        // user is not a participant in event (display toast and redirect to home)
+        if (!isParticipant) {
+          console.error('User is not a participant of the event');
+          setSnackbar({
+            open: true,
+            content: 'You are not a participant in this event!',
+            type: 'warning',
+          })
+          navigate("/allEvents")
+        } else {
+          getEventDetails()
+          fetchChannelDetails()
+          setUser({ ...user, role, participantId: participant.id });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user role:', error);
     }
   }
-
   useEffect(() => {
-    getEventDetails()
-    fetchChannelDetails()
     fetchUserRole(Number(eventId))
   }, [eventId])
 
@@ -453,7 +471,17 @@ export default function SidebarNav(props: Props) {
                 <MenuItem onClick={handleBackToEvents}>
                   <span className="font-josefin">Back to All Events</span>
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>
+                <MenuItem onClick={() => setAlert({
+                  open: true,
+                  title: `Sure you wanna logout from this account?`,
+                  text: "This won't mean you are leaving the event, you will just logout from this account!",
+                  primaryButton: 'Yes',
+                  primaryAction: () => {
+                    handleLogout()
+                  },
+                  secondaryButton: 'No',
+                  secondaryAction: () => closeAlert()
+                })}>
                   <span className="font-josefin">Logout</span>
                 </MenuItem>
               </div>

@@ -259,6 +259,7 @@ router.post('/invite', async (req: Request, res: Response) => {
   }
 })
 
+// /event/join -> For direct invitation to the user for the event
 router.post('/join', async (req: Request, res: Response) => {
   const { userId, eventId, role } = req.body
   const status = 1
@@ -355,25 +356,31 @@ router
   .route('/user/role')
   .get(async (req: Request, res: Response) => {
     try {
-      const { userId, eventId } = req.query
+      const { userId, eventId } = req.query;
 
-      const participant = await prisma.eventParticipant.findFirstOrThrow({
+      const participant = await prisma.eventParticipant.findFirst({
         where: {
           userId: Number(userId),
           eventId: Number(eventId),
         },
-      })
+      });
 
-      return res
-        .status(200)
-        .json({
-          message: 'Role for the user fetched!',
-          role: participant.role,
-          participant,
-        })
+      if (!participant) {
+        return res.status(200).json({
+          message: 'User is not a participant of the event',
+          isParticipant: false,
+        });
+      }
+
+      return res.status(200).json({
+        message: 'Role for the user fetched!',
+        role: participant.role,
+        isParticipant: true,
+        participant,
+      });
     } catch (error) {
-      console.error(error)
-      res.status(500).json({ error: 'Failed to get user role' })
+      console.error(error);
+      res.status(500).json({ error: 'Failed to get user role' });
     }
   })
   .put(async (req: Request, res: Response) => {
