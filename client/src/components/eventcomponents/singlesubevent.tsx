@@ -9,15 +9,15 @@ import useSnackbar from '../../hooks/use-snackbar'
 import { useParams } from 'react-router-dom'
 
 const SingleSubEvent = ({ channel }) => {
-  const [setAlert, closeAlert] = useAlert();
-  const callApi = useApi();
-  const { eventId } = useParams();
-  const setSnackbar = useSnackbar();
-  const { setChannel } = useChannelStore();
+  const [setAlert, closeAlert] = useAlert()
+  const callApi = useApi()
+  const { eventId } = useParams()
+  const setSnackbar = useSnackbar()
+  const { setChannel } = useChannelStore()
   const [newGroup, setNewGroup] = useState({
-    id: "",
-    name: "",
-    desc: ""
+    id: '',
+    name: '',
+    desc: '',
   })
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -27,21 +27,16 @@ const SingleSubEvent = ({ channel }) => {
   const handleEditClose = () => {
     setEditOpen(false)
     setNewGroup({
-      id: "",
-      name: "",
-      desc: ""
+      id: '',
+      name: '',
+      desc: '',
     })
   }
 
   const createGroup = async (e, isEdit = false) => {
     e.preventDefault()
     try {
-      if (
-        !newGroup.name ||
-        !newGroup.desc ||
-        !eventId ||
-        !channel.id
-      ) {
+      if (!newGroup.name || !newGroup.desc || !eventId || !channel.id) {
         setSnackbar({
           open: true,
           content: 'Please fill all the details',
@@ -68,16 +63,16 @@ const SingleSubEvent = ({ channel }) => {
 
       if (res.status === 201) {
         setNewGroup({
-          id: "",
-          name: "",
-          desc: ""
+          id: '',
+          name: '',
+          desc: '',
         })
         setSnackbar({
           open: true,
           content: isEdit ? 'Group Details edited!' : 'Group created!',
           type: 'success',
         })
-        if (!isEdit) window.location.reload();
+        if (!isEdit) window.location.reload()
       } else {
         setSnackbar({
           open: true,
@@ -95,7 +90,6 @@ const SingleSubEvent = ({ channel }) => {
         type: 'error',
       })
     }
-
   }
 
   const handleDelete = async (group) => {
@@ -111,7 +105,7 @@ const SingleSubEvent = ({ channel }) => {
     try {
       const res = await callApi('/group', 'DELETE', {
         groupId: Number(group.groupId),
-        eventId: Number(eventId)
+        eventId: Number(eventId),
       })
       if (res.status === 200) {
         setSnackbar({
@@ -127,7 +121,7 @@ const SingleSubEvent = ({ channel }) => {
         })
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
       setSnackbar({
         open: true,
         content: 'Error deleting group, try again!',
@@ -145,7 +139,6 @@ const SingleSubEvent = ({ channel }) => {
         className="flex flex-col bg-background-extralight my-4 px-4 md:px-8 py-8 rounded-md"
       >
         <div className="flex md:flex-row flex-col justify-between items-center w-full">
-
           <p className="font-bold text-center text-xl">{channel?.name}</p>
 
           <div className="flex px-2 py-1 border border-black rounded-full">
@@ -168,7 +161,6 @@ const SingleSubEvent = ({ channel }) => {
         </div>
 
         <p className="font-xl text-black text-md">{channel?.desc}</p>
-
       </Box>
 
       <Box
@@ -185,7 +177,6 @@ const SingleSubEvent = ({ channel }) => {
           <p className="font-medium text-lg">{`${getDate(
             channel?.startTime,
           )} - ${getDate(channel?.endTime)}`}</p>
-
         </div>
       </Box>
 
@@ -204,17 +195,17 @@ const SingleSubEvent = ({ channel }) => {
         <Modal
           open={open}
           onClose={handleClose}
-          className="flex justify-center items-center"
+          className="flex justify-center items-center font-josefin"
         >
           <Box className="flex flex-col gap-2 bg-white px-4 py-4 rounded-md w-1/2 h-fit">
             <h2 className="font-semibold text-lg">Create Group</h2>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1 pt-1 pb-4">
-                <h2>
-                  Create groups for managing messages inside your channel
-                </h2>
+                <h2>Create groups for managing messages inside your channel</h2>
                 <h3>
-                  All participants who are part of channel will be able to message except for groups named (Announcements, Vendor) which are specific to user role
+                  All participants who are part of channel will be able to
+                  message except for groups named (Announcements, Vendor) which
+                  are specific to user role
                 </h3>
               </div>
               <form
@@ -222,7 +213,7 @@ const SingleSubEvent = ({ channel }) => {
                 onSubmit={createGroup}
               >
                 <input
-                  placeholder="Group Name Eg. #general"
+                  placeholder="Group Name Eg. general"
                   className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 w-2/3 text-[18px] focus:outline-none"
                   type="text"
                   value={newGroup.name}
@@ -287,15 +278,20 @@ const SingleSubEvent = ({ channel }) => {
           </Box>
         </Modal>
 
-        {channel?.GroupRelation?.map(item => (
-          <div className="flex md:flex-row flex-col justify-between text-center" key={item.id}>
-            <span className="font-medium text-lg">#{item?.Group?.name.toLowerCase()}</span>
+        {channel?.GroupRelation?.map((item) => (
+          <div
+            className="flex md:flex-row flex-col justify-between text-center"
+            key={item.id}
+          >
+            <span className="font-medium text-lg">
+              #{item?.Group?.name.toLowerCase()}
+            </span>
             <div className="flex gap-1">
               <button
                 className="hover:text-gray-500 transition-all cursor-pointer"
                 onClick={() => {
-                  setNewGroup(item.Group);
-                  handleEditOpen();
+                  setNewGroup(item.Group)
+                  handleEditOpen()
                 }}
               >
                 Edit
@@ -303,17 +299,19 @@ const SingleSubEvent = ({ channel }) => {
               <span>|</span>
               <button
                 className="hover:text-gray-500 transition-all cursor-pointer"
-                onClick={() => setAlert({
-                  open: true,
-                  title: `Are you sure you want to delete ${item?.Group?.name} group?`,
-                  text: "All messages will be deleted and won't be recovered later!",
-                  primaryButton: 'Yes',
-                  primaryAction: () => {
-                    handleDelete(item)
-                  },
-                  secondaryButton: 'No',
-                  secondaryAction: () => closeAlert()
-                })}
+                onClick={() =>
+                  setAlert({
+                    open: true,
+                    title: `Are you sure you want to delete ${item?.Group?.name} group?`,
+                    text: "All messages will be deleted and won't be recovered later!",
+                    primaryButton: 'Yes',
+                    primaryAction: () => {
+                      handleDelete(item)
+                    },
+                    secondaryButton: 'No',
+                    secondaryAction: () => closeAlert(),
+                  })
+                }
               >
                 Delete
               </button>

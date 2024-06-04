@@ -76,7 +76,7 @@ export default function SidebarNav(props: Props) {
   const { user, setUser } = useUserStore((state) => state)
   const { event, setEvent } = useEventStore((state) => state)
   const { channel, setChannel } = useChannelStore((state) => state)
-  const setSnackbar = useSnackbar();
+  const setSnackbar = useSnackbar()
   const [renderList, setRenderList] = useState('Home')
   const [selectedChannel, setSelectedChannel] = useState<ChannelType | null>(
     null,
@@ -153,7 +153,7 @@ export default function SidebarNav(props: Props) {
           getEventDetails()
           fetchChannelDetails()
           setUser({ ...user, role, participantId: participant.id })
-          if (role === "host") handleDash()
+          if (role === 'host') handleDash()
         }
       }
     } catch (error) {
@@ -517,26 +517,56 @@ export default function SidebarNav(props: Props) {
                   key={item.id}
                   className="bg-white font-medium text-lg"
                 >
-                  <ListItemText
-                    onClick={() => setRenderComponent('Groups')}
-                    disableTypography={true}
-                  >
-                    @ {item?.name?.toLowerCase()}
-                  </ListItemText>
+                  <Accordion className="!border-0 !shadow-none w-full">
+                    <AccordionSummary
+                      expandIcon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-black"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                          />
+                        </svg>
+                      }
+                      aria-controls={`panel${item.id}-content`}
+                      id={`panel${item.id}-header`}
+                    >
+                      <p className="w-32">@ {item?.name?.toLowerCase()}</p>
+                    </AccordionSummary>
+                    {item?.GroupRelation?.map((group) => (
+                      <AccordionDetails
+                        key={group.id}
+                        onClick={() => {
+                          setRenderComponent('GroupChat')
+                          setSelectedGroupId(group.id)
+                        }}
+                      >
+                        <ListItemButton
+                          key={group.id}
+                          className="ml-3 w-54 font-josefin font-md text-black"
+                          selected={
+                            selectedIndex === item.id &&
+                            selectedAccordionIndex === group.id
+                          }
+                          onClick={() => {
+                            handleChannelClick(item)
+                            handleAccordionItemClick(item.id, group.id)
+                          }}
+                        >
+                          #{group?.Group?.name.toLowerCase()}
+                        </ListItemButton>
+                      </AccordionDetails>
+                    ))}
+                  </Accordion>
                 </ListItem>
-                {item?.GroupRelation?.map((group) => (
-                  <ListItem
-                    key={group.id}
-                    onClick={() => {
-                      setRenderComponent('GroupChat')
-                      setSelectedGroupId(group.id)
-                    }}
-                  >
-                    <ListItemButton>
-                      #{group?.Group?.name.toLowerCase()}
-                    </ListItemButton>
-                  </ListItem>
-                ))}
+
                 <Divider className="m-0" />
               </List>
             ))}
@@ -744,23 +774,25 @@ export default function SidebarNav(props: Props) {
                   User Settings
                 </ListItemButton>
               </ListItem>
-              {user.role === "host" && <ListItem
-                className={`bg-white font-medium text-lg ${
-                  selectedIndex === 3 && selectedAccordionIndex === null
-                    ? 'bg-gray-200'
-                    : ''
-                }`}
-                selected={
-                  selectedIndex === 3 && selectedAccordionIndex === null
-                }
-                onClick={() => handleListItemClick(3, null)}
-              >
-                <ListItemButton
-                  onClick={() => setRenderComponent('Event Settings')}
+              {user.role === 'host' && (
+                <ListItem
+                  className={`bg-white font-medium text-lg ${
+                    selectedIndex === 3 && selectedAccordionIndex === null
+                      ? 'bg-gray-200'
+                      : ''
+                  }`}
+                  selected={
+                    selectedIndex === 3 && selectedAccordionIndex === null
+                  }
+                  onClick={() => handleListItemClick(3, null)}
                 >
-                  Event Settings
-                </ListItemButton>
-              </ListItem>}
+                  <ListItemButton
+                    onClick={() => setRenderComponent('Event Settings')}
+                  >
+                    Event Settings
+                  </ListItemButton>
+                </ListItem>
+              )}
             </List>
           )}
 
