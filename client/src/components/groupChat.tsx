@@ -19,7 +19,7 @@ import { GroupMessageType } from '../global-types/model'
 
 const BACKEND_URL = import.meta.env.VITE_SERVER || 'http://localhost:5000'
 
-export default function GroupChat({ groupId }) {
+export default function GroupChat({ group }) {
   const [socket, setSocket] = useState(null)
   const callApi = useApi()
   const { eventId } = useParams()
@@ -33,6 +33,7 @@ export default function GroupChat({ groupId }) {
   const [open, setOpen] = useState(false)
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+  const [allowMessage, setAllowMessage] = useState(false);
   const [preview, setPreview] = useState(false)
   const handleOpenPreview = () => setPreview(true)
   const handleClosePreview = () => setPreview(false)
@@ -49,18 +50,18 @@ export default function GroupChat({ groupId }) {
 
   // Join room in case of user, group connects
   useEffect(() => {
-    console.log('socket: ', socket, 'grpuid: ', groupId)
+    console.log('socket: ', socket, 'grpuid: ', group.id)
     if (socket) {
       const handleMessage = (newMessage) => {
         setMessages((prevMessages) => [...prevMessages, newMessage])
       }
 
-      socket.emit('join-group', { userId: user.id, groupId: groupId })
+      socket.emit('join-group', { userId: user.id, groupId: group.id })
       socket.on('message', handleMessage)
 
       return () => {
         socket.off('message', handleMessage)
-        socket.emit('leave-group', { userId: user.id, groupId: groupId })
+        socket.emit('leave-group', { userId: user.id, groupId: group.id })
       }
     } else {
       console.log('Error connecting socket!')
@@ -70,7 +71,7 @@ export default function GroupChat({ groupId }) {
       setMessage('')
       setMessages([])
     }
-  }, [socket, groupId])
+  }, [socket, group])
 
   // Fetch new messages
   const fetchMessages = async () => {
@@ -83,7 +84,7 @@ export default function GroupChat({ groupId }) {
     try {
       const res = await callApi('/group/message/list', 'POST', {
         eventId: Number(eventId),
-        groupId: Number(groupId),
+        groupId: Number(group.id),
       })
       if (res.status === 200) {
         console.log(res.data.messages)
@@ -96,8 +97,16 @@ export default function GroupChat({ groupId }) {
 
   // Fetch new messages
   useEffect(() => {
+    const groupName: string = group.name.toLowerCase();
+    console.log("details: ", user.role, groupName);
+
+    if (user.role === "host") setAllowMessage(true);
+    else if (user.role === "vendor" && groupName !== "announcements") setAllowMessage(true);
+    else if (groupName !== "announcements" && groupName !== "vendor") setAllowMessage(true);
+    else setAllowMessage(false);
+
     fetchMessages()
-  }, [groupId])
+  }, [group])
 
   // Scroll to bottom whenever messages changes!
   useEffect(() => {
@@ -114,7 +123,7 @@ export default function GroupChat({ groupId }) {
       userId: user.id,
       userName: user.name,
       userAvatar: user.profilePic,
-      groupId: groupId,
+      groupId: group.id,
       message,
       photoLink: photoLink,
     })
@@ -135,7 +144,7 @@ export default function GroupChat({ groupId }) {
   const handleScroll = () => {
     if (
       chatContainerRef.current?.scrollHeight -
-        Math.ceil(chatContainerRef.current?.scrollTop) <=
+      Math.ceil(chatContainerRef.current?.scrollTop) <=
       chatContainerRef.current?.clientHeight
     ) {
       setShowScroll(false)
@@ -153,53 +162,57 @@ export default function GroupChat({ groupId }) {
     let lastDate = null
     let lastSender = null
 
-    return messages?.map((item) => {
-      const messageDate = new Date(item.time).toDateString()
-      const showDate = messageDate !== lastDate
-      const showSender = item.senderId !== lastSender
-      lastDate = messageDate
-      lastSender = item.senderId
+    return messages.length > 0 ? (
+      messages?.map((item) => {
+        const messageDate = new Date(item.time).toDateString()
+        const showDate = messageDate !== lastDate
+        const showSender = item.senderId !== lastSender
+        lastDate = messageDate
+        lastSender = item.senderId
 
-      return (
-        <div key={item.id}>
-          {showDate && (
-            <div className="flex items-center gap-2 mt-4">
-              <div className="flex-grow border-gray-200 border-t"></div>
-              <p className="text-[14px] text-center text-gray-500">
-                {messageDate}
-              </p>
-              <div className="flex-grow border-gray-200 border-t"></div>
-            </div>
-          )}
-
-          {(showSender || showDate) && (
-            <div className="flex items-center gap-2 mt-4">
-              {showAvatar(item.senderAvatar, item.senderName)}
-              <p className="font-medium text-[18px]">{item.senderName} </p>
-            </div>
-          )}
-
-          <div className="flex items-end gap-2">
-            {!item?.photos || item?.photos === '' ? (
-              <p className="ml-12 text-gray-600">{item?.message}</p>
-            ) : (
-              <img
-                className="mb-2 ml-12 rounded-md w-[500px] cursor-pointer"
-                src={item?.photos}
-                alt="img"
-                onClick={() => {
-                  setShowPhoto(item?.photos)
-                  handleOpen()
-                }}
-              />
+        return (
+          <div key={item.id}>
+            {showDate && (
+              <div className="flex items-center gap-2 mt-4">
+                <div className="flex-grow border-gray-200 border-t"></div>
+                <p className="text-[14px] text-center text-gray-500">
+                  {messageDate}
+                </p>
+                <div className="flex-grow border-gray-200 border-t"></div>
+              </div>
             )}
-            <p className="text-[14px] text-gray-500">
-              {formatTime(item?.time)}
-            </p>
+
+            {(showSender || showDate) && (
+              <div className="flex items-center gap-2 mt-4">
+                {showAvatar(item.senderAvatar, item.senderName)}
+                <p className="font-medium text-[18px]">{item.senderName} </p>
+              </div>
+            )}
+
+            <div className="flex items-end gap-2">
+              {!item?.photos || item?.photos === '' ? (
+                <p className="ml-12 text-gray-600">{item?.message}</p>
+              ) : (
+                <img
+                  className="mb-2 ml-12 rounded-md w-[500px] cursor-pointer"
+                  src={item?.photos}
+                  alt="img"
+                  onClick={() => {
+                    setShowPhoto(item?.photos)
+                    handleOpen()
+                  }}
+                />
+              )}
+              <p className="text-[14px] text-gray-500">
+                {formatTime(item?.time)}
+              </p>
+            </div>
           </div>
-        </div>
-      )
-    })
+        )
+      })
+    ) : (
+      <div className="flex h-4/5 justify-center items-center opacity-50 text-md">No messages yet!</div>
+    )
   }
 
   async function HandleImage(img: File) {
@@ -219,6 +232,7 @@ export default function GroupChat({ groupId }) {
         ref={chatContainerRef}
         onScroll={handleScroll}
       >
+        <h2 className="flex justify-center items-center font-medium opacity-70 mb-4 underline">{group.desc.substring(0, 200) + "..."}</h2>
         {renderMessages()}
 
         <Modal
@@ -269,38 +283,40 @@ export default function GroupChat({ groupId }) {
           <ArrowDownward />
         </button>
       )}
-      <form
-        className="bottom-2 sticky flex items-center gap-2 bg-gray-100 px-4 py-1"
-        onSubmit={(e) => {
-          e.preventDefault()
-          sendMessage()
-        }}
-      >
-        <input
-          type="file"
-          title="upload image"
-          placeholder="upload image"
-          name="image"
-          accept="image/*"
-          id="image"
-          onChange={(e) => HandleImage(e.target.files[0])}
-          className="hidden"
-        />
-        <label htmlFor="image" className="cursor-pointer">
-          <AttachFile />
-        </label>
+      {allowMessage &&
+        <form
+          className="bottom-2 sticky flex items-center gap-2 bg-gray-100 px-4 py-1"
+          onSubmit={(e) => {
+            e.preventDefault()
+            sendMessage()
+          }}
+        >
+          <input
+            type="file"
+            title="upload image"
+            placeholder="upload image"
+            name="image"
+            accept="image/*"
+            id="image"
+            onChange={(e) => HandleImage(e.target.files[0])}
+            className="hidden"
+          />
+          <label htmlFor="image" className="cursor-pointer">
+            <AttachFile />
+          </label>
 
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="flex-1 bg-transparent px-4 py-2 rounded-lg outline-none"
-          placeholder="Type your message..."
-          type="text"
-        />
-        <Button type="submit">
-          <Send />
-        </Button>
-      </form>
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="flex-1 bg-transparent px-4 py-2 rounded-lg outline-none"
+            placeholder="Type your message..."
+            type="text"
+          />
+          <Button type="submit">
+            <Send />
+          </Button>
+        </form>
+      }
     </div>
   )
 }

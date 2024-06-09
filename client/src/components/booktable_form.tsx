@@ -32,11 +32,12 @@ const BookTableForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const { row, column, size } = formData
+    console.log("aloow dbookng: ", allowBooking.toString());
 
     try {
       const res = await callApi('/table/setup', 'POST', {
         eventId: Number(eventId),
-        bookTable: allowBooking,
+        bookTable: allowBooking.toString(),
         totalRow: row,
         totalCol: column,
         tableSize: size,
@@ -133,11 +134,12 @@ const BookTableForm = () => {
               />
             </div>
             <div className='flex flex-col gap-1'>
-              <label className="font-medium">Total Size</label>
+              <label className="font-medium">Total Tables</label>
               <input
                 className="border-primary-light bg-background-light my-1 px-2 py-1 border-b focus:border-b-2 min-w-60 md:min-w-80 text-[14px] focus:outline-none"
                 type="number"
                 min={0}
+                max={formData.row * formData.column}
                 placeholder="Enter the size of each table"
                 name="size"
                 value={formData.size}

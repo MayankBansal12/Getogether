@@ -5,17 +5,32 @@ import { ChatBubbleOutline } from '@mui/icons-material'
 import monkey from '../../assets/monkey.png'
 import { getDate } from '../../helpers/formatDate'
 import { redirect, useParams } from 'react-router-dom'
+import useSnackbar from '../../hooks/use-snackbar'
 
 const Participants = ({ participants }) => {
-  const image = monkey
   const [open, setOpen] = useState(false)
   const [rotate, setRotate] = useState(false)
+  const setSnackbar = useSnackbar()
   const { eventId } = useParams()
   const frontend = import.meta.env.VITE_CLIENT
 
   const handleClick = () => {
     setOpen(!open)
     setRotate(!rotate)
+  }
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`${frontend}/join/event/${eventId}`)
+      .then(() => {
+        setSnackbar({
+          open: true,
+          content: 'Invite Link copied!',
+          type: 'info',
+        })
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
   }
 
   const renderRole = (role: string) => {
@@ -48,9 +63,8 @@ const Participants = ({ participants }) => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className={`hover:bg-white px-2 py-2 rounded-full w-10 h-10 transition-transform duration-300 ${
-              rotate ? 'rotate-45' : ''
-            }`}
+            className={`hover:bg-white px-2 py-2 rounded-full w-10 h-10 transition-transform duration-300 ${rotate ? 'rotate-45' : ''
+              }`}
           >
             <path
               strokeLinecap="round"
@@ -64,7 +78,7 @@ const Participants = ({ participants }) => {
         <div className="border-primary-light bg-white px-4 py-10 border min-w-40 font-josefin text-center">
           <p className="py-4 text-3xl">Call your friends and family!! 📩</p>
           <p className="py-2 text-xl">You can share this invite link.</p>
-          <Link className="py-2 text-xl wrap">
+          <Link className="py-2 text-xl wrap cursor-pointer" onClick={handleCopy}>
             {frontend + '/join/event/' + eventId}
           </Link>
         </div>
@@ -78,7 +92,7 @@ const Participants = ({ participants }) => {
         >
           <div className="flex items-center gap-3">
             <Avatar
-              src={participant?.User?.profilePic}
+              src={participant?.User?.profilePic || monkey}
               sx={{ width: '60px', height: '60px' }}
             />
             <div className="flex flex-col gap-1">
@@ -89,7 +103,7 @@ const Participants = ({ participants }) => {
                 <span>{renderRole(participant?.role)}</span>
               </p>
               <span className="font-medium text-md text-primary-dull">
-                {getDate(participant?.createdDate)}
+                Joined {getDate(participant?.createdDate)}
               </span>
             </div>
           </div>
