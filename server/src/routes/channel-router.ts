@@ -3,7 +3,7 @@ import { Router, Request, Response } from "express";
 import prisma from "../db/db";
 const router = Router();
 
-// /channel -> For creating/editing that sub event 
+// /channel -> For fetching/editing that sub event 
 router.route("/")
     .post(async (req: Request, res: Response) => {
         try {
@@ -16,7 +16,15 @@ router.route("/")
                 include: {
                     ChannelService: true,
                     GroupRelation: true,
-                    ChannelParticipant: true,
+                    ChannelParticipant: {
+                        include: {
+                            EventParticipant: {
+                                include: {
+                                    User: true
+                                }
+                            }
+                        }
+                    },
                 },
             });
             if (!channel) {
@@ -92,12 +100,12 @@ router.post("/group/create", async (req: Request, res: Response) => {
 // action -> "add" or "remove"
 router.post("/user", async (req: Request, res: Response) => {
     try {
-        const { channelId, userId, action } = req.body;
+        const { channelId, participantId, action } = req.body;
 
         if (action === "add") {
             const existingParticipant = await prisma.channelParticipant.findFirst({
                 where: {
-                    participantId: userId,
+                    participantId: participantId,
                     channelId: channelId,
                 }
             });
@@ -109,7 +117,7 @@ router.post("/user", async (req: Request, res: Response) => {
             const channelParticipant = await prisma.channelParticipant.create({
                 data: {
                     channelId,
-                    participantId: userId,
+                    participantId: participantId,
                 },
             });
             return res.status(200).json({ message: "User added to channel", channelParticipant });
@@ -117,7 +125,7 @@ router.post("/user", async (req: Request, res: Response) => {
             const channelParticipant = await prisma.channelParticipant.deleteMany({
                 where: {
                     channelId,
-                    participantId: userId,
+                    participantId: participantId,
                 },
             });
             return res.status(200).json({ message: "User removed from channel!", channelParticipant });
@@ -146,7 +154,7 @@ router.get("/list", async (req: Request, res: Response) => {
         });
         const users = [];
         participants.map(participant => {
-            users.push({ ...participant?.EventParticipant?.User, "role": participant?.EventParticipant?.role })
+            users.push({ ...participant?.EventParticipant?.User, "participantId": participant?.EventParticipant?.id, "role": participant?.EventParticipant?.role })
         });
 
         return res.status(200).json({ message: "Successfully fetched all the participants!", "participants": users });

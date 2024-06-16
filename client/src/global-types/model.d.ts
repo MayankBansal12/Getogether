@@ -50,6 +50,7 @@ interface EventType {
   image: string
   date: Date
   bookTable: boolean
+  hostId: number,
   EventParticipant: EventParticipantType[]
   Photo: []
   Vendor: []
