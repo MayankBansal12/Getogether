@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react'
-import { Box, Divider, Modal } from '@mui/material'
+import monkey from '../../assets/monkey.png'
+import { Avatar, Box, Divider, Modal, Tab, Tabs } from '@mui/material'
 import Button from '../button'
 import { getDate } from '../../helpers/formatDate'
 import useApi from '../../hooks/use-api'
-import { useChannelStore } from '../../global-store/store'
+import { useEventStore } from '../../global-store/store'
 import useAlert from '../../hooks/use-alert'
 import useSnackbar from '../../hooks/use-snackbar'
 import { useParams } from 'react-router-dom'
+import { renderRole } from '../../helpers/event'
 
 const SingleSubEvent = ({ channel }) => {
   const [setAlert, closeAlert] = useAlert()
   const callApi = useApi()
   const { eventId } = useParams()
   const setSnackbar = useSnackbar()
-  const { setChannel } = useChannelStore()
+  const { event } = useEventStore()
   const [newGroup, setNewGroup] = useState({
     id: '',
     name: '',
@@ -21,6 +23,8 @@ const SingleSubEvent = ({ channel }) => {
   })
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [totalParticipants, setTotalParticipants] = useState([]);
+  const [channelParticipants, setChannelParticipants] = useState([]);
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
   const handleEditOpen = () => setEditOpen(true)
@@ -32,6 +36,10 @@ const SingleSubEvent = ({ channel }) => {
       desc: '',
     })
   }
+  const [participantOpen, setParticipantOpen] = useState(false)
+  const handleParticipantOpen = () => setParticipantOpen(true)
+  const handleParticipantClose = () => setParticipantOpen(false)
+  const [tabValue, setTabValue] = useState(0);
 
   const createGroup = async (e, isEdit = false) => {
     e.preventDefault()
@@ -131,6 +139,72 @@ const SingleSubEvent = ({ channel }) => {
     closeAlert()
   }
 
+  const addOrRemoveParticipant = async (action: string, user) => {
+    if (action === "remove" && user.id === event.hostId) {
+      setSnackbar({
+        open: true,
+        content: "Event creator can't be removed from event!",
+        type: 'warning',
+      })
+      return;
+    }
+
+    try {
+      const res = await callApi('/channel/user', 'POST', {
+        channelId: Number(channel.id),
+        participantId: Number(user?.participantId),
+        action: action
+      })
+      if (res.status === 200) {
+        fetchParticipants();
+        setSnackbar({
+          open: true,
+          content: action === "add" ? "Participant added!" : "Participant removed!",
+          type: 'success',
+        })
+      } else {
+        setSnackbar({
+          open: true,
+          content: 'Error, try again!',
+          type: 'error',
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      setSnackbar({
+        open: true,
+        content: 'Error, try again!',
+        type: 'error',
+      })
+    }
+  }
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const fetchParticipants = async () => {
+    if (channel) {
+      const channelParticipants = await callApi("/channel/list?channelId=" + channel?.id, "GET")
+      console.log("channel participants: ", channelParticipants.data.participants);
+      setChannelParticipants(channelParticipants.data.participants);
+    }
+
+    const eventParticipants = await callApi("/event/participants?eventId=" + eventId, "GET")
+    console.log("event parti: ", eventParticipants.data.users);
+    setTotalParticipants(eventParticipants.data.users);
+  }
+
+  const checkStatus = (user) => {
+    console.log("userId: ", user.id);
+    return channelParticipants?.some(participant => participant.id === user.id) || false;
+  }
+
+  useEffect(() => {
+    fetchParticipants();
+    console.log("event: ", event);
+  }, [channel])
+
   return (
     <div className="flex-col px-4 md:px-10 w-full font-josefin container">
       <Box
@@ -141,7 +215,7 @@ const SingleSubEvent = ({ channel }) => {
         <div className="flex md:flex-row flex-col justify-between items-center w-full">
           <p className="font-bold text-center text-xl">{channel?.name}</p>
 
-          <div className="flex px-2 py-1 border border-black rounded-full">
+          <button onClick={handleParticipantOpen} className="flex px-2 py-1 border border-black rounded-md cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -156,10 +230,91 @@ const SingleSubEvent = ({ channel }) => {
                 d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
               />
             </svg>
-            <span>{channel?.ChannelParticipant?.length || 0} People</span>
-          </div>
+            <span>{channelParticipants?.length || 0} People</span>
+          </button>
+          <Modal open={participantOpen}
+            onClose={handleParticipantClose}
+            className="font-josefin flex justify-center items-center">
+            <Box className="bg-white p-4 rounded-md w-1/2 h-1/2">
+              <div className="flex justify-between">
+                <h2 className="mb-4 font-semibold text-lg">{channel?.name} Participants</h2>
+                <h3>Total: {channelParticipants?.length || 0}</h3>
+              </div>
+              <Box sx={{ width: '100%' }}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
+                    <Tab label="Current Participants" />
+                    <Tab label="Add More Participants" />
+                  </Tabs>
+                </Box>
+                {tabValue === 0 ? <h2 className="text-lg font-semibold my-3">Current Participants</h2> : <h2 className="text-lg font-semibold my-3">Add Participants</h2>}
+              </Box>
+              <div className="flex flex-col gap-4 overflow-y-scroll h-[55%]">
+                {tabValue === 0 ? channelParticipants?.map((participant) => (
+                  <>
+                    <Box
+                      display={'flex'}
+                      gap={2}
+                      key={participant.id}
+                      className="flex md:flex-row flex-col justify-between items-center gap-1 md:px-2 py-1 rounded-md text-center md:text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          src={participant?.profilePic || monkey}
+                          sx={{ width: '50px', height: '50px' }}
+                        />
+                        <div className="flex flex-col gap-1">
+                          <p className="flex gap-2">
+                            <span className="font-semibold text-xl">
+                              {participant?.name}
+                            </span>
+                            <span>{renderRole(participant?.role)}</span>
+                          </p>
+                          <span className="font-medium text-sm text-primary-dull">
+                            Joined {getDate(participant?.createdDate)}
+                          </span>
+                        </div>
+                      </div>
+                      <button className="text-sm border-black border px-3 py-1 rounded-md cursor-pointer" onClick={() => addOrRemoveParticipant("remove", participant)}>Remove</button>
+                    </Box>
+                    <Divider />
+                  </>
+                )) :
+                  totalParticipants?.map((participant) => (
+                    <>
+                      <Box
+                        display={'flex'}
+                        gap={2}
+                        key={participant.id}
+                        className="flex md:flex-row flex-col justify-between items-center gap-1 md:px-2 py-1 rounded-md text-center md:text-left"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar
+                            src={participant?.profilePic || monkey}
+                            sx={{ width: '50px', height: '50px' }}
+                          />
+                          <div className="flex flex-col gap-1">
+                            <p className="flex gap-2">
+                              <span className="font-semibold text-xl">
+                                {participant?.name}
+                              </span>
+                              <span>{renderRole(participant?.role)}</span>
+                            </p>
+                            <span className="font-medium text-sm text-primary-dull">
+                              Joined {getDate(participant?.createdDate)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="pr-4 text-sm">{checkStatus(participant) ? <span>Already Added</span> : <button className="border-black border px-3 py-1 rounded-md cursor-pointer" onClick={() => addOrRemoveParticipant("add", participant)}>Add now</button>}</div>
+                      </Box>
+                      <Divider />
+                    </>
+                  ))
+                }
+              </div>
+            </Box>
+          </Modal>
         </div>
-
         <p className="font-xl text-black text-md">{channel?.desc}</p>
       </Box>
 

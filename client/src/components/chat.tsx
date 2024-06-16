@@ -192,7 +192,7 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
   const handleScroll = () => {
     if (
       chatContainerRef.current?.scrollHeight -
-        Math.ceil(chatContainerRef.current?.scrollTop) <=
+      Math.ceil(chatContainerRef.current?.scrollTop) <=
       chatContainerRef.current?.clientHeight
     ) {
       setShowScroll(false)
@@ -219,57 +219,61 @@ export default function Chat({ selectedUser, isGroup, groupId = null }) {
     let lastDate = null
     let lastSender = null
 
-    return messages?.map((item) => {
-      const messageDate = new Date(item.time).toDateString()
-      const showDate = messageDate !== lastDate
-      const showSender = item.senderId !== lastSender
-      lastDate = messageDate
-      lastSender = item.senderId
+    return messages.length > 0 ? (
+      messages?.map((item) => {
+        const messageDate = new Date(item.time).toDateString()
+        const showDate = messageDate !== lastDate
+        const showSender = item.senderId !== lastSender
+        lastDate = messageDate
+        lastSender = item.senderId
 
-      console.log('last Date ', lastDate, ' messagDate: ', messageDate)
+        console.log('last Date ', lastDate, ' messagDate: ', messageDate)
 
-      return (
-        <div key={item.id}>
-          {showDate && (
-            <div className="flex items-center gap-2 mt-4">
-              <div className="flex-grow border-gray-200 border-t"></div>
-              <p className="text-[14px] text-center text-gray-500">
-                {messageDate}
-              </p>
-              <div className="flex-grow border-gray-200 border-t"></div>
-            </div>
-          )}
-
-          {(showSender || showDate) && (
-            <div className="flex items-center gap-2 mt-4">
-              {showAvatar(item.senderId)}
-              <p className="font-medium text-[18px]">
-                {item.senderId === user.id ? user.name : participant.name}{' '}
-              </p>
-            </div>
-          )}
-
-          <div className="flex items-end gap-2">
-            {!item.photos || item.photos === '' ? (
-              <p className="ml-12 text-gray-600">{item.message}</p>
-            ) : (
-              <img
-                className="mb-2 ml-12 rounded-md w-[500px] cursor-pointer"
-                src={item.photos}
-                alt="img"
-                onClick={() => {
-                  setShowPhoto(item.photos)
-                  handleOpen()
-                }}
-              />
+        return (
+          <div key={item.id}>
+            {showDate && (
+              <div className="flex items-center gap-2 mt-4">
+                <div className="flex-grow border-gray-200 border-t"></div>
+                <p className="text-[14px] text-center text-gray-500">
+                  {messageDate}
+                </p>
+                <div className="flex-grow border-gray-200 border-t"></div>
+              </div>
             )}
-            <p className="text-[14px] text-gray-500">
-              {formatTime(item?.time)}
-            </p>
+
+            {(showSender || showDate) && (
+              <div className="flex items-center gap-2 mt-4">
+                {showAvatar(item.senderId)}
+                <p className="font-medium text-[18px]">
+                  {item.senderId === user.id ? user.name : participant.name}{' '}
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-end gap-2">
+              {!item.photos || item.photos === '' ? (
+                <p className="ml-12 text-gray-600">{item.message}</p>
+              ) : (
+                <img
+                  className="mb-2 ml-12 rounded-md w-[500px] cursor-pointer"
+                  src={item.photos}
+                  alt="img"
+                  onClick={() => {
+                    setShowPhoto(item.photos)
+                    handleOpen()
+                  }}
+                />
+              )}
+              <p className="text-[14px] text-gray-500">
+                {formatTime(item?.time)}
+              </p>
+            </div>
           </div>
-        </div>
+        )
+      }))
+      : (
+        <div className="flex h-4/5 justify-center items-center opacity-50 text-md">No messages yet, start a conversation!</div>
       )
-    })
   }
 
   async function HandleImage(img: File) {

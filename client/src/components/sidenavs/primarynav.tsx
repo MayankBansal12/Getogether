@@ -45,7 +45,7 @@ import EventSettings from '../event-settings'
 import EventPhotos from '../event-photos'
 import ChatDefault from '../chatDefault'
 import BookTableForm from '../booktable_form'
-import { ChannelType, EventType } from '../../global-types/model'
+import { ChannelType, EventType, GroupType } from '../../global-types/model'
 import GroupChat from '../groupChat'
 import useSnackbar from '../../hooks/use-snackbar'
 import useAlert from '../../hooks/use-alert'
@@ -81,7 +81,7 @@ export default function SidebarNav(props: Props) {
   const [selectedChannel, setSelectedChannel] = useState<ChannelType | null>(
     null,
   )
-  const [selectedGroupId, setSelectedGroupId] = useState<number>(0)
+  const [selectedGroup, setSelectedGroup] = useState<GroupType | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [selectedAccordionIndex, setSelectedAccordionIndex] = useState(null)
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
@@ -540,12 +540,14 @@ export default function SidebarNav(props: Props) {
                     >
                       <p className="w-32">@ {item?.name?.toLowerCase()}</p>
                     </AccordionSummary>
-                    {item?.GroupRelation?.map((group) => (
+                    {item?.GroupRelation?.sort((a, b) =>
+                      a.Group.name.toLowerCase().localeCompare(b.Group.name.toLowerCase())
+                    )?.map((group) => (
                       <AccordionDetails
                         key={group.id}
                         onClick={() => {
                           setRenderComponent('GroupChat')
-                          setSelectedGroupId(group.id)
+                          setSelectedGroup(group?.Group)
                         }}
                       >
                         <ListItemButton
@@ -577,11 +579,10 @@ export default function SidebarNav(props: Props) {
               {dashlistitems?.map((item, index) => (
                 <ListItem
                   key={index}
-                  className={`bg-white font-medium text-lg ${
-                    selectedIndex === index && selectedAccordionIndex === null
-                      ? 'bg-gray-200'
-                      : ''
-                  }`}
+                  className={`bg-white font-medium text-lg ${selectedIndex === index && selectedAccordionIndex === null
+                    ? 'bg-gray-200'
+                    : ''
+                    }`}
                   selected={
                     selectedIndex === index && selectedAccordionIndex === null
                   }
@@ -651,12 +652,11 @@ export default function SidebarNav(props: Props) {
                 event?.EventParticipant?.map((item, index) => (
                   <React.Fragment key={index}>
                     <ListItem
-                      className={`bg-white font-medium text-lg ${
-                        selectedIndex === index &&
+                      className={`bg-white font-medium text-lg ${selectedIndex === index &&
                         selectedAccordionIndex === null
-                          ? 'bg-gray-200'
-                          : ''
-                      }`}
+                        ? 'bg-gray-200'
+                        : ''
+                        }`}
                       selected={
                         selectedIndex === index &&
                         selectedAccordionIndex === null
@@ -706,11 +706,10 @@ export default function SidebarNav(props: Props) {
               {event?.Channel?.map((item, index) => (
                 <React.Fragment key={index}>
                   <ListItem
-                    className={`bg-white font-medium text-lg ${
-                      selectedIndex === index && selectedAccordionIndex === null
-                        ? 'bg-gray-200'
-                        : ''
-                    }`}
+                    className={`bg-white font-medium text-lg ${selectedIndex === index && selectedAccordionIndex === null
+                      ? 'bg-gray-200'
+                      : ''
+                      }`}
                     selected={
                       selectedIndex === index && selectedAccordionIndex === null
                     }
@@ -740,11 +739,10 @@ export default function SidebarNav(props: Props) {
           {renderList === 'Settings' && (
             <List>
               <ListItem
-                className={`bg-white font-medium text-lg ${
-                  selectedIndex === 1 && selectedAccordionIndex === null
-                    ? 'bg-gray-200'
-                    : ''
-                }`}
+                className={`bg-white font-medium text-lg ${selectedIndex === 1 && selectedAccordionIndex === null
+                  ? 'bg-gray-200'
+                  : ''
+                  }`}
                 selected={
                   selectedIndex === 1 && selectedAccordionIndex === null
                 }
@@ -758,11 +756,10 @@ export default function SidebarNav(props: Props) {
                 </ListItemButton>
               </ListItem>
               <ListItem
-                className={`bg-white font-medium text-lg ${
-                  selectedIndex === 2 && selectedAccordionIndex === null
-                    ? 'bg-gray-200'
-                    : ''
-                }`}
+                className={`bg-white font-medium text-lg ${selectedIndex === 2 && selectedAccordionIndex === null
+                  ? 'bg-gray-200'
+                  : ''
+                  }`}
                 selected={
                   selectedIndex === 2 && selectedAccordionIndex === null
                 }
@@ -776,11 +773,10 @@ export default function SidebarNav(props: Props) {
               </ListItem>
               {user.role === 'host' && (
                 <ListItem
-                  className={`bg-white font-medium text-lg ${
-                    selectedIndex === 3 && selectedAccordionIndex === null
-                      ? 'bg-gray-200'
-                      : ''
-                  }`}
+                  className={`bg-white font-medium text-lg ${selectedIndex === 3 && selectedAccordionIndex === null
+                    ? 'bg-gray-200'
+                    : ''
+                    }`}
                   selected={
                     selectedIndex === 3 && selectedAccordionIndex === null
                   }
@@ -921,7 +917,7 @@ export default function SidebarNav(props: Props) {
         {rendercomponent === '' && renderList === 'Dash' && <Default />}
         {rendercomponent === 'Groups' && renderList === 'Home' && <Groups />}
         {rendercomponent === 'GroupChat' && renderList === 'Home' && (
-          <GroupChat groupId={selectedGroupId} />
+          <GroupChat group={selectedGroup} />
         )}
         {rendercomponent === 'Participants' && (
           <Participants participants={event.EventParticipant} />

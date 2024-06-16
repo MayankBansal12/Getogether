@@ -503,6 +503,7 @@ router.route('/participants').get(async (req: Request, res: Response) => {
       users.push({
         ...participant.User,
         role: participant.role,
+        participantId: participant.id,
         inviteStatus: participant.status,
       })
     })
